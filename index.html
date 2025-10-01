@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema de Inventário - CEVA</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="home-screen" class="hidden">
+    <div class="sidebar">
+        <h3 style="color: white; text-align: center; margin-bottom: 30px;">MENU</h3>
+        <a href="#" onclick="alert('INVENTARIO clicado');">INVENTARIO</a>
+        <a href="#" onclick="alert('QUALIDADE clicado');">QUALIDADE</a>
+        <a href="#" onclick="alert('OPERAÇÃO clicado');">OPERAÇÃO</a>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <button class="logout-btn" onclick="handleLogout()">Sair</button>
+            <div class="app-name">Sistema de Inventário CEVA</div>
+            <div class="user-info-header">
+                User: <span id="user-logado"></span> <span class="status-dot"></span> Ativo
+            </div>
+        </div>
+
+        <div class="page-content">
+            <h1>Página Inicial</h1>
+            <p>Bem-vindo ao sistema, <span id="user-welcome"></span>. Use o menu lateral para navegar pelas áreas.</p>
+        </div>
+    </div>
+</div>
+
+<div id="login-cadastro-screen" class="hidden">
+    <div class="container">
+        <div id="login-block">
+            <h2>Login</h2>
+            <div class="sistema-nome">Sistema de Inventário</div>
+            <div class="form-group">
+                <label for="login-usuario">Usuário</label>
+                <input type="text" id="login-usuario" autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label for="login-senha">Senha</label>
+                <input type="password" id="login-senha" autocomplete="current-password">
+            </div>
+            <button class="btn" onclick="handleLogin()">Logar</button>
+            <span class="link" onclick="showCadastro()">Fazer Cadastro</span>
+            <div id="login-error" class="error"></div>
+        </div>
+
+        <div id="cadastro-block" class="hidden">
+            <h2>Cadastro</h2>
+            <div class="sistema-nome">Sistema de Inventário</div>
+            <div class="form-group">
+                <label for="cadastro-usuario">Usuário</label>
+                <input type="text" id="cadastro-usuario">
+            </div>
+            <div class="form-group">
+                <label for="cadastro-senha">Senha</label>
+                <input type="password" id="cadastro-senha">
+            </div>
+            <div class="form-group">
+                <label for="cadastro-confirmar">Confirmar Senha</label>
+                <input type="password" id="cadastro-confirmar">
+            </div>
+            <div class="form-group">
+                <label for="cadastro-email">Email (cevalogistics.com)</label>
+                <input type="email" id="cadastro-email">
+            </div>
+            <button class="btn" id="botao-enviar" onclick="handleEnviarCodigo()">Enviar código para email</button>
+            <div id="cadastro-email-info" class="success"></div>
+            <div class="form-group hidden" id="codigo-block">
+                <label for="cadastro-codigo">Código de validação</label>
+                <input type="number" id="cadastro-codigo" maxlength="6">
+                <button class="btn" onclick="handleValidarCodigo()">Validar Código</button>
+            </div>
+            <button class="link" style="color:red; background:none;" onclick="voltarLogin()">Voltar para Login</button>
+            <div id="cadastro-error" class="error"></div>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
