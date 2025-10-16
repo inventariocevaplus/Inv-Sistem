@@ -5,8 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const buttonText = document.getElementById('buttonText');
     const loadingIndicator = document.getElementById('loadingIndicator');
 
-    // **A URL do seu Google Apps Script foi inserida aqui.**
-    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxyTHClV4Ypa2mrPQ7Kp8rDLxZdBI-Bshc3JNv5UqU4hVhqUkOObLlBac0o2oKUmTux/exec';
+    // 🚨 COPIE O NOVO URL DO APPS SCRIPT AQUI (URL que termina em /exec)
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz7eqdwZ_GKF8UvlK_lDbT02K7uabe_SrZpmFHjLiHqVy4GblWjmnuOrLlnvdCdaihc/exec';
 
     function setLoading(isLoading) {
         logarBtn.disabled = isLoading;
@@ -15,40 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
         message.style.display = 'none';
     }
 
-    // Função de callback global que será chamada pelo Apps Script
-    // É necessário que esta função esteja acessível globalmente (na janela)
-    window.handleLoginResponse = function(result) {
-        setLoading(false);
-
-        // 1. Remove a tag <script> temporária
-        const scriptTag = document.getElementById('jsonpScript');
-        if (scriptTag) {
-            document.body.removeChild(scriptTag);
-        }
-
-        // 2. Tratamento da Resposta
-        if (result && result.success) {
-            // Login Aprovado
-            const usuario = document.getElementById('usuario').value;
-            message.textContent = `Seja bem-vindo(a), ${usuario}! Redirecionando...`;
-            message.className = 'login-message success';
-            message.style.display = 'block';
-
-            // Simula o redirecionamento
-            setTimeout(() => {
-                window.location.href = 'Menu/dashboard.html';
-            }, 1500);
-
-        } else {
-            // Login Reprovado
-            const errorMessage = result.message || 'Erro de autenticação. Tente novamente.';
-            message.textContent = errorMessage;
-            message.className = 'login-message error';
-            message.style.display = 'block';
-        }
-    };
-
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => { // Tornar função assíncrona
         e.preventDefault();
 
         const usuario = document.getElementById('usuario').value;
@@ -56,31 +23,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
         setLoading(true);
 
-        // 3. Cria a URL da requisição JSONP
+        // 1. Constrói a URL da requisição (Fetch)
         const url = new URL(APPS_SCRIPT_URL);
-        url.searchParams.append('callback', 'handleLoginResponse'); // Nome da função global
         url.searchParams.append('usuario', usuario);
         url.searchParams.append('senha', senha);
 
-        // 4. Cria e anexa a tag <script> ao documento
-        const script = document.createElement('script');
-        script.id = 'jsonpScript';
-        script.src = url.toString();
+        try {
+            // 2. Faz a requisição usando FETCH (Método moderno)
+            const response = await fetch(url.toString(), {
+                method: 'GET',
+                mode: 'cors', // Necessário para Apps Script
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
 
-        // 5. Trata falhas de rede antes mesmo de receber o callback
-        script.onerror = () => {
-            setLoading(false);
-            message.textContent = 'Erro de comunicação de rede. Verifique sua conexão.';
+            if (!response.ok) {
+                throw new Error('Falha no servidor Apps Script.');
+            }
+
+            const result = await response.json(); // Analisa o JSON
+
+            // 3. Tratamento da Resposta
+            if (result && result.success) {
+                // Login Aprovado
+                message.textContent = `Seja bem-vindo(a), ${usuario}! Redirecionando...`;
+                message.className = 'login-message success';
+                message.style.display = 'block';
+
+                setTimeout(() => {
+                    // O caminho deve ser relativo à raiz do repositório
+                    window.location.href = 'Menu/dashboard.html';
+                }, 1500);
+
+            } else {
+                // Login Reprovado
+                const errorMessage = result.message || 'Erro de autenticação. Tente novamente.';
+                message.textContent = errorMessage;
+                message.className = 'login-message error';
+                message.style.display = 'block';
+            }
+
+        } catch (error) {
+            // 4. Trata falhas de rede e CORB
+            console.error('Erro de comunicação:', error);
+            message.textContent = 'Erro de comunicação de rede ou bloqueio de segurança. Verifique sua conexão/firewall.';
             message.className = 'login-message error';
             message.style.display = 'block';
-
-            // Tenta remover a tag de script, mesmo em erro
-            const scriptTag = document.getElementById('jsonpScript');
-            if (scriptTag) {
-                document.body.removeChild(scriptTag);
-            }
-        };
-
-        document.body.appendChild(script);
+        } finally {
+            setLoading(false);
+        }
     });
 });
