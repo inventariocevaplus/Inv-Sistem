@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadingIndicator = document.getElementById('loadingIndicator');
 
     // **A URL do seu Google Apps Script foi inserida aqui.**
-    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyzFq8xk-cJHmFWSjGVwJanPhtvycymycQbaJbrSvro0lyO1Lt4yZ8SLC4u9i7SmW0q/exec';
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxyTHClV4Ypa2mrPQ7Kp8rDLxZdBI-Bshc3JNv5UqU4hVhqUkOObLlBac0o2oKUmTux/exec';
 
     function setLoading(isLoading) {
         logarBtn.disabled = isLoading;
