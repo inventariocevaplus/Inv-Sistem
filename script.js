@@ -1,12 +1,21 @@
+// =========================================================================
+// 🚨 CREDENCIAIS FINAIS DO SUPABASE (URL + ANON KEY) 🚨
+// =========================================================================
+const SUPABASE_URL = 'https://kidpprfegedkjifbwkju.supabase.co'; 
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtpZHBwcmZlZ2Vka2ppZmJ3a2p1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA1OTE5NjQsImV4cCI6MjA3NjE2Nzk2NH0.OkpgPHJtFIKyicX_qeOSMVHMk58Bppf0SzyZAPgWzLw'; 
+// =========================================================================
+
+// Inicializa o cliente Supabase
+// Nota: O objeto 'supabase' é injetado pelo <script> no index.html.
+const { createClient } = supabase;
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('loginForm');
     const message = document.getElementById('message');
     const logarBtn = document.getElementById('logarBtn');
     const buttonText = document.getElementById('buttonText');
     const loadingIndicator = document.getElementById('loadingIndicator');
-
-    // **A URL do seu Google Apps Script foi inserida aqui.**
-    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxyTHClV4Ypa2mrPQ7Kp8rDLxZdBI-Bshc3JNv5UqU4hVhqUkOObLlBac0o2oKUmTux/exec';
 
     function setLoading(isLoading) {
         logarBtn.disabled = isLoading;
@@ -15,72 +24,65 @@ document.addEventListener('DOMContentLoaded', () => {
         message.style.display = 'none';
     }
 
-    // Função de callback global que será chamada pelo Apps Script
-    // É necessário que esta função esteja acessível globalmente (na janela)
-    window.handleLoginResponse = function(result) {
-        setLoading(false);
-
-        // 1. Remove a tag <script> temporária
-        const scriptTag = document.getElementById('jsonpScript');
-        if (scriptTag) {
-            document.body.removeChild(scriptTag);
-        }
-
-        // 2. Tratamento da Resposta
-        if (result && result.success) {
-            // Login Aprovado
-            const usuario = document.getElementById('usuario').value;
-            message.textContent = `Seja bem-vindo(a), ${usuario}! Redirecionando...`;
-            message.className = 'login-message success';
-            message.style.display = 'block';
-
-            // Simula o redirecionamento
-            setTimeout(() => {
-                window.location.href = 'Menu/dashboard.html';
-            }, 1500);
-
-        } else {
-            // Login Reprovado
-            const errorMessage = result.message || 'Erro de autenticação. Tente novamente.';
-            message.textContent = errorMessage;
-            message.className = 'login-message error';
-            message.style.display = 'block';
-        }
-    };
-
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const usuario = document.getElementById('usuario').value;
-        const senha = document.getElementById('senha').value;
+        // Remove espaços em branco do usuário e senha
+        const usuario = document.getElementById('usuario').value.trim();
+        const senha = document.getElementById('senha').value.trim();
+
+        if (!usuario || !senha) {
+            message.textContent = 'Preencha todos os campos.';
+            message.className = 'login-message error';
+            message.style.display = 'block';
+            return;
+        }
 
         setLoading(true);
 
-        // 3. Cria a URL da requisição JSONP
-        const url = new URL(APPS_SCRIPT_URL);
-        url.searchParams.append('callback', 'handleLoginResponse'); // Nome da função global
-        url.searchParams.append('usuario', usuario);
-        url.searchParams.append('senha', senha);
+        try {
+            // 1. Tenta encontrar o usuário e senha na tabela 'cadastros'
+            let { data: userData, error: loginError } = await supabaseClient
+                .from('cadastros')
+                .select('usuario') 
+                .eq('usuario', usuario) 
+                .eq('senha', senha);    
 
-        // 4. Cria e anexa a tag <script> ao documento
-        const script = document.createElement('script');
-        script.id = 'jsonpScript';
-        script.src = url.toString();
+            if (loginError) throw loginError;
 
-        // 5. Trata falhas de rede antes mesmo de receber o callback
-        script.onerror = () => {
-            setLoading(false);
-            message.textContent = 'Erro de comunicação de rede. Verifique sua conexão.';
+            if (userData && userData.length > 0) {
+                // 2. Login Aprovado: Atualiza o campo 'status' para 'User Ativo'
+                const { error: updateError } = await supabaseClient
+                    .from('cadastros')
+                    .update({ status: 'User Ativo' })
+                    .eq('usuario', usuario);
+                
+                if (updateError) throw updateError;
+
+                // 3. Redirecionamento
+                message.textContent = `Seja bem-vindo(a), ${usuario}! Redirecionando...`;
+                message.className = 'login-message success';
+                message.style.display = 'block';
+
+                setTimeout(() => {
+                    window.location.href = 'Menu/dashboard.html'; 
+                }, 1500);
+
+            } else {
+                // 4. Login Reprovado
+                message.textContent = 'Usuário ou senha inválidos. Verifique suas credenciais.';
+                message.className = 'login-message error';
+                message.style.display = 'block';
+            }
+
+        } catch (error) {
+            // Trata falhas de rede, Supabase Key, ou erros do banco de dados
+            console.error('Erro no Supabase:', error.message || error);
+            message.textContent = `Erro: Não foi possível conectar ao banco de dados. ${error.message || ''}`;
             message.className = 'login-message error';
             message.style.display = 'block';
-
-            // Tenta remover a tag de script, mesmo em erro
-            const scriptTag = document.getElementById('jsonpScript');
-            if (scriptTag) {
-                document.body.removeChild(scriptTag);
-            }
-        };
-
-        document.body.appendChild(script);
+        } finally {
+            setLoading(false);
+        }
     });
 });
