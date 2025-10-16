@@ -3,32 +3,111 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CEVA - Inventário</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="menu.css">
+  <title>Inventário - CEVA Logistics</title>
+  <link rel="stylesheet" href="../style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@300;400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* Estilos específicos para a lista suspensa de Rotinas */
+    .dropdown-rotinas {
+        position: relative;
+    }
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        top: 100%; /* Posição abaixo do botão */
+        left: 0;
+        background-color: #2c3e50; /* Cor de fundo da barra lateral */
+        min-width: 100%;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+        border-radius: 4px;
+        margin-top: 5px;
+    }
+    .dropdown-content a {
+        color: #ecf0f1;
+        padding: 10px 15px;
+        text-decoration: none;
+        display: block;
+        white-space: nowrap;
+        font-size: 0.9em;
+        transition: background-color 0.2s;
+    }
+    .dropdown-content a:hover {
+        background-color: #34495e;
+    }
+    .dropdown-rotinas.open .dropdown-content {
+        display: block;
+    }
+    /* Estilos para botões bloqueados (desativados) */
+    .sidebar-item.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none; /* Impede cliques */
+    }
+    .sidebar-item.disabled a {
+        pointer-events: none;
+    }
+  </style>
 </head>
 <body>
-<div class="dashboard-container">
+<div class="app-layout">
+
   <aside class="sidebar">
+    <div class="sidebar-header">
+      <h3>CEVA Inventário</h3>
+    </div>
+    <nav class="sidebar-menu">
+
+      <div class="sidebar-item dropdown-rotinas" id="rotinasDropdown">
+        <a href="#" class="dropdown-toggle">
+          <i class="fas fa-list-ul"></i> Rotinas <i class="fas fa-chevron-down dropdown-icon"></i>
+        </a>
+        <div class="dropdown-content">
+          <a href="#" id="btnCiclico"><i class="fas fa-redo-alt"></i> Cíclico</a>
+          <a href="#" id="btnClause"><i class="fas fa-balance-scale"></i> Clause</a>
+          <a href="#" id="btnRN"><i class="fas fa-tags"></i> RN (Reserva Normal)</a>
+        </div>
+      </div>
+
+      <div class="sidebar-item disabled">
+        <a href="#">
+          <i class="fas fa-chart-line"></i> Dashboard
+        </a>
+      </div>
+
+      <div class="sidebar-item disabled">
+        <a href="#">
+          <i class="fas fa-file-alt"></i> Relatório
+        </a>
+      </div>
+
+      <div class="sidebar-item">
+        <a href="../index.html">
+          <i class="fas fa-arrow-circle-left"></i> Voltar (Sair)
+        </a>
+      </div>
+
+    </nav>
   </aside>
 
   <main class="main-content">
-    <header class="content-header">
-      <h1>Módulo de Inventário (Pendente)</h1>
-      <p>Aqui será construída a tela de gestão de estoque.</p>
-    </header>
+    <h1>Menu de Inventário</h1>
+    <p>Selecione uma rotina na barra lateral para iniciar a operação.</p>
 
-    <section class="info-card">
-      <h3>Próximos Passos (Aguardando sua solicitação):</h3>
-      <p>Nesta página, criaremos uma **tabela dinâmica** que irá:</p>
-      <ol>
-        <li>Consumir dados de uma nova aba do Sheets (ex: `ESTOQUE_ATUAL`).</li>
-        <li>Permitir filtros e exibição de informações logísticas.</li>
-      </ol>
-    </section>
-
-    <a href="dashboard.html" class="back-link">Voltar ao Dashboard</a>
   </main>
 </div>
+
+<script>
+  document.getElementById('rotinasDropdown').addEventListener('click', function() {
+      this.classList.toggle('open');
+      // Altera o ícone de seta (opcional, mas visualmente agradável)
+      const icon = this.querySelector('.dropdown-icon');
+      if (icon) {
+          icon.classList.toggle('fa-chevron-down');
+          icon.classList.toggle('fa-chevron-up');
+      }
+  });
+</script>
 </body>
 </html>
