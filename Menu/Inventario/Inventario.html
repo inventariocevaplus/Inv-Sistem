@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Inventário - CEVA Logistics</title>
 
-  <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="styleInv.css">
 
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@300;400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -19,14 +19,14 @@
     </div>
     <nav class="sidebar-menu">
 
-      <div class="sidebar-item dropdown-rotinas" id="rotinasDropdown">
+      <div class="sidebar-item dropdown-rotinas open" id="rotinasDropdown">
         <a href="#" class="dropdown-toggle">
           <i class="fas fa-list-ul"></i> Rotinas <i class="fas fa-chevron-down dropdown-icon"></i>
         </a>
         <div class="dropdown-content">
-          <a href="#" id="btnCiclico"><i class="fas fa-redo-alt"></i> Cíclico</a>
-          <a href="#" id="btnClause"><i class="fas fa-balance-scale"></i> Clause</a>
-          <a href="#" id="btnRN"><i class="fas fa-tags"></i> RN (Reserva Normal)</a>
+          <a href="Ciclico.html" id="btnCiclico"><i class="fas fa-redo-alt"></i> Cíclico</a>
+          <a href="Inventario.html" id="btnClause"><i class="fas fa-balance-scale"></i> Clause</a>
+          <a href="RN.html" id="btnRN"><i class="fas fa-tags"></i> RN </a>
         </div>
       </div>
 
@@ -43,8 +43,8 @@
       </div>
 
       <div class="sidebar-item">
-        <a href="../../index.html">
-          <i class="fas fa-arrow-circle-left"></i> Voltar (Sair)
+        <a href="../dashboard.html">
+          <i class="fas fa-arrow-circle-left"></i> Voltar (Menu)
         </a>
       </div>
 
@@ -52,23 +52,198 @@
   </aside>
 
   <main class="main-content">
-    <h1>Menu de Inventário</h1>
-    <p>Selecione uma rotina na barra lateral para iniciar a operação.</p>
+
+    <div id="defaultMessage">
+      <h1>Menu de Inventário</h1>
+      <p>Selecione uma rotina na barra lateral para iniciar a operação.</p>
+    </div>
+
+    <div id="clauseContainer" class="rotina-container" style="display:none;">
+      <header class="content-header">
+        <h1>Clause</h1>
+      </header>
+
+      <div class="search-controls">
+        <input type="text" id="searchInput" placeholder="Pesquisar por Nome do Contrato ou Analista...">
+        <button id="searchBtn" class="action-btn">
+          <i class="fas fa-search"></i> Pesquisar
+        </button>
+        <button id="addContractBtn" class="action-btn primary-action">
+          <i class="fas fa-plus"></i> Adicionar Contrato
+        </button>
+      </div>
+
+      <div id="contractsList" class="contracts-grid">
+        <p id="loadingMessage" style="color:var(--text-muted);">Carregando contratos...</p>
+      </div>
+    </div>
   </main>
 </div>
 
-<script>
-  document.getElementById('rotinasDropdown').addEventListener('click', function(event) {
-      // Previne que o link (<a>) navegue para #
-      event.preventDefault();
-      this.classList.toggle('open');
-      // Altera o ícone de seta
-      const icon = this.querySelector('.dropdown-icon');
-      if (icon) {
-          icon.classList.toggle('fa-chevron-down');
-          icon.classList.toggle('fa-chevron-up');
-      }
-  });
-</script>
+<div id="addContractModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn">&times;</span>
+    <h2>Adicionar Novo Contrato</h2>
+    <form id="addContractForm">
+
+      <div class="input-group">
+        <label for="contractName">Nome do Contrato</label>
+        <input type="text" id="contractName" required>
+      </div>
+
+      <div class="input-group">
+        <label for="contractStatus">Status</label>
+        <select id="contractStatus" required>
+          <option value="ATIVO">ATIVO</option>
+          <option value="INATIVO">INATIVO</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label for="analystName">Analista Responsável</label>
+        <input type="text" id="analystName" required>
+      </div>
+
+      <button type="submit" class="action-btn primary-action full-width-btn">
+        <i class="fas fa-save"></i> Salvar Contrato
+      </button>
+
+      <p id="formMessage" class="form-message"></p>
+    </form>
+  </div>
+</div>
+
+<div id="monthlyDataModal" class="modal">
+  <div class="modal-content large-modal">
+    <span class="close-btn">&times;</span>
+    <h2 id="monthlyModalTitle">Dados Mensais do Contrato</h2>
+    <form id="monthlyDataForm">
+
+      <input type="hidden" id="dataRecordId">
+      <input type="hidden" id="contractIdInput">
+
+      <div class="input-group">
+        <label for="monthlyContractName">Contrato (Nome)</label>
+        <input type="text" id="monthlyContractName" disabled required>
+      </div>
+
+      <div class="input-group monthly-search-group">
+        <label for="mesReferencia">Mês/Ano de Referência (MM/AAAA)</label>
+        <div class="search-input-wrapper">
+          <input type="text" id="mesReferencia" placeholder="Ex: 01/2025" required pattern="\d{2}/\d{4}" title="Formato esperado: MM/AAAA">
+          <button type="button" id="searchMonthlyDataBtn" class="action-btn small-action">
+            <i class="fas fa-search"></i> Carregar Dados
+          </button>
+        </div>
+      </div>
+
+      <div id="monthlyDataFields">
+        <hr>
+        <h3>Detalhamento do Inventário</h3>
+
+        <div class="form-grid">
+          <div class="input-group">
+            <label for="partNumbersInStock">Itens em Estoque</label>
+            <input type="number" id="partNumbersInStock" value="0" min="0">
+          </div>
+          <div class="input-group">
+            <label for="piecesInStock">Peças em Estoque</label>
+            <input type="number" id="piecesInStock" value="0" min="0">
+          </div>
+          <div class="input-group">
+            <label for="stockValue">Valor do Estoque (R$)</label>
+            <input type="number" id="stockValue" step="0.01" value="0.00">
+          </div>
+          <div class="input-group">
+            <label for="partNumbersCounted">Itens Contados</label>
+            <input type="number" id="partNumbersCounted" value="0" min="0">
+          </div>
+
+          <div class="input-group">
+            <label for="partNumbersCorrect">Itens Corretos</label>
+            <input type="number" id="partNumbersCorrect" value="0" min="0">
+          </div>
+          <div class="input-group">
+            <label for="countedValue">Valor Contado (R$)</label>
+            <input type="number" id="countedValue" step="0.01" value="0.00">
+          </div>
+          <div class="input-group">
+            <label for="positiveValue">Var. Positiva (R$)</label>
+            <input type="number" id="positiveValue" step="0.01" value="0.00">
+          </div>
+          <div class="input-group">
+            <label for="negativeValue">Var. Negativa (R$)</label>
+            <input type="number" id="negativeValue" step="0.01" value="0.00">
+          </div>
+
+          <div class="input-group">
+            <label for="grossVariationValue">Var. Bruta (R$)</label>
+            <input type="number" id="grossVariationValue" step="0.01" value="0.00">
+          </div>
+          <div class="input-group">
+            <label for="netVariationValue">Var. Líquida (R$)</label>
+            <input type="number" id="netVariationValue" step="0.01" value="0.00">
+          </div>
+          <div class="input-group">
+            <label for="netPercent">% Líquido</label>
+            <input type="number" id="netPercent" step="0.01" value="0.00">
+          </div>
+          <div class="input-group">
+            <label for="grossPercent">% Bruto</label>
+            <input type="number" id="grossPercent" step="0.01" value="0.00">
+          </div>
+
+          <div class="input-group">
+            <label for="targetNet">Target Líquido</label>
+            <input type="number" id="targetNet" step="0.01" value="0.00">
+          </div>
+          <div class="input-group">
+            <label for="accuracyItem">Ac. Item</label>
+            <input type="number" id="accuracyItem" step="0.01" value="0.00">
+          </div>
+          <div class="input-group">
+            <label for="accuracyPecas">Ac. Peças</label>
+            <input type="number" id="accuracyPecas" step="0.01" value="0.00">
+          </div>
+          <div class="input-group">
+            <label for="accuracyLocacao">Ac. Locação</label>
+            <input type="number" id="accuracyLocacao" step="0.01" value="0.00">
+          </div>
+        </div>
+
+        <div class="modal-actions-monthly">
+          <button type="button" id="cancelMonthlyBtn" class="action-btn">
+            <i class="fas fa-arrow-left"></i> Voltar
+          </button>
+          <button type="submit" class="action-btn primary-action">
+            <i class="fas fa-cloud-upload-alt"></i> Salvar Dados Mensais
+          </button>
+        </div>
+
+        <p id="monthlyFormMessage" class="form-message"></p>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="deleteConfirmModal" class="modal">
+  <div class="modal-content small-modal">
+    <span class="close-btn delete-close-btn">&times;</span>
+    <h2>Confirmar Exclusão</h2>
+
+    <p id="deleteMessage">Você tem certeza que deseja excluir este contrato? Esta ação não pode ser desfeita e deletará **todos os dados mensais** associados a ele.</p>
+
+    <div class="modal-actions">
+      <button id="cancelDeleteBtn" class="action-btn">
+        <i class="fas fa-times"></i> Não
+      </button>
+      <button id="confirmDeleteBtn" class="action-btn primary-action">
+        <i class="fas fa-trash-alt"></i> Sim, Excluir
+      </button>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="Inventario.js"></script>
 </body>
 </html>

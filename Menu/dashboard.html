@@ -4,62 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CEVA Logistics - Dashboard</title>
-    <link rel="stylesheet" href="../style.css">
-
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@300;400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="Menu.css">
 
-    <style>
-        /* Ajuste simples para o link se parecer com o botão */
-        .sidebar-nav .nav-link {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            padding: 15px 10px;
-            margin-bottom: 15px;
-            background-color: #0076a8; /* Azul CEVA */
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none; /* Remove sublinhado do link */
-            transition: background-color 0.2s, opacity 0.2s;
-            font-weight: 600;
-        }
-        .sidebar-nav .nav-link:hover {
-            background-color: #005a80;
-        }
-        .sidebar-nav .nav-link.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
-        .icon-text-wrap {
-            display: flex;
-            align-items: center;
-        }
-        .icon-text-wrap i {
-            margin-right: 10px;
-        }
-        /* Layout Básico */
-        .dashboard-container {
-            display: flex;
-            min-height: 100vh;
-        }
-        .sidebar {
-            width: 250px;
-            background-color: #2c3e50;
-            color: white;
-            flex-shrink: 0;
-            padding: 20px;
-        }
-        .main-content {
-            flex-grow: 1;
-            padding: 30px;
-            background-color: #f4f6f9;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLMDJz9T4uOQ00fH2l7p5C1F03e5w5yK0X4jCg4eT1zV9G15A5eB6o7u0s3lJ8lBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
 <div class="dashboard-container">
@@ -71,30 +19,29 @@
         </div>
 
         <nav class="sidebar-nav">
-
-            <a href="Inventario/Inventario.html" class="nav-link interactive-btn">
+            <button class="nav-button interactive-btn" id="btnInventario">
                 <span class="icon-text-wrap">
                     <i class="fas fa-boxes"></i>
                     <span>INVENTÁRIO</span>
                 </span>
-            </a>
+            </button>
 
-            <a href="#" class="nav-link disabled">
+            <button class="nav-button" disabled>
                 <span class="icon-text-wrap">
                     <i class="fas fa-user-plus"></i>
                     <span>CADASTRO</span>
                 </span>
-            </a>
+            </button>
 
-            <a href="#" class="nav-link disabled">
+            <button class="nav-button interactive-btn" id="btnPermissoes">
                 <span class="icon-text-wrap">
                     <i class="fas fa-user-shield"></i>
                     <span>PERMISSÕES</span>
                 </span>
-            </a>
+            </button>
         </nav>
 
-        <a href="../index.html" class="nav-link logout-btn" id="btnSair">
+        <a href="../index.html" class="nav-button logout-btn" id="btnSair">
             <span class="icon-text-wrap">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>SAIR</span>
@@ -109,9 +56,14 @@
         </header>
 
         <section class="info-card">
-            <h3>Próximo Módulo: INVENTÁRIO</h3>
-            <p>O login com o Supabase está sólido. Agora, ao clicar em **INVENTÁRIO**, você será direcionado para o novo menu que criamos.</p>
-            <p>Clique em **INVENTÁRIO** para testar a navegação e o novo layout!</p>
+            <h3>Instruções para a próxima etapa: Módulo INVENTÁRIO</h3>
+            <p>O módulo de **INVENTÁRIO** será o próximo foco do nosso desenvolvimento. Esta página (`inventario.html`) será o coração do nosso sistema, onde faremos o seguinte:</p>
+            <ul>
+                <li>**Exibição de Dados:** Usaremos o Apps Script/Google Sheets como nosso banco de dados.</li>
+                <li>**Funcionalidade:** Será um sistema de consulta e gestão simples de estoque.</li>
+                <li>**Próximo Passo:** Na próxima solicitação, focaremos em como criar uma tabela dinâmica na página `inventario.html` que consome dados de uma nova aba do Sheets, por exemplo, `ESTOQUE_ATUAL`.</li>
+            </ul>
+            <p>Clique em **INVENTÁRIO** para ver o redirecionamento.</p>
         </section>
     </main>
 </div>

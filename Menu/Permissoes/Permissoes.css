@@ -1,0 +1,189 @@
+/* ============================================== */
+/* ESTILOS DA TELA PERMISSÕES */
+/* ============================================== */
+
+/* Layout da Lista de Usuários */
+.user-permissions-grid {
+    display: grid;
+    /* Adapta-se ao tamanho da tela, com mínimo de 300px por coluna */
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.user-card {
+    background-color: var(--box-bg); /* Fundo branco */
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 5px solid var(--primary-color);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.user-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.user-info .user-name {
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 5px;
+}
+
+.user-info .user-role {
+    font-size: 0.9em;
+    color: var(--text-dark);
+    margin-bottom: 3px;
+}
+
+.user-info .user-status {
+    font-size: 0.8em;
+    color: var(--text-muted);
+}
+
+.user-action-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    flex-shrink: 0; /* Impede que o botão encolha */
+}
+
+.user-action-btn:hover {
+    background: var(--secondary-color);
+}
+
+/* ============================================== */
+/* ESTILOS DO MODAL (JANELA FLUTUANTE) */
+/* ============================================== */
+
+.modal {
+    /* 🚨 ESTES ESTILOS FAZEM O MODAL SER UMA JANELA FLUTUANTE */
+    display: none; /* Escondido por padrão, é ativado pelo JS */
+    position: fixed; /* Fixo na tela */
+    z-index: 1000; /* Acima de tudo */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4); /* Fundo escuro transparente */
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto; /* 5% do topo e centralizado horizontalmente */
+    padding: 30px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 700px; /* Limita o tamanho para não ser muito grande */
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    position: relative;
+    animation-name: animatetop;
+    animation-duration: 0.4s;
+}
+
+/* Animação de entrada */
+@keyframes animatetop {
+    from {top: -300px; opacity: 0}
+    to {top: 0; opacity: 1}
+}
+
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Estilos de layout do Formulário de Permissões */
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.input-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+h3 {
+    color: var(--primary-color);
+    border-bottom: 1px solid var(--secondary-color);
+    padding-bottom: 5px;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    font-size: 1.2em;
+}
+
+.permissions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.permissions-grid input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+.permission-actions-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 30px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.action-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.primary-action {
+    background-color: var(--secondary-color); /* Vermelho */
+    color: white;
+}
+
+.primary-action:hover {
+    background-color: #cc0000;
+}
+
+.secondary-action {
+    background-color: #ddd;
+    color: var(--text-dark);
+}
+
+.secondary-action:hover {
+    background-color: #ccc;
+}

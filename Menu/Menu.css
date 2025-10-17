@@ -1,4 +1,4 @@
-/* Variáveis CEVA (Importadas do style.css original, mas repetidas para clareza) */
+/* Variáveis CEVA (Mantidas) */
 :root {
     --primary-color: #051039; /* Azul Marinho */
     --secondary-color: #FF0000; /* Vermelho */
@@ -8,6 +8,18 @@
     --box-bg: #ffffff;
     --sidebar-width: 250px;
 }
+
+/* 🚨 CORREÇÃO 1: Remover as barras de rolagem */
+html, body {
+    margin: 0;
+    padding: 0;
+    /* Remove a barra horizontal (rolagem lateral) */
+    overflow-x: hidden;
+    /* Remove a barra vertical (rolagem para cima/baixo) */
+    /* ATENÇÃO: Se o conteúdo da página não couber na tela, ele será cortado! */
+    overflow-y: hidden;
+}
+
 
 /* ---------------------------------- */
 /* Layout Geral do Dashboard */
@@ -27,7 +39,7 @@
 
 .sidebar {
     width: var(--sidebar-width);
-    background-color: var(--primary-color); /* Azul Marinho principal */
+    background-color: var(--primary-color);
     color: white;
     padding: 20px 0;
     display: flex;
@@ -51,18 +63,17 @@
 }
 
 .sidebar-header .text-highlight {
-    color: var(--secondary-color); /* Destaque vermelho */
+    color: var(--secondary-color);
     font-weight: 700;
 }
 
 .sidebar-nav {
-    flex-grow: 1; /* Permite que o nav ocupe o espaço restante */
+    flex-grow: 1;
 }
 
 /* Estilo para todos os botões de navegação */
 .nav-button {
     width: 100%;
-    text-align: left;
     padding: 15px 20px;
     margin-bottom: 5px;
     background: transparent;
@@ -73,6 +84,11 @@
     cursor: pointer;
     transition: background-color 0.2s, color 0.2s;
     letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    box-sizing: border-box;
+    text-decoration: none;
 }
 
 /* Estilo para ícones e texto */
@@ -82,7 +98,7 @@
 }
 
 .icon-text-wrap i {
-    width: 25px; /* Alinha os ícones */
+    width: 25px;
     text-align: center;
     margin-right: 10px;
     font-size: 1.1em;
@@ -94,27 +110,26 @@
 }
 
 .nav-button:disabled {
-    color: rgba(255, 255, 255, 0.3); /* Botões obsoletos/inativos */
+    color: rgba(255, 255, 255, 0.3);
     cursor: not-allowed;
 }
 
-/* Botão de INVENTÁRIO (Interativo) */
+/* Botão de Destaque (Fundo Vermelho) */
 .interactive-btn {
-    background-color: var(--secondary-color); /* Cor de destaque para o botão principal */
+    background-color: var(--secondary-color);
     color: white;
     box-shadow: 0 4px 8px rgba(255, 0, 0, 0.3);
 }
 
 .interactive-btn:hover {
-    background-color: #cc0000; /* Escurece no hover */
-    /* Efeito de interatividade ao passar o mouse */
+    background-color: #cc0000;
     transform: scale(1.02);
     box-shadow: 0 6px 12px rgba(255, 0, 0, 0.5);
 }
 
 /* Botão SAIR (Fica no rodapé da sidebar) */
 .logout-btn {
-    margin-top: auto; /* Empurra para o final */
+    margin-top: auto;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     color: rgba(255, 255, 255, 0.7);
 }
@@ -129,9 +144,12 @@
 /* ---------------------------------- */
 
 .main-content {
-    margin-left: var(--sidebar-width); /* Cria espaço para a sidebar fixa */
+    margin-left: var(--sidebar-width);
     flex-grow: 1;
     padding: 30px;
+    /* 🚨 CORREÇÃO 2: Se o conteúdo principal é maior que a tela,
+       ele deve ter sua própria barra de rolagem interna, e não o body. */
+    overflow-y: auto;
 }
 
 .content-header {
@@ -153,7 +171,7 @@
     margin-top: 5px;
 }
 
-/* Cartão de Informações */
+/* Cartão de Informações (Mantido) */
 .info-card {
     background-color: var(--box-bg);
     padding: 25px;

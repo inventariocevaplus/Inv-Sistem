@@ -4,7 +4,23 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7d79809c-8bab-4b33-a110-025983aa6406" name="Changes" comment="Deploy Netlify pronto. Estrutura final e limpeza de código Flask" />
+    <list default="true" id="7d79809c-8bab-4b33-a110-025983aa6406" name="Changes" comment="Deploy Netlify pronto. Estrutura final e limpeza de código Flask">
+      <change afterPath="$PROJECT_DIR$/LoginInicial.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Menu/Inventario/Ciclico.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Menu/Inventario/styleInv.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Menu/Login.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Menu/Permissoes/Permissoes.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Menu/Permissoes/Permissoes.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Menu/Permissoes/Permissoes.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Inventario/Inventario.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Inventario.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Inventario/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Inventario.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Menu.css" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Menu.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Menu.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Menu.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/script.js" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -36,7 +52,9 @@
   &quot;associatedIndex&quot;: 6
 }</component>
   <component name="ProjectId" id="33SlWm6YW4af01vywkLQqoozEUd" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="showLibraryContents" value="true" />
   </component>
@@ -61,6 +79,7 @@
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Silvagabrieln\OneDrive - CEVA Logistics\Desktop\Inv Sistem\Inv Sistem 1.0\Menu" />
       <recent name="C:\Users\Silvagabrieln\OneDrive - CEVA Logistics\Desktop\Inv Sistem\Inv Sistem 1.0\Login\Menu" />
       <recent name="C:\Users\Silvagabrieln\OneDrive - CEVA Logistics\Desktop\Inv Sistem\Inv Sistem 1.0\Login" />
       <recent name="C:\Users\Silvagabrieln\OneDrive - CEVA Logistics\Desktop\Inv Sistem\Inv Sistem 1.0" />

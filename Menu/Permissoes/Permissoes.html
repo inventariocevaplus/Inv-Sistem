@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciamento de Permissões - CEVA Logistics</title>
+
+    <link rel="stylesheet" href="../Menu.css">
+    <link rel="stylesheet" href="Permissoes.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@300;400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+<div class="dashboard-container">
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h3 class="logo-text">CEVA <span class="text-highlight">PERMS</span></h3>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <a href="../dashboard.html" class="nav-button interactive-btn" id="btnVoltarMenu">
+                <span class="icon-text-wrap">
+                    <i class="fas fa-arrow-circle-left"></i>
+                    <span>Voltar (Menu)</span>
+                </span>
+            </a>
+
+        </nav>
+    </aside>
+
+    <main class="main-content">
+
+        <div id="permissionsContainer" class="rotina-container">
+            <header class="content-header">
+                <h1>Gerenciamento de Usuários e Permissões</h1>
+                <p>Ajuste as permissões de acesso e funções dos usuários do sistema.</p>
+            </header>
+
+            <div id="usersList" class="user-permissions-grid">
+                <p id="usersLoadingMessage" class="text-muted">Carregando usuários...</p>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<div id="editPermissionsModal" class="modal">
+    <div class="modal-content large-modal">
+        <span class="close-btn edit-close-btn">&times;</span>
+        <h2 id="modalTitle">Editar Permissões para [Nome do Usuário]</h2>
+        <form id="editPermissionsForm">
+            <h3>Função (Role)</h3>
+            <div class="input-group">
+                <label for="userRole">Nível de Acesso Rápido:</label>
+                <select id="userRole">
+                    <option value="MASTER">Master (Sem Restrições)</option>
+                    <option value="ADM">Administrador</option>
+                    <option value="OPERACAO">Operação</option>
+                </select>
+            </div>
+
+            <h3>Permissões de Ação</h3>
+            <div id="actionPermissions" class="permissions-grid"></div>
+
+            <h3>Acesso às Telas</h3>
+            <div id="screenAccess" class="permissions-grid"></div>
+
+            <div class="permission-actions-footer">
+                <button type="button" id="changePasswordBtn" class="action-btn secondary-action">
+                    <i class="fas fa-key"></i> Solicitar Troca de Senha
+                </button>
+                <button type="submit" class="action-btn primary-action">
+                    <i class="fas fa-save"></i> Salvar Permissões
+                </button>
+            </div>
+            <p id="permissionFormMessage" class="form-message"></p>
+            <input type="hidden" id="editingUserId">
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="Permissoes.js"></script>
+</body>
+</html>
