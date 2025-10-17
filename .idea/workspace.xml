@@ -4,23 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7d79809c-8bab-4b33-a110-025983aa6406" name="Changes" comment="Deploy Netlify pronto. Estrutura final e limpeza de código Flask">
-      <change afterPath="$PROJECT_DIR$/LoginInicial.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/Inventario/Ciclico.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/Inventario/styleInv.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/Login.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/Permissoes/Permissoes.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/Permissoes/Permissoes.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/Permissoes/Permissoes.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Inventario/Inventario.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Inventario.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Inventario/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Inventario.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Menu.css" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Menu.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Menu.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Menu.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/dashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/script.js" beforeDir="false" />
-    </list>
+    <list default="true" id="7d79809c-8bab-4b33-a110-025983aa6406" name="Changes" comment="Deploy Netlify pronto. Estrutura final e limpeza de código Flask" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -58,25 +42,25 @@
   <component name="ProjectViewState">
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;onboarding.tips.debug.path&quot;: &quot;C:/Users/Silvagabrieln/OneDrive - CEVA Logistics/Desktop/Inv Sistem/Inv Sistem 1.0/src/main/java/com/ceva/Main.java&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;vcs.Git&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultHtmlFileTemplate": "HTML File",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "onboarding.tips.debug.path": "C:/Users/Silvagabrieln/OneDrive - CEVA Logistics/Desktop/Inv Sistem/Inv Sistem 1.0/src/main/java/com/ceva/Main.java",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "vcs.Git"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;PLAIN_TEXT&quot;
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "PLAIN_TEXT"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\Silvagabrieln\OneDrive - CEVA Logistics\Desktop\Inv Sistem\Inv Sistem 1.0\Menu" />
