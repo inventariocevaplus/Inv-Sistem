@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relatórios - CEVA Inventário</title>
+
+  <link rel="stylesheet" href="styleCiclico.css">
+  <link rel="stylesheet" href="Relatorio.css">
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-header"><h3>CEVA Inventário</h3></div>
+    <nav class="sidebar-menu">
+      <div class="sidebar-item dropdown-rotinas" id="rotinasDropdown">
+        <a href="#" class="dropdown-toggle">
+          <i class="fas fa-list-ul"></i> Rotinas <i class="fas fa-chevron-down dropdown-icon"></i>
+        </a>
+        <div class="dropdown-content">
+          <a href="Ciclico.html" id="btnCiclico"><i class="fas fa-redo-alt"></i> Cíclico</a>
+          <a href="Inventario.html" id="btnClause"><i class="fas fa-balance-scale"></i> Clause</a>
+          <a href="RN.html" id="btnRN"><i class="fas fa-tags"></i> RN </a>
+        </div>
+      </div>
+      <div class="sidebar-item"><a href="Relatorio.html"><i class="fas fa-chart-bar"></i> Relatório</a></div>
+      <div class="sidebar-item"><a href="../dashboard.html"><i class="fas fa-arrow-circle-left"></i> Voltar (Menu)</a></div>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <div class="rotina-container">
+      <header class="grade-header">
+        <div class="header-details">
+          <h1>Geração de Relatórios</h1>
+        </div>
+      </header>
+
+      <div class="panel report-panel">
+        <div class="report-config-grid">
+
+          <div class="config-block bases-block">
+            <h2>1. Bases de Dados</h2>
+            <div class="checkbox-group" id="basesCheckboxGroup">
+              <label><input type="checkbox" name="base" value="RN" checked> RN</label>
+              <label><input type="checkbox" name="base" value="CLAUSE" checked> Clause</label>
+              <label><input type="checkbox" value="CICLICO" checked> Cíclico</label>
+            </div>
+          </div>
+
+          <div class="config-block mode-block">
+            <h2>2. Modo de Base</h2>
+            <div class="radio-group">
+              <label><input type="radio" name="mode" value="compilado" checked> Compilado</label>
+              <label><input type="radio" name="mode" value="diversas"> Diversas</label>
+            </div>
+          </div>
+
+          <div class="config-block contracts-block">
+            <h2>3. Contratos (Filtragem)</h2>
+
+            <div class="custom-select-contract-container">
+              <div class="select-styled" id="contractSelectDisplay">
+                Selecione Contrato(s)
+              </div>
+              <div class="select-options" id="contractSelectOptions">
+              </div>
+            </div>
+            <p class="small-info">Selecione os contratos para inclusão. Nomes de contratos duplicados entre as bases foram unificados.</p>
+          </div>
+
+          <div class="config-block month-year-block">
+            <h2>4. Mês/Ano (Principal)</h2>
+            <div class="select-group">
+
+              <div class="custom-select-month-container">
+                <div class="select-styled" id="monthSelectDisplay">
+                  Selecione Mês(es)
+                </div>
+                <div class="select-options" id="monthSelectOptions">
+                </div>
+              </div>
+
+              <div class="custom-select-year-container">
+                <div class="select-styled" id="yearSelectDisplay">
+                  Ano
+                </div>
+                <div class="select-options" id="yearSelectOptions">
+                </div>
+              </div>
+            </div>
+
+            <button id="generateReportBtn" class="action-btn primary-action">
+              <i class="fas fa-download"></i> Gerar Relatório
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="Relatorio.js"></script>
+</body>
+</html>

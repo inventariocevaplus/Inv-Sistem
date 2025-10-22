@@ -41,13 +41,24 @@ html, body {
     width: var(--sidebar-width);
     background-color: var(--primary-color);
     color: white;
-    padding: 20px 0;
+    /* 🚨 AJUSTE AQUI: Adicionado padding-bottom para dar espaço no final */
+    padding: 20px 0 20px 0;
     display: flex;
     flex-direction: column;
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
     position: fixed;
     height: 100%;
+    /* 🚨 NOVO: Para o conteúdo não vazar se a tela for pequena demais */
+    overflow-y: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
 }
+
+/* Esconde a barra de rolagem para navegadores Webkit */
+.sidebar::-webkit-scrollbar {
+    display: none;
+}
+
 
 .sidebar-header {
     padding: 0 20px 20px;
@@ -118,25 +129,61 @@ html, body {
 .interactive-btn {
     background-color: var(--secondary-color);
     color: white;
-    box-shadow: 0 4px 8px rgba(255, 0, 0, 0.3);
+    box-shadow: 0 0 5px rgba(255, 0, 0, 0.3);
 }
 
 .interactive-btn:hover {
     background-color: #cc0000;
-    transform: scale(1.02);
-    box-shadow: 0 6px 12px rgba(255, 0, 0, 0.5);
+    box-shadow: 0 0 8px rgba(255, 0, 0, 0.5);
 }
 
-/* Botão SAIR (Fica no rodapé da sidebar) */
-.logout-btn {
+/* ---------------------------------- */
+/* Rodapé da Sidebar (Perfil + Sair) */
+/* ---------------------------------- */
+
+.sidebar-footer {
     margin-top: auto;
+    padding-top: 10px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
+    /* 🚨 NOVO: Padding-bottom para dar espaço real do final da tela */
+    padding-bottom: 10px;
+}
+
+/* Estilos do Perfil do Usuário (Mais limpo e profissional) */
+.user-profile {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 10px 20px;
+    /* 🚨 AJUSTE AQUI: Mais espaço em baixo para separar do botão Sair */
+    margin: 0 10px 15px 10px;
+    font-size: 0.95em;
+    font-weight: 600;
+    color: white;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+.user-profile .user-icon {
+    font-size: 1.2em;
+    color: var(--secondary-color);
+    margin-right: 8px;
+}
+
+/* Botão SAIR (Ajustado para o novo rodapé) */
+.logout-btn {
+    width: 100%;
+    margin-top: 0;
+    /* 🚨 AJUSTE AQUI: Reduzido o padding para não sair da tela */
+    padding: 12px 20px;
     color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 0;
+    border-top: none;
 }
 
 .logout-btn:hover {
     color: white;
-    background-color: rgba(255, 0, 0, 0.3);
+    background-color: var(--secondary-color);
 }
 
 /* ---------------------------------- */
@@ -147,8 +194,6 @@ html, body {
     margin-left: var(--sidebar-width);
     flex-grow: 1;
     padding: 30px;
-    /* 🚨 CORREÇÃO 2: Se o conteúdo principal é maior que a tela,
-       ele deve ter sua própria barra de rolagem interna, e não o body. */
     overflow-y: auto;
 }
 

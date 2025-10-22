@@ -1,0 +1,229 @@
+/* =======================================================
+   Relatorio.css
+   Estilos específicos para a página de Geração de Relatórios
+   ======================================================= */
+
+/* Estilos de layout da área principal */
+.report-panel {
+    background-color: var(--box-bg, #ffffff);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Grid para organizar os blocos de configuração */
+.report-config-grid {
+    display: grid;
+    /* Padrão para telas menores/médias: 2 colunas */
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* Estilo para cada bloco de configuração */
+.config-block {
+    padding: 15px;
+    border: 1px solid var(--light-grey, #e0e0e0);
+    border-radius: 6px;
+    background-color: var(--light-grey, #f7f7f7);
+}
+
+.config-block h2 {
+    font-size: 1.1em;
+    color: var(--primary-color, #001f3f);
+    border-bottom: 2px solid var(--primary-color, #001f3f);
+    padding-bottom: 5px;
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+/* Estilos para grupos de Checkbox/Radio */
+.checkbox-group, .radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.checkbox-group label, .radio-group label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 0.95em;
+}
+
+.checkbox-group input, .radio-group input {
+    margin-right: 8px;
+    transform: scale(1.1);
+}
+
+/* Bloco de Contratos */
+.contracts-block {
+    grid-column: 1 / 3; /* Ocupa as duas colunas padrão */
+}
+
+/* Bloco Mês/Ano e Botão */
+.month-year-block {
+    grid-column: 1 / 3; /* Ocupa as duas colunas padrão */
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.select-group {
+    display: flex;
+    gap: 10px;
+    position: relative;
+}
+
+.form-select {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    flex-grow: 1;
+}
+
+/* ------------------------------------------- */
+/* ESTILOS DE COMPONENTES CUSTOMIZADOS (Base)  */
+/* ------------------------------------------- */
+
+.select-styled {
+    background-color: white;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 40px;
+}
+
+.select-options {
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background-color: white;
+    border: 1px solid #ccc;
+    max-height: 250px;
+    overflow-y: auto;
+    display: none;
+    padding: 0;
+    list-style: none;
+}
+
+.select-options.open {
+    display: block;
+}
+
+.select-option-item {
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.1s;
+    font-size: 0.95em;
+    display: flex;
+    align-items: center;
+}
+
+.select-option-item:hover {
+    background-color: #e9ecef;
+}
+
+.select-option-item.selected {
+    background-color: var(--primary-color-light, #cce5ff);
+    color: var(--primary-color, #001f3f);
+    font-weight: bold;
+}
+/* Fim dos estilos base de componentes customizados */
+
+
+/* ------------------------------------------- */
+/* AJUSTES ESPECÍFICOS: Mês/Ano (Abre para CIMA) */
+/* ------------------------------------------- */
+.custom-select-month-container,
+.custom-select-year-container { /* Adiciona a nova classe do Ano */
+    position: relative;
+    flex-grow: 1;
+}
+
+/* Aplica o posicionamento para cima para ambas as classes de container */
+.custom-select-month-container .select-options,
+.custom-select-year-container .select-options {
+    /* 💥 AJUSTE CHAVE REFORÇADO: Abre para CIMA */
+    bottom: 100% !important;
+    top: unset !important;
+
+    border-bottom: none;
+    box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 4px 4px 0 0;
+}
+
+
+/* ------------------------------------------- */
+/* AJUSTES ESPECÍFICOS: Contratos (Abre para BAIXO) */
+/* ------------------------------------------- */
+.custom-select-contract-container {
+    position: relative;
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+.custom-select-contract-container .select-options {
+    /* 💥 AJUSTE: Abre para BAIXO */
+    top: 100%;
+    bottom: unset; /* Garante que 'bottom' não anule o 'top' */
+    border-top: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 0 0 4px 4px; /* Arredondamento na parte de baixo */
+}
+
+.custom-select-contract-container .select-option-item {
+    padding: 8px 12px;
+    font-size: 0.9em;
+}
+
+.custom-select-contract-container .select-option-item input[type="checkbox"] {
+    margin-right: 10px;
+    transform: scale(1.1);
+}
+
+
+/* ------------------------------------------- */
+/* ESTILOS GERAIS                               */
+/* ------------------------------------------- */
+
+.primary-action {
+    padding: 10px 15px;
+    font-weight: bold;
+    font-size: 1em;
+    background-color: var(--primary-color, #001f3f);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.primary-action:hover {
+    background-color: #003366;
+}
+
+.small-info {
+    font-size: 0.8em;
+    color: var(--text-muted, #6c757d);
+    margin-top: 5px;
+}
+
+/* Ajuste de layout para telas grandes (4 colunas) */
+@media (min-width: 900px) {
+    .report-config-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    /* Redefinindo o posicionamento na grid de 4 colunas: */
+    .bases-block { grid-column: 1 / 2; }
+    .mode-block { grid-column: 2 / 3; }
+    .month-year-block { grid-column: 3 / 5; } /* Ocupa as duas colunas da direita */
+
+    /* Contratos embaixo dos dois primeiros blocos */
+    .contracts-block { grid-column: 1 / 3; }
+}

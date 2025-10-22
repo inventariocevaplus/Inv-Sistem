@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade Cíclica - [Nome do Contrato]</title>
+
+    <style>
+        :root {
+            --primary-color: #001f3f;
+            --secondary-color: #FF4136;
+            --success-color: #2ECC40;
+            --error-color: #FF4136;
+            --text-muted: #6c757d;
+            --box-bg: #ffffff;
+            --light-grey: #f0f0f0;
+        }
+
+        /* Estilos adicionais para o KPI (pode estar no Grade.css) */
+        .status-ok-kpi {
+            border-left: 5px solid var(--success-color) !important;
+        }
+    </style>
+
+    <link rel="stylesheet" href="styleCiclico.css">
+    <link rel="stylesheet" href="Grade.css">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="app-layout">
+    <aside class="sidebar">
+        <div class="sidebar-header"><h3>CEVA Inventário</h3></div>
+        <nav class="sidebar-menu">
+            <div class="sidebar-item dropdown-rotinas" id="rotinasDropdown">
+                <a href="#" class="dropdown-toggle">
+                    <i class="fas fa-list-ul"></i> Rotinas <i class="fas fa-chevron-down dropdown-icon"></i>
+                </a>
+                <div class="dropdown-content">
+                    <a href="Ciclico.html" id="btnCiclico"><i class="fas fa-redo-alt"></i> Cíclico</a>
+                    <a href="Inventario.html" id="btnClause"><i class="fas fa-balance-scale"></i> Clause</a>
+                    <a href="RN.html" id="btnRN"><i class="fas fa-tags"></i> RN </a>
+                </div>
+            </div>
+            <div class="sidebar-item"><a href="../dashboard.html"><i class="fas fa-arrow-circle-left"></i> Voltar (Menu)</a></div>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div id="gradeContainer" class="rotina-container">
+            <header class="grade-header">
+                <div class="header-details">
+                    <h1 id="gradeContractTitle">Inventário Cíclico - [Carregando Contrato]</h1>
+                </div>
+                <div class="header-actions">
+                    <button id="saveChangesBtn" class="action-btn primary-action">
+                        <i class="fas fa-save"></i> Salvar Alterações
+                    </button>
+                    <button id="backToConfigBtn" class="action-btn secondary-action">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </button>
+                </div>
+            </header>
+
+            <div class="kpi-panel panel">
+                <h2>KPIs Acumulados</h2>
+                <div class="kpi-grid">
+                    <div class="kpi-card" id="kpiRealizado">
+                        <span class="kpi-label">Realizado (%)</span>
+                        <span class="kpi-value" data-kpi="realizado-percent">0.00%</span>
+                    </div>
+                    <div class="kpi-card" id="kpiPendente">
+                        <span class="kpi-label">Pendente (%)</span>
+                        <span class="kpi-value" data-kpi="pendente-percent">0.00%</span>
+                    </div>
+                    <div class="kpi-card" id="kpiRealizadoTotal">
+                        <span class="kpi-label">Realizado (Total)</span>
+                        <span class="kpi-value" data-kpi="realizado-total">0</span>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="grade-body">
+                <div class="table-container">
+                    <table id="ciclicoGradeTable">
+                        <thead>
+                        <tr id="rowDayOfWeek">
+                            <th class="sticky-cell-header"></th>
+                        </tr>
+                        <tr id="rowDayOfMonth">
+                            <th class="sticky-cell-header"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        <tr id="rowPlano" class="row-calculated">
+                            <td class="sticky-cell"><div class="sticky-label">Plano (Loc.)</div></td>
+                        </tr>
+                        <tr id="rowPlanoAcumulado" class="row-calculated">
+                            <td class="sticky-cell"><div class="sticky-label">Acumulado Planejado</div></td>
+                        </tr>
+
+                        <tr id="rowRealizado">
+                            <td class="sticky-cell"><div class="sticky-label">Realizado (Loc.)</div></td>
+                        </tr>
+
+                        <tr id="rowLocIncorreta">
+                            <td class="sticky-cell"><div class="sticky-label">Loc. Incorretas</div></td>
+                        </tr>
+                        <tr id="rowRealizadoAcumulado" class="row-calculated">
+                            <td class="sticky-cell"><div class="sticky-label">Realizado Acumulado</div></td>
+                        </tr>
+
+                        <tr id="rowPcsCorretas">
+                            <td class="sticky-cell"><div class="sticky-label">Pçs Contadas</div></td>
+                        </tr>
+                        <tr id="rowPcsIncorretas">
+                            <td class="sticky-cell"><div class="sticky-label">Pçs Incorretas</div></td>
+                        </tr>
+
+                        <tr id="rowAcompanhamento" class="row-calculated">
+                            <td class="sticky-cell"><div class="sticky-label">Acomp. Plano (%)</div></td>
+                        </tr>
+                        </tbody>
+
+                        <tfoot>
+                        <tr id="rowStatusPlano" class="row-calculated row-total-footer">
+                            <td class="sticky-cell"><div class="sticky-label total-label">Status Plano</div></td>
+                        </tr>
+                        </tfoot>
+
+                    </table>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="Grade.js"></script>
+</body>
+</html>

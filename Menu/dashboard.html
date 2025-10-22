@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <base href='/Inv-Sistem/'>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CEVA Logistics - Dashboard</title>
@@ -15,7 +14,7 @@
     <aside class="sidebar">
         <div class="sidebar-header">
             <div class="logo-area">
-                <h1 class="logo-text">CEVA <span class="text-highlight">DASH</span></h1>
+                <h1 class="logo-text">CEVA <span class="text-highlight">MENU</span></h1>
             </div>
         </div>
 
@@ -42,12 +41,20 @@
             </button>
         </nav>
 
-        <a href="../index.html" class="nav-button logout-btn" id="btnSair">
-            <span class="icon-text-wrap">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>SAIR</span>
-            </span>
-        </a>
+        <div class="sidebar-footer">
+
+            <div class="user-profile">
+                <i class="fas fa-user-circle user-icon"></i>
+                <span id="userName">Usuário Logado</span>
+            </div>
+
+            <a href="../index.html" class="nav-button logout-btn" id="btnSair">
+                <span class="icon-text-wrap">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>SAIR</span>
+                </span>
+            </a>
+        </div>
     </aside>
 
     <main class="main-content">

@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <base href='/Inv-Sistem/'>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Inventário Cíclico - CEVA Logistics</title>
@@ -20,9 +19,9 @@
     </div>
     <nav class="sidebar-menu">
 
-      <div class="sidebar-item dropdown-rotinas open" id="rotinasDropdown">
+      <div class="sidebar-item dropdown-rotinas" id="rotinasDropdown">
         <a href="#" class="dropdown-toggle">
-          <i class="fas fa-list-ul"></i> Rotinas <i class="fas fa-chevron-up dropdown-icon"></i>
+          <i class="fas fa-list-ul"></i> Rotinas <i class="fas fa-chevron-down dropdown-icon"></i>
         </a>
         <div class="dropdown-content">
           <a href="Ciclico.html" id="btnCiclico"><i class="fas fa-redo-alt"></i> Cíclico</a>
@@ -37,8 +36,8 @@
         </a>
       </div>
 
-      <div class="sidebar-item disabled">
-        <a href="#">
+      <div class="sidebar-item">
+        <a href="Relatorio.html">
           <i class="fas fa-file-alt"></i> Relatório
         </a>
       </div>
@@ -53,14 +52,13 @@
   </aside>
 
   <main class="main-content">
-
     <div id="ciclicoContainer" class="rotina-container">
       <header class="content-header">
         <h1>Cíclico</h1>
       </header>
 
       <div class="search-controls">
-        <input type="text" id="searchInput" placeholder="Pesquisar por Endereço ou Código do Material...">
+        <input type="text" id="searchInput" placeholder="Pesquisar por Nome do Contrato ou Analista...">
         <button id="searchBtn" class="action-btn">
           <i class="fas fa-search"></i> Pesquisar
         </button>
@@ -70,10 +68,9 @@
       </div>
 
       <div id="ciclicoList" class="contracts-grid">
-        <p id="loadingMessage" style="color:var(--text-muted);">Carregando itens do inventário...</p>
+        <p id="loadingMessage" style="color:var(--text-muted);">Carregando contratos...</p>
       </div>
     </div>
-
   </main>
 </div>
 
@@ -93,7 +90,6 @@
         <select id="contractStatusCiclico" required>
           <option value="ATIVO">ATIVO</option>
           <option value="INATIVO">INATIVO</option>
-          <option value="PENDENTE">PENDENTE</option>
         </select>
       </div>
 
@@ -107,6 +103,39 @@
       </button>
 
       <p id="formMessageCiclico" class="form-message"></p>
+    </form>
+  </div>
+</div>
+
+<div id="editStatusModalCiclico" class="modal">
+  <div class="modal-content small-modal">
+    <span class="close-btn edit-status-close-btn">&times;</span>
+    <h2 id="editStatusTitleCiclico">Editar Status do Contrato</h2>
+
+    <form id="editStatusFormCiclico">
+      <input type="hidden" id="editContractIdInputCiclico">
+      <input type="hidden" id="editContractNameInputCiclico">
+
+      <p>Contrato: <strong id="currentContractNameCiclico"></strong></p>
+      <p>Status Atual: <strong id="currentStatusDisplayCiclico"></strong></p>
+
+      <div class="input-group" style="margin-top: 20px;">
+        <label for="newContractStatusCiclico">Novo Status</label>
+        <select id="newContractStatusCiclico" required>
+          <option value="ATIVO">ATIVO</option>
+          <option value="INATIVO">INATIVO</option>
+        </select>
+      </div>
+
+      <div class="modal-actions-edit">
+        <button type="button" id="cancelEditBtnCiclico" class="action-btn">
+          <i class="fas fa-times"></i> Cancelar
+        </button>
+        <button type="submit" class="action-btn primary-action">
+          <i class="fas fa-check"></i> Salvar Status
+        </button>
+      </div>
+      <p id="editStatusFormMessageCiclico" class="form-message"></p>
     </form>
   </div>
 </div>
@@ -129,20 +158,118 @@
   </div>
 </div>
 
-<script>
-  document.getElementById('rotinasDropdown').querySelector('.dropdown-toggle').addEventListener('click', function(event) {
-      event.preventDefault();
+<div id="ciclicoConfigModal" class="modal">
+  <div class="modal-content config-modal-size">
+    <span class="close-btn">&times;</span>
+    <h2>Configuração de Inventário Cíclico</h2>
 
-      const dropdown = document.getElementById('rotinasDropdown');
-      dropdown.classList.toggle('open');
+    <div class="header-info">
+      <h3 id="configContractName">Contrato: [Nome do Contrato]</h3>
+      <p class="analyst-info"><i class="fas fa-user"></i> Analista: <strong id="configAnalystName"></strong></p>
+    </div>
 
-      const icon = dropdown.querySelector('.dropdown-icon');
-      if (icon) {
-          icon.classList.toggle('fa-chevron-down');
-          icon.classList.toggle('fa-chevron-up');
-      }
-  });
-</script>
+    <form id="ciclicoConfigForm">
+      <input type="hidden" id="configContractId">
+
+      <div class="input-group-flex">
+        <div class="input-group">
+          <label for="totalLocacoes">Total de Locações (Estoque):</label>
+          <input type="number" id="totalLocacoes" min="1" required>
+        </div>
+        <div class="input-group">
+          <label for="cicloValue">Ciclo:</label>
+          <input type="number" id="cicloValue" min="1" required>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="regimeTrabalho">Regime de Trabalho:</label>
+        <select id="regimeTrabalho" required>
+          <option value="DIAS_UTEIS">Apenas Dias Úteis (Seg a Sex)</option>
+          <option value="TODOS_OS_DIAS">Todos os Dias (Inclui Sáb/Dom)</option>
+          <option value="MANUAL">Seleção Manual (Dias Específicos)</option>
+        </select>
+      </div>
+
+      <div class="input-group" id="existingGradeGroup">
+        <label for="existingGradeSelector">Grade de Referência (Opcional):</label>
+        <select id="existingGradeSelector" name="existingGradeSelector" class="custom-select">
+          <option value="">-- Selecione uma Grade Existente --</option>
+        </select>
+        <small style="color: var(--text-muted); font-size: 0.8em;">Se selecionado, ignora Locações/Ciclo e carrega a grade salva.</small>
+      </div>
+
+      <div id="monthYearSelectionGroup" class="input-group-flex" style="margin-bottom: 20px;">
+        <div class="input-group" style="flex: 1;">
+          <label for="monthSelector">Mês de Referência:</label>
+          <select id="monthSelector" required>
+          </select>
+        </div>
+        <div class="input-group" style="flex: 1;">
+          <label for="yearSelector">Ano de Referência:</label>
+          <select id="yearSelector" required>
+          </select>
+        </div>
+      </div>
+      <div class="input-group">
+        <button type="button" id="manualDaysBtn" class="action-btn full-width-btn" style="background-color: #f0f0f0; color: var(--text-dark); border: 1px solid #ced4da; display: none;">
+          <i class="fas fa-calendar-alt"></i> Selecionar Dias Manualmente
+        </button>
+      </div>
+
+      <p id="configFormMessage" class="form-message"></p>
+
+      <div class="modal-actions-config">
+        <button type="button" id="configVoltarBtn" class="action-btn secondary-action">
+          <i class="fas fa-arrow-left"></i> Fechar
+        </button>
+        <button type="submit" class="action-btn primary-action">
+          <i class="fas fa-table"></i> Gerar Grade Cíclica
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<div id="manualDaysModal" class="modal">
+  <div class="modal-content calendar-modal-size">
+    <span class="close-btn manual-close-btn">&times;</span>
+    <h2>Seleção Manual de Dias de Inventário</h2>
+
+    <p class="calendar-instruction">Clique nos dias que farão parte da contagem cíclica. Dias selecionados ficarão verdes.</p>
+
+    <div id="calendarContainer">
+      <div class="calendar-navigation">
+        <button type="button" id="prevMonth" class="nav-btn"><i class="fas fa-chevron-left"></i></button>
+        <h3 id="currentMonthTitle">Mês Atual</h3>
+        <button type="button" id="nextMonth" class="nav-btn"><i class="fas fa-chevron-right"></i></button>
+      </div>
+
+      <div class="calendar-header-days">
+        <div class="day-of-week">DOM</div>
+        <div class="day-of-week">SEG</div>
+        <div class="day-of-week">TER</div>
+        <div class="day-of-week">QUA</div>
+        <div class="day-of-week">QUI</div>
+        <div class="day-of-week">SEX</div>
+        <div class="day-of-week">SAB</div>
+      </div>
+
+      <div id="calendarGrid" class="calendar-grid">
+      </div>
+    </div>
+
+    <div class="modal-actions-manual">
+      <button type="button" id="manualVoltarBtn" class="action-btn secondary-action">
+        <i class="fas fa-arrow-left"></i> Cancelar e Voltar
+      </button>
+      <button type="button" id="manualSaveBtn" class="action-btn primary-action">
+        <i class="fas fa-check"></i> Salvar Seleção
+      </button>
+    </div>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="Ciclico.js"></script>

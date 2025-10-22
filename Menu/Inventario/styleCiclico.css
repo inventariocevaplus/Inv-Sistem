@@ -1,404 +1,619 @@
-/* Menu/Inventario/styleInv.css (CÓDIGO FINAL CORRIGIDO) */
+    /* ======================================================= */
+    /* Menu/Inventario/styleCiclico.css (CÓDIGO FINAL CONSOLIDADO) */
+    /* ======================================================= */
 
-/* ---------------------------------- */
-/* Variáveis */
-/* ---------------------------------- */
-:root {
-    --primary-color: #051039; /* Azul Marinho */
-    --secondary-color: #FF0000; /* Vermelho */
-    --background-light: #f4f7f9;
-    --text-dark: #212529;
-    --text-muted: #6c757d;
-    --box-bg: #ffffff;
-    --sidebar-width: 250px;
-}
+    /* ---------------------------------- */
+    /* Variáveis */
+    /* ---------------------------------- */
+    :root {
+        --primary-color: #051039; /* Azul Marinho */
+        --secondary-color: #FF0000; /* Vermelho */
+        --background-light: #f4f7f9;
+        --text-dark: #212529;
+        --text-muted: #6c757d;
+        --box-bg: #ffffff;
+        --sidebar-width: 250px;
+        --success-color: #155724;
+        --error-color: #721c24;
+    }
 
-/* ---------------------------------- */
-/* 🚨 CORREÇÃO PRINCIPAL: Remover barras de rolagem */
-/* ---------------------------------- */
-html, body {
-    margin: 0;
-    padding: 0;
-    /* Remove a barra horizontal */
-    overflow-x: hidden;
-    /* Remove a barra vertical do navegador */
-    overflow-y: hidden;
-    height: 100%;
-}
+    /* ---------------------------------- */
+    /* Layout Geral e Reset */
+    /* ---------------------------------- */
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
 
-/* ---------------------------------- */
-/* Layout Geral do Inventário */
-/* ---------------------------------- */
+    html, body {
+        overflow-x: hidden;
+        height: 100%;
+    }
 
-.app-layout {
-    display: flex;
-    width: 100vw;
-    min-height: 100vh;
-    font-family: 'Open Sans', sans-serif;
-    background-color: var(--background-light);
-}
+    body {
+        font-family: 'Open Sans', sans-serif;
+        background-color: var(--background-light);
+        color: var(--text-dark);
+    }
 
-/* ---------------------------------- */
-/* Sidebar (Menu Esquerdo) */
-/* ---------------------------------- */
+    .app-layout {
+        display: flex;
+        width: 100vw;
+        min-height: 100vh;
+    }
 
-.sidebar {
-    width: var(--sidebar-width);
-    background-color: var(--primary-color);
-    color: white;
-    padding: 20px 0;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
-    position: fixed;
-    height: 100vh; /* Usa a altura total da viewport */
-}
+    /* ---------------------------------- */
+    /* Sidebar (Menu Esquerdo) */
+    /* ---------------------------------- */
 
-.sidebar-header {
-    padding: 0 20px 20px;
-    margin-bottom: 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
+    .sidebar {
+        width: var(--sidebar-width);
+        background-color: var(--primary-color);
+        color: white;
+        padding: 20px 0;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+        position: fixed;
+        height: 100vh;
+        z-index: 1000;
+    }
 
-.sidebar-header h3 {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 1.4em;
-    font-weight: 600;
-    color: white;
-}
+    .sidebar-header {
+        padding: 0 20px 20px;
+        margin-bottom: 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
 
-/* ---------------------------------- */
-/* Itens do Menu */
-/* ---------------------------------- */
+    .sidebar-header h3 {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 1.4em;
+        font-weight: 600;
+        color: white;
+    }
 
-.sidebar-menu {
-    flex-grow: 1;
-}
+    /* ---------------------------------- */
+    /* Itens do Menu e Dropdown */
+    /* ---------------------------------- */
+    .sidebar-menu { flex-grow: 1; }
 
-.sidebar-item a {
-    display: flex;
-    align-items: center;
-    text-align: left;
-    padding: 15px 20px;
-    margin-bottom: 5px;
-    background: transparent;
-    border: none;
-    color: rgba(255, 255, 255, 0.85);
-    font-size: 1em;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s, color 0.2s;
-    text-decoration: none;
-}
+    .sidebar-item a {
+        display: flex;
+        align-items: center;
+        padding: 15px 20px;
+        margin-bottom: 5px;
+        color: rgba(255, 255, 255, 0.85);
+        font-weight: 600;
+        text-decoration: none;
+        transition: background-color 0.2s;
+    }
 
-.sidebar-item a i {
-    width: 25px;
-    text-align: center;
-    margin-right: 10px;
-    font-size: 1.1em;
-}
+    .sidebar-item a:hover { background-color: rgba(255, 255, 255, 0.1); }
+    .sidebar-item a i { width: 25px; text-align: center; margin-right: 10px; font-size: 1.1em; }
 
-.sidebar-item a:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: white;
-}
+    .sidebar-item.disabled { pointer-events: none; }
+    .sidebar-item.disabled a { color: rgba(255, 255, 255, 0.3); }
+    .sidebar-item.disabled a:hover { background-color: transparent; }
 
-/* Estilos para Itens Desativados */
-.sidebar-item.disabled {
-    opacity: 1;
-    color: rgba(255, 255, 255, 0.3);
-    cursor: not-allowed;
-    pointer-events: none;
-}
-.sidebar-item.disabled a {
-    color: rgba(255, 255, 255, 0.3);
-}
-.sidebar-item.disabled a:hover {
-    background-color: transparent;
-}
+    .dropdown-rotinas { background-color: var(--secondary-color); box-shadow: 0 4px 8px rgba(255, 0, 0, 0.3); }
+    .dropdown-rotinas:hover { background-color: #cc0000; }
+    .dropdown-rotinas .dropdown-toggle { display: flex; justify-content: space-between; color: white; }
+    .dropdown-content { display: none; background-color: #cc0000; box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.1); padding: 0; }
+    .dropdown-content a { padding: 10px 20px 10px 45px; font-weight: 400; background: transparent !important; }
+    .dropdown-content a:hover { background-color: #aa0000 !important; }
+    .dropdown-rotinas.open .dropdown-content { display: block; }
 
 
-/* ---------------------------------- */
-/* Estilos do Dropdown (Rotinas) */
-/* ---------------------------------- */
-.dropdown-rotinas {
-    background-color: var(--secondary-color);
-    box-shadow: 0 4px 8px rgba(255, 0, 0, 0.3);
-}
-.dropdown-rotinas:hover {
-    background-color: #cc0000;
-}
-.dropdown-rotinas .dropdown-toggle {
-    display: flex;
-    justify-content: space-between;
-    color: white;
-}
+    /* ---------------------------------- */
+    /* Conteúdo Principal (Direita) */
+    /* ---------------------------------- */
+    .main-content {
+        margin-left: var(--sidebar-width);
+        flex-grow: 1;
+        padding: 30px;
+        background-color: var(--background-light);
+        min-height: 100vh;
+        overflow-y: auto;
+        box-sizing: border-box;
+    }
 
-.dropdown-content {
-    display: none;
-    background-color: #cc0000;
-    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.1);
-    padding: 0;
-}
+    .main-content h1 {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 1.8em;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 20px;
+    }
 
-.dropdown-content a {
-    padding: 10px 20px 10px 45px;
-    font-weight: 400;
-    background: transparent !important;
-}
+    /* ========================================================= */
+    /* ESTILOS GERAIS DA ROTINA */
+    /* ========================================================= */
 
-.dropdown-content a:hover {
-    background-color: #aa0000 !important;
-}
+    .rotina-container {
+        padding: 20px;
+        background-color: var(--box-bg);
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
 
-.dropdown-rotinas.open .dropdown-content {
-    display: block;
-}
+    .search-controls {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 30px;
+        align-items: center;
+    }
 
-/* ---------------------------------- */
-/* Conteúdo Principal (Direita) */
-/* ---------------------------------- */
+    #searchInput {
+        flex-grow: 1;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 1em;
+    }
 
-.main-content {
-    margin-left: var(--sidebar-width);
-    flex-grow: 1;
-    padding: 30px;
-    background-color: var(--background-light);
+    .action-btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background-color 0.2s;
+        background-color: var(--primary-color);
+        color: white;
+    }
+    .action-btn i { margin-right: 5px; }
 
-    /* 🚨 CORREÇÃO: Adiciona rolagem APENAS ao conteúdo, mantendo a sidebar fixa */
-    height: 100vh;
-    overflow-y: auto;
-    box-sizing: border-box; /* Garante que padding não cause overflow */
-}
-
-.main-content h1 {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 1.8em;
-    font-weight: 700;
-    color: var(--primary-color);
-    margin-bottom: 20px;
-}
-
-/* ========================================================= */
-/* NOVOS ESTILOS PARA ROTINA CLAUSE (MANTIDOS) */
-/* ========================================================= */
-
-.rotina-container {
-    padding: 20px;
-    background-color: var(--box-bg);
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-}
-
-.search-controls {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 30px;
-    align-items: center;
-}
-
-#searchInput {
-    flex-grow: 1;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 1em;
-}
-
-.action-btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background-color 0.2s, opacity 0.2s;
-    background-color: var(--primary-color);
-    color: white;
-}
-.action-btn i { margin-right: 5px; }
-
-.action-btn:hover {
-    background-color: #030825;
-}
-
-.primary-action {
-    background-color: var(--secondary-color); /* Vermelho */
-}
-.primary-action:hover {
-    background-color: #cc0000;
-}
-.full-width-btn { width: 100%; margin-top: 20px; }
+    .action-btn:hover { background-color: #030825; }
+    .primary-action { background-color: var(--secondary-color); }
+    .primary-action:hover { background-color: #cc0000; }
+    .full-width-btn { width: 100%; margin-top: 20px; }
 
 
-/* ---------------------------------- */
-/* ESTILOS DO GRID DE CONTRATOS (MANTIDOS) */
-/* ---------------------------------- */
-.contracts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 20px;
-    margin-top: 20px;
-}
+    /* ---------------------------------- */
+    /* ESTILOS DO GRID DE CONTRATOS/ITENS */
+    /* ---------------------------------- */
+    .contracts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+    }
 
-.contract-card {
-    background-color: var(--box-bg);
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-    overflow: hidden;
-    position: relative;
-    padding: 20px;
-}
+    .contract-card {
+        background-color: var(--box-bg);
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        overflow: hidden;
+        position: relative;
+        padding: 20px;
+    }
 
-.contract-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-}
+    .contract-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    }
 
-/* NOVO ESTILO: Botão de exclusão (X) */
-.delete-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    color: var(--text-muted);
-    background: none;
-    border: none;
-    font-size: 1.1em;
-    cursor: pointer;
-    transition: color 0.2s;
-    padding: 5px;
-    line-height: 1;
-    z-index: 10;
-}
+    /* --- AÇÕES DO CARD (Engrenagem e X) --- */
+    .card-actions {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        display: flex;
+        gap: 5px;
+        z-index: 10;
+    }
 
-.delete-btn:hover {
-    color: var(--secondary-color); /* Vermelho no hover */
-}
+    .card-actions button {
+        background: none;
+        border: none;
+        font-size: 1.1em;
+        cursor: pointer;
+        padding: 5px;
+        line-height: 1;
+        transition: color 0.2s;
+    }
 
+    .edit-status-btn {
+        color: var(--primary-color); /* Cor da engrenagem */
+    }
+    .edit-status-btn:hover {
+        color: #030825;
+    }
 
-.contract-name {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    font-size: 1.2em;
-    color: var(--primary-color);
-    text-align: center;
-    margin-top: 5px;
-    margin-bottom: 15px;
-}
-
-.contract-analyst {
-    font-size: 0.85em;
-    color: var(--text-muted);
-    text-align: right;
-    margin-top: 5px;
-}
-
-.status-bar {
-    height: 5px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-}
-
-.status-bar.ATIVO { background-color: #28a745; } /* Verde para ATIVO */
-.status-bar.INATIVO { background-color: var(--secondary-color); } /* Vermelho para INATIVO */
+    .delete-btn {
+        color: var(--text-muted);
+    }
+    .delete-btn:hover {
+        color: var(--secondary-color);
+    }
+    /* ------------------------------------ */
 
 
-/* ---------------------------------- */
-/* ESTILOS GERAIS DO MODAL (POP-UP) - MANTIDOS */
-/* ---------------------------------- */
+    .contract-name {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 700;
+        font-size: 1.2em;
+        color: var(--primary-color);
+        text-align: center;
+        margin-top: 5px;
+        margin-bottom: 15px;
+    }
 
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.6);
-}
+    .contract-analyst {
+        font-size: 0.85em;
+        color: var(--text-muted);
+        text-align: right;
+        margin-top: 5px;
+    }
 
-.modal-content {
-    background-color: #fefefe;
-    margin: 10% auto;
-    padding: 30px;
-    border-radius: 10px;
-    width: 90%;
-    max-width: 500px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    position: relative;
-}
+    /* Status Bar */
+    .status-bar {
+        height: 5px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+    }
 
-.close-btn {
-    color: var(--text-muted);
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-}
-
-.close-btn:hover,
-.close-btn:focus {
-    color: var(--secondary-color);
-    text-decoration: none;
-    cursor: pointer;
-}
-
-/* Estilos do Formulário no Modal */
-.input-group {
-    margin-bottom: 20px;
-}
-.input-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: var(--primary-color);
-}
-.input-group input, .input-group select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    box-sizing: border-box;
-}
-
-.form-message {
-    text-align: center;
-    margin-top: 15px;
-    padding: 10px;
-    border-radius: 5px;
-    display: none;
-}
-.form-message.success { background-color: #d4edda; color: #155724; }
-.form-message.error { background-color: #f8d7da; color: #721c24; }
+    .status-bar.ATIVO { background-color: #28a745; } /* Verde */
+    .status-bar.INATIVO { background-color: var(--secondary-color); } /* Vermelho */
+    .status-bar.PENDENTE { background-color: #ffc107; } /* Amarelo */
+    .status-bar.CONCLUIDO { background-color: #007bff; } /* Azul */
 
 
-/* ---------------------------------- */
-/* ESTILOS ESPECÍFICOS DO MODAL DE CONFIRMAÇÃO (MANTIDOS) */
-/* ---------------------------------- */
-.small-modal {
-    max-width: 400px;
-    text-align: center;
-}
+    /* ---------------------------------- */
+    /* ESTILOS GERAIS DO MODAL (POP-UP) */
+    /* ---------------------------------- */
 
-#deleteMessage {
-    margin: 20px 0;
-    font-size: 1.1em;
-    color: var(--text-dark);
-}
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 2000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.6);
+        backdrop-filter: blur(2px);
+    }
 
-.modal-actions {
-    display: flex;
-    justify-content: space-around;
-    gap: 15px;
-    margin-top: 25px;
-}
-.modal-actions .action-btn {
-    width: 100%;
-}
-.modal-actions .primary-action {
-    background-color: var(--secondary-color);
-}
+    .modal-content {
+        background-color: #fefefe;
+        margin: 10% auto;
+        padding: 30px;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        position: relative;
+    }
+
+    .small-modal {
+        max-width: 400px;
+        text-align: center;
+        margin-top: 15%;
+    }
+
+    .modal-content h2 {
+        color: var(--primary-color);
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+
+    .close-btn {
+        color: var(--text-muted);
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .close-btn:hover {
+        color: var(--secondary-color);
+    }
+
+    /* Estilos do Formulário no Modal */
+    .input-group {
+        margin-bottom: 20px;
+    }
+    .input-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: var(--primary-color);
+        text-align: left;
+    }
+    .input-group input, .input-group select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        box-sizing: border-box;
+        text-align: left;
+    }
+
+    /* Flexbox para Agrupar Inputs no Modal de Configuração */
+    .input-group-flex {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+    .input-group-flex .input-group {
+        flex-grow: 1;
+        margin-bottom: 0;
+    }
+
+
+    .form-message {
+        text-align: center;
+        margin-top: 15px;
+        padding: 10px;
+        border-radius: 5px;
+        display: none;
+    }
+    .form-message.success { background-color: #d4edda; color: var(--success-color); }
+    .form-message.error { background-color: #f8d7da; color: var(--error-color); }
+
+
+    /* Estilos Específicos dos botões de Ação (Confirmação e Edição Rápida) */
+    #deleteMessage {
+        margin: 20px 0;
+        font-size: 1.1em;
+        color: var(--text-dark);
+    }
+
+    .modal-actions, .modal-actions-edit, .modal-actions-manual {
+        display: flex;
+        justify-content: space-around;
+        gap: 15px;
+        margin-top: 25px;
+    }
+    .modal-actions .action-btn, .modal-actions-edit .action-btn, .modal-actions-manual .action-btn {
+        width: 100%;
+    }
+    .modal-actions .primary-action, .modal-actions-edit .primary-action, .modal-actions-manual .primary-action {
+        background-color: var(--secondary-color);
+    }
+
+    /* ======================================================= */
+    /* ESTILOS PARA O NOVO MODAL DE CONFIGURAÇÃO DO CÍCLICO */
+    /* ======================================================= */
+
+    .config-modal-size {
+        max-width: 650px;
+        width: 90%;
+    }
+
+    .header-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0 20px 0;
+        border-bottom: 1px solid #e9ecef;
+        margin-bottom: 20px;
+    }
+
+    .header-info h3 {
+        font-size: 1.2em;
+        color: var(--primary-color);
+        margin: 0;
+        font-weight: 700;
+    }
+
+    /* 🚨 Ajuste: Fundo Azul e Texto Branco para a info do Analista */
+    .analyst-info {
+        display: flex;
+        align-items: center;
+        font-size: 0.9em;
+        background-color: var(--primary-color);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+    }
+
+    /* 🚨 Ajuste: Ícone Branco */
+    .analyst-info i {
+        margin-right: 5px;
+        font-size: 1.1em;
+        color: white;
+    }
+
+    /* Botão "Selecionar Dias Manualmente" */
+    #manualDaysBtn {
+        background-color: #f0f0f0 !important;
+        color: var(--text-dark) !important;
+        border: 1px solid #ced4da !important;
+        width: 100%;
+        padding: 10px 20px;
+        margin-top: 5px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        font-weight: 600;
+    }
+
+    #manualDaysBtn:hover {
+        background-color: #e2e6ea !important;
+    }
+
+    /* NOVO: Ações (Voltar e Salvar) no Modal de Configuração */
+    .modal-actions-config {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .modal-actions-config .action-btn {
+        flex-grow: 1;
+        padding: 12px;
+    }
+
+    /* 🚨 Ajuste: O botão principal "Gerar Grade Cíclica" deve ser AZUL */
+    .modal-actions-config .primary-action {
+        background-color: var(--primary-color) !important;
+    }
+    .modal-actions-config .primary-action:hover {
+        background-color: #030825 !important;
+    }
+
+
+    .modal-actions-config .secondary-action {
+        background-color: var(--text-muted);
+        color: white;
+    }
+    .modal-actions-config .secondary-action:hover {
+        background-color: #5a6268;
+    }
+
+
+    /* ======================================================= */
+    /* ESTILOS PARA O CALENDÁRIO MENSAL E PEQUENO */
+    /* ======================================================= */
+
+    .calendar-modal-size {
+        max-width: 500px;
+        margin-top: 5%;
+    }
+
+    .calendar-instruction {
+        font-size: 0.9em;
+        color: var(--text-muted);
+        margin-bottom: 20px;
+        padding-top: 10px;
+        border-top: 1px dashed #eee;
+    }
+
+    /* Navegação do Mês */
+    .calendar-navigation {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding: 0 10px;
+    }
+
+    #currentMonthTitle {
+        font-size: 1.2em;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin: 0;
+    }
+
+    .nav-btn {
+        background: none;
+        border: none;
+        color: var(--secondary-color);
+        font-size: 1.2em;
+        cursor: pointer;
+        padding: 5px;
+        transition: color 0.2s;
+    }
+
+    .nav-btn:hover {
+        color: var(--primary-color);
+    }
+
+    /* Header: Dias da Semana */
+    .calendar-header-days {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        text-align: center;
+        font-weight: 700;
+        color: var(--primary-color);
+        padding: 5px 0;
+        border-bottom: 2px solid #ddd;
+        margin-bottom: 5px;
+    }
+
+    .day-of-week {
+        font-size: 0.8em;
+    }
+
+    /* Grid de Dias */
+    .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 3px;
+    }
+
+    .calendar-day {
+        padding: 5px 0;
+        aspect-ratio: 1 / 1;
+        font-size: 0.8em;
+        font-weight: 600;
+        text-align: center;
+        border: 1px solid #eee;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.15s, color 0.15s;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .calendar-day .day-number {
+        font-size: 1em;
+    }
+
+    .calendar-day.selected {
+        background-color: #28a745;
+        color: white;
+        border-color: #1e7e34;
+    }
+
+    .calendar-day.empty-day {
+        visibility: hidden;
+        cursor: default;
+        background-color: transparent;
+        border: none;
+    }
+
+
+    /* ---------------------------------- */
+    /* Media Queries (Responsividade) */
+    /* ---------------------------------- */
+    @media (max-width: 768px) {
+        .sidebar { width: 100%; height: auto; position: relative; }
+        .main-content { margin-left: 0; padding: 20px; }
+        .contracts-grid {
+            grid-template-columns: 1fr;
+        }
+        .search-controls {
+            flex-direction: column;
+            gap: 10px;
+        }
+        .search-controls button, .search-controls input {
+            width: 100%;
+        }
+        .modal-content { margin: 5% auto; }
+
+        .input-group-flex {
+            flex-direction: column;
+            gap: 0;
+        }
+        .input-group-flex .input-group {
+            margin-bottom: 20px;
+        }
+        .header-info {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+    }
+    @media (max-width: 550px) {
+        .calendar-modal-size {
+            max-width: 95%;
+        }
+        .calendar-day {
+            font-size: 0.7em;
+            padding: 4px 0;
+        }
+        .day-of-week {
+            font-size: 0.65em;
+        }
+    }

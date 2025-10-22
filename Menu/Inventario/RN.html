@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <base href='/Inv-Sistem/'>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RN  - CEVA Logistics</title>
+  <title>RN - CEVA Logistics</title>
 
   <link rel="stylesheet" href="styleRN.css">
 
@@ -20,9 +19,9 @@
     </div>
     <nav class="sidebar-menu">
 
-      <div class="sidebar-item dropdown-rotinas open" id="rotinasDropdown">
+      <div class="sidebar-item dropdown-rotinas" id="rotinasDropdown">
         <a href="#" class="dropdown-toggle">
-          <i class="fas fa-list-ul"></i> Rotinas <i class="fas fa-chevron-up dropdown-icon"></i>
+          <i class="fas fa-list-ul"></i> Rotinas <i class="fas fa-chevron-down dropdown-icon"></i>
         </a>
         <div class="dropdown-content">
           <a href="Ciclico.html" id="btnCiclico"><i class="fas fa-redo-alt"></i> Cíclico</a>
@@ -37,8 +36,8 @@
         </a>
       </div>
 
-      <div class="sidebar-item disabled">
-        <a href="#">
+      <div class="sidebar-item">
+        <a href="Relatorio.html">
           <i class="fas fa-file-alt"></i> Relatório
         </a>
       </div>
@@ -56,11 +55,11 @@
 
     <div id="rnContainer" class="rotina-container">
       <header class="content-header">
-        <h1>RN </h1>
+        <h1>RN</h1>
       </header>
 
       <div class="search-controls">
-        <input type="text" id="searchInput" placeholder="Pesquisar por Número da Reserva ou Endereço...">
+        <input type="text" id="searchInput" placeholder="Pesquisar por Nome do Contrato ou Analista...">
         <button id="searchBtn" class="action-btn">
           <i class="fas fa-search"></i> Pesquisar
         </button>
@@ -70,7 +69,7 @@
       </div>
 
       <div id="rnList" class="contracts-grid">
-        <p id="loadingMessage" style="color:var(--text-muted);">Carregando reservas normais...</p>
+        <p id="loadingMessage" style="color:var(--text-muted);">Carregando contratos...</p>
       </div>
     </div>
 
@@ -91,9 +90,8 @@
       <div class="input-group">
         <label for="contractStatusRN">Status</label>
         <select id="contractStatusRN" required>
-          <option value="ATIVA">ATIVA</option>
-          <option value="INATIVA">INATIVA</option>
-          <option value="BAIXADA">BAIXADA</option>
+          <option value="ATIVO">ATIVO</option>
+          <option value="INATIVO">INATIVO</option>
         </select>
       </div>
 
@@ -103,10 +101,43 @@
       </div>
 
       <button type="submit" class="action-btn primary-action full-width-btn">
-        <i class="fas fa-save"></i> Salvar Reserva
+        <i class="fas fa-save"></i> Salvar RN
       </button>
 
       <p id="formMessageRN" class="form-message"></p>
+    </form>
+  </div>
+</div>
+
+<div id="editStatusModalRN" class="modal">
+  <div class="modal-content small-modal">
+    <span class="close-btn edit-status-close-btn">&times;</span>
+    <h2 id="editStatusTitleRN">Editar Status da RN</h2>
+
+    <form id="editStatusFormRN">
+      <input type="hidden" id="editContractIdInputRN">
+      <input type="hidden" id="editContractNameInputRN">
+
+      <p>RN: <strong id="currentContractNameRN"></strong></p>
+      <p>Status Atual: <strong id="currentStatusDisplayRN"></strong></p>
+
+      <div class="input-group" style="margin-top: 20px;">
+        <label for="newContractStatusRN">Novo Status</label>
+        <select id="newContractStatusRN" required>
+          <option value="ATIVO">ATIVO</option>
+          <option value="INATIVO">INATIVO</option>
+        </select>
+      </div>
+
+      <div class="modal-actions-edit">
+        <button type="button" id="cancelEditBtnRN" class="action-btn">
+          <i class="fas fa-times"></i> Cancelar
+        </button>
+        <button type="submit" class="action-btn primary-action">
+          <i class="fas fa-check"></i> Salvar Status
+        </button>
+      </div>
+      <p id="editStatusFormMessageRN" class="form-message"></p>
     </form>
   </div>
 </div>
@@ -129,20 +160,91 @@
   </div>
 </div>
 
-<script>
-  document.getElementById('rotinasDropdown').querySelector('.dropdown-toggle').addEventListener('click', function(event) {
-      event.preventDefault();
+<div id="rnMonthlyDataModal" class="modal">
+  <div class="modal-content large-modal">
+    <span class="close-btn">&times;</span>
+    <h2 id="rnMonthlyModalTitle">Dados Mensais: [Nome do Contrato]</h2>
 
-      const dropdown = document.getElementById('rotinasDropdown');
-      dropdown.classList.toggle('open');
+    <form id="rnMonthlyDataForm">
+      <input type="hidden" id="rnDataRecordId" value="">
+      <input type="hidden" id="rnContractIdInput" value="">
 
-      const icon = dropdown.querySelector('.dropdown-icon');
-      if (icon) {
-          icon.classList.toggle('fa-chevron-down');
-          icon.classList.toggle('fa-chevron-up');
-      }
-  });
-</script>
+      <div class="input-group">
+        <label for="rnMonthlyContractName">Contrato (Nome)</label>
+        <input type="text" id="rnMonthlyContractName" disabled required>
+      </div>
+
+      <div class="input-group monthly-search-group">
+        <label for="rnMesReferencia">Mês/Ano de Referência (MM/AAAA)</label>
+        <div class="search-input-wrapper">
+          <input type="text" id="rnMesReferencia" placeholder="Ex: 01/2025" required pattern="\d{2}/\d{4}" maxlength="7" title="Formato esperado: MM/AAAA">
+          <button type="button" id="rnSearchMonthlyDataBtn" class="action-btn small-action">
+            <i class="fas fa-search"></i> Carregar Dados
+          </button>
+        </div>
+      </div>
+
+      <div id="rnMonthlyDataFields" style="display: none;">
+        <hr>
+        <h3>Detalhamento Operacional</h3>
+
+        <div class="data-grid-4-cols">
+          <div class="input-group">
+            <label for="qtdLinhas">QTD Linhas</label>
+            <input type="number" id="qtdLinhas" value="0" min="0" required>
+          </div>
+          <div class="input-group">
+            <label for="repicking">Repicking</label>
+            <input type="number" id="repicking" value="0" min="0" required>
+          </div>
+          <div class="input-group">
+            <label for="nilPicking">NilPicking</label>
+            <input type="number" id="nilPicking" value="0" min="0" required>
+          </div>
+          <div class="input-group">
+            <label for="metaRN">Meta (%)</label>
+            <input type="text" id="metaRN" value="0.15" required>
+          </div>
+        </div>
+
+        <div class="data-grid-4-cols">
+          <div class="input-group">
+            <label for="qtdErros">QTD Erros</label>
+            <input type="number" id="qtdErros" value="0" disabled>
+          </div>
+          <div class="input-group">
+            <label for="repiPercent">Repi (%)</label>
+            <input type="text" id="repiPercent" value="0.00" disabled>
+          </div>
+          <div class="input-group">
+            <label for="nilpiPercent">NilPi (%)</label>
+            <input type="text" id="nilpiPercent" value="0.00" disabled>
+          </div>
+          <div class="input-group">
+            <label for="errosPercent">Erros (%)</label>
+            <input type="text" id="errosPercent" value="0.00" disabled>
+          </div>
+        </div>
+
+        <div class="data-grid-4-cols">
+          <div class="input-group">
+            <label for="acuraciaMes">Acuracia Mês (%)</label>
+            <input type="text" id="acuraciaMes" value="100.00" disabled>
+          </div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+
+        <button type="submit" class="action-btn primary-action full-width-btn">
+          <i class="fas fa-save"></i> Salvar Detalhamento
+        </button>
+      </div>
+
+      <p id="rnMonthlyFormMessage" class="form-message"></p>
+    </form>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="RN.js"></script>

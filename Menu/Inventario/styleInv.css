@@ -171,28 +171,50 @@ body {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s, box-shadow 0.2s;
     overflow: hidden;
-    position: relative;
+    position: relative; /* ESSENCIAL para posicionar os botões */
     padding: 20px;
 }
 
 .contract-card.clickable { cursor: pointer; }
 .contract-card.clickable:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15); }
 
-.delete-btn {
+/* --- NOVO: Container para agrupar botões --- */
+.card-actions {
     position: absolute;
     top: 10px;
     right: 10px;
-    color: var(--text-muted);
+    display: flex; /* Para alinhar os botões lado a lado */
+    gap: 5px; /* Espaço entre a engrenagem e o X */
+    z-index: 10;
+}
+
+.card-actions button {
     background: none;
     border: none;
     font-size: 1.1em;
     cursor: pointer;
-    transition: color 0.2s;
     padding: 5px;
     line-height: 1;
-    z-index: 10;
+    transition: color 0.2s;
 }
-.delete-btn:hover { color: var(--secondary-color); }
+
+/* Estilo para o botão de Edição (Engrenagem) */
+.edit-status-btn {
+    color: var(--primary-color);
+}
+.edit-status-btn:hover {
+    color: #030825;
+}
+
+/* Estilo para o botão de Exclusão (X) */
+.delete-btn {
+    color: var(--text-muted);
+}
+.delete-btn:hover {
+    color: var(--secondary-color); /* Vermelho no hover */
+}
+/* --- FIM NOVO --- */
+
 
 .contract-name {
     font-family: 'Montserrat', sans-serif;
@@ -214,6 +236,7 @@ body {
 .status-bar { height: 5px; position: absolute; top: 0; left: 0; width: 100%; }
 .status-bar.ATIVO { background-color: #28a745; }
 .status-bar.INATIVO { background-color: var(--secondary-color); }
+.status-bar.CONCLUIDO { background-color: #6c757d; } /* Exemplo de cor para CONCLUIDO */
 
 
 /* ---------------------------------- */
@@ -302,7 +325,7 @@ body {
     font-size: 1em;
     width: auto;
     white-space: nowrap;
-    margin: 0; /* Remove os margens negativos que causavam sobreposição */
+    margin: 0;
 }
 
 /* 2. Grid de campos do formulário mensal (Redução do tamanho dos inputs) */
@@ -351,27 +374,7 @@ body {
 @media (max-width: 768px) {
     .sidebar { width: 100%; height: auto; position: relative; }
     .main-content { margin-left: 0; }
-    .search-controls { flex-direction: column; align-items: stretch; gap: 8px; }
-    .search-controls input[type="text"] { width: 100%; }
-
-    /* Correção do layout de pesquisa do mês em telas pequenas */
-    .search-input-wrapper {
-        flex-direction: column;
-        align-items: stretch;
+    .contracts-grid {
+        grid-template-columns: 1fr; /* Coluna única em telas pequenas */
     }
-    #mesReferencia {
-        max-width: 100%;
-    }
-    .action-btn.small-action {
-        width: 100%;
-        margin-top: 0;
-    }
-
-    .form-grid {
-        grid-template-columns: 1fr; /* 1 coluna em celular */
-    }
-    .modal-content { margin: 5% 10px; width: calc(100% - 20px); }
-    .large-modal { max-width: 98%; }
-
-    .modal-actions-monthly { flex-direction: column; }
 }

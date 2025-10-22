@@ -1,8 +1,6 @@
-/* Menu/Inventario/styleInv.css (CÓDIGO FINAL CORRIGIDO) */
-
-/* ---------------------------------- */
-/* Variáveis */
-/* ---------------------------------- */
+/* ======================================================= */
+/* VARIÁVEIS DE COR E TIPOGRAFIA */
+/* ======================================================= */
 :root {
     --primary-color: #051039; /* Azul Marinho */
     --secondary-color: #FF0000; /* Vermelho */
@@ -11,37 +9,39 @@
     --text-muted: #6c757d;
     --box-bg: #ffffff;
     --sidebar-width: 250px;
+    --success-color: #155724;
+    --error-color: #721c24;
 }
 
 /* ---------------------------------- */
-/* 🚨 CORREÇÃO PRINCIPAL: Remover barras de rolagem */
+/* Layout Geral e Reset */
 /* ---------------------------------- */
-html, body {
+* {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    /* Remove a barra horizontal */
+}
+
+html, body {
     overflow-x: hidden;
-    /* Remove a barra vertical do navegador */
-    overflow-y: hidden;
     height: 100%;
 }
 
-/* ---------------------------------- */
-/* Layout Geral do Inventário */
-/* ---------------------------------- */
+body {
+    font-family: 'Open Sans', sans-serif;
+    background-color: var(--background-light);
+    color: var(--text-dark);
+}
 
 .app-layout {
     display: flex;
     width: 100vw;
     min-height: 100vh;
-    font-family: 'Open Sans', sans-serif;
-    background-color: var(--background-light);
 }
 
 /* ---------------------------------- */
-/* Sidebar (Menu Esquerdo) */
+/* Sidebar */
 /* ---------------------------------- */
-
 .sidebar {
     width: var(--sidebar-width);
     background-color: var(--primary-color);
@@ -51,7 +51,7 @@ html, body {
     flex-direction: column;
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
     position: fixed;
-    height: 100vh; /* Usa a altura total da viewport */
+    height: 100vh;
 }
 
 .sidebar-header {
@@ -67,108 +67,44 @@ html, body {
     color: white;
 }
 
-/* ---------------------------------- */
-/* Itens do Menu */
-/* ---------------------------------- */
-
-.sidebar-menu {
-    flex-grow: 1;
-}
+.sidebar-menu { flex-grow: 1; }
 
 .sidebar-item a {
     display: flex;
     align-items: center;
-    text-align: left;
     padding: 15px 20px;
     margin-bottom: 5px;
-    background: transparent;
-    border: none;
     color: rgba(255, 255, 255, 0.85);
-    font-size: 1em;
     font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s, color 0.2s;
     text-decoration: none;
-}
-
-.sidebar-item a i {
-    width: 25px;
-    text-align: center;
-    margin-right: 10px;
-    font-size: 1.1em;
+    transition: background-color 0.2s;
 }
 
 .sidebar-item a:hover {
     background-color: rgba(255, 255, 255, 0.1);
-    color: white;
 }
+.sidebar-item a i { width: 25px; text-align: center; margin-right: 10px; font-size: 1.1em; }
 
-/* Estilos para Itens Desativados */
-.sidebar-item.disabled {
-    opacity: 1;
-    color: rgba(255, 255, 255, 0.3);
-    cursor: not-allowed;
-    pointer-events: none;
-}
-.sidebar-item.disabled a {
-    color: rgba(255, 255, 255, 0.3);
-}
-.sidebar-item.disabled a:hover {
-    background-color: transparent;
-}
+.dropdown-rotinas { background-color: var(--secondary-color); box-shadow: 0 4px 8px rgba(255, 0, 0, 0.3); }
+.dropdown-rotinas:hover { background-color: #cc0000; }
+.dropdown-rotinas .dropdown-toggle { display: flex; justify-content: space-between; color: white; }
+.dropdown-content { display: none; background-color: #cc0000; padding: 0; }
+.dropdown-content a { padding: 10px 20px 10px 45px; font-weight: 400; background: transparent !important; }
+.dropdown-content a:hover { background-color: #aa0000 !important; }
+.dropdown-rotinas.open .dropdown-content { display: block; }
 
 
 /* ---------------------------------- */
-/* Estilos do Dropdown (Rotinas) */
+/* Conteúdo Principal */
 /* ---------------------------------- */
-.dropdown-rotinas {
-    background-color: var(--secondary-color);
-    box-shadow: 0 4px 8px rgba(255, 0, 0, 0.3);
-}
-.dropdown-rotinas:hover {
-    background-color: #cc0000;
-}
-.dropdown-rotinas .dropdown-toggle {
-    display: flex;
-    justify-content: space-between;
-    color: white;
-}
-
-.dropdown-content {
-    display: none;
-    background-color: #cc0000;
-    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.1);
-    padding: 0;
-}
-
-.dropdown-content a {
-    padding: 10px 20px 10px 45px;
-    font-weight: 400;
-    background: transparent !important;
-}
-
-.dropdown-content a:hover {
-    background-color: #aa0000 !important;
-}
-
-.dropdown-rotinas.open .dropdown-content {
-    display: block;
-}
-
-/* ---------------------------------- */
-/* Conteúdo Principal (Direita) */
-/* ---------------------------------- */
-
 .main-content {
     margin-left: var(--sidebar-width);
     flex-grow: 1;
     padding: 30px;
     background-color: var(--background-light);
-
-    /* 🚨 CORREÇÃO: Adiciona rolagem APENAS ao conteúdo, mantendo a sidebar fixa */
     height: 100vh;
     overflow-y: auto;
-    box-sizing: border-box; /* Garante que padding não cause overflow */
+    box-sizing: border-box;
 }
 
 .main-content h1 {
@@ -180,9 +116,8 @@ html, body {
 }
 
 /* ========================================================= */
-/* NOVOS ESTILOS PARA ROTINA CLAUSE (MANTIDOS) */
+/* ROTINA RN (Contratos) */
 /* ========================================================= */
-
 .rotina-container {
     padding: 20px;
     background-color: var(--box-bg);
@@ -211,28 +146,18 @@ html, body {
     border-radius: 5px;
     cursor: pointer;
     font-weight: 600;
-    transition: background-color 0.2s, opacity 0.2s;
+    transition: background-color 0.2s;
     background-color: var(--primary-color);
     color: white;
 }
 .action-btn i { margin-right: 5px; }
 
-.action-btn:hover {
-    background-color: #030825;
-}
-
-.primary-action {
-    background-color: var(--secondary-color); /* Vermelho */
-}
-.primary-action:hover {
-    background-color: #cc0000;
-}
+.action-btn:hover { background-color: #030825; }
+.primary-action { background-color: var(--secondary-color); }
+.primary-action:hover { background-color: #cc0000; }
 .full-width-btn { width: 100%; margin-top: 20px; }
 
-
-/* ---------------------------------- */
-/* ESTILOS DO GRID DE CONTRATOS (MANTIDOS) */
-/* ---------------------------------- */
+/* Grid de Contratos */
 .contracts-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -244,38 +169,50 @@ html, body {
     background-color: var(--box-bg);
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
     overflow: hidden;
     position: relative;
     padding: 20px;
 }
 
-.contract-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-}
+.contract-card.clickable { cursor: pointer; }
+.contract-card.clickable:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15); }
 
-/* NOVO ESTILO: Botão de exclusão (X) */
-.delete-btn {
+/* --- Container para agrupar botões --- */
+.card-actions {
     position: absolute;
     top: 10px;
     right: 10px;
-    color: var(--text-muted);
+    display: flex;
+    gap: 5px;
+    z-index: 10;
+}
+
+.card-actions button {
     background: none;
     border: none;
     font-size: 1.1em;
     cursor: pointer;
-    transition: color 0.2s;
     padding: 5px;
     line-height: 1;
-    z-index: 10;
+    transition: color 0.2s;
 }
 
+/* Estilo para o botão de Edição (Engrenagem) */
+.edit-status-btn {
+    color: var(--primary-color);
+}
+.edit-status-btn:hover {
+    color: #030825;
+}
+
+/* Estilo para o botão de Exclusão (X) */
+.delete-btn {
+    color: var(--text-muted);
+}
 .delete-btn:hover {
-    color: var(--secondary-color); /* Vermelho no hover */
+    color: var(--secondary-color);
 }
-
 
 .contract-name {
     font-family: 'Montserrat', sans-serif;
@@ -294,22 +231,14 @@ html, body {
     margin-top: 5px;
 }
 
-.status-bar {
-    height: 5px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-}
-
-.status-bar.ATIVO { background-color: #28a745; } /* Verde para ATIVO */
-.status-bar.INATIVO { background-color: var(--secondary-color); } /* Vermelho para INATIVO */
+.status-bar { height: 5px; position: absolute; top: 0; left: 0; width: 100%; }
+.status-bar.ATIVO { background-color: #28a745; }
+.status-bar.INATIVO { background-color: var(--secondary-color); }
 
 
 /* ---------------------------------- */
-/* ESTILOS GERAIS DO MODAL (POP-UP) - MANTIDOS */
+/* MODAIS (Gerais) */
 /* ---------------------------------- */
-
 .modal {
     display: none;
     position: fixed;
@@ -333,30 +262,29 @@ html, body {
     position: relative;
 }
 
-.close-btn {
-    color: var(--text-muted);
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
+/* Aumentado para 4 colunas */
+.large-modal {
+    max-width: 900px;
 }
 
-.close-btn:hover,
-.close-btn:focus {
-    color: var(--secondary-color);
-    text-decoration: none;
-    cursor: pointer;
-}
-
-/* Estilos do Formulário no Modal */
-.input-group {
+.modal-content h2 {
+    color: var(--primary-color);
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
     margin-bottom: 20px;
 }
-.input-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: var(--primary-color);
+.modal-content h3 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    color: #555;
+    font-size: 1.1em;
 }
+
+.close-btn { color: var(--text-muted); float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+.close-btn:hover { color: var(--secondary-color); }
+
+.input-group { margin-bottom: 20px; }
+.input-group label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--primary-color); }
 .input-group input, .input-group select {
     width: 100%;
     padding: 10px;
@@ -365,40 +293,97 @@ html, body {
     box-sizing: border-box;
 }
 
-.form-message {
-    text-align: center;
-    margin-top: 15px;
-    padding: 10px;
-    border-radius: 5px;
-    display: none;
-}
-.form-message.success { background-color: #d4edda; color: #155724; }
-.form-message.error { background-color: #f8d7da; color: #721c24; }
+.form-message { text-align: center; margin-top: 15px; padding: 10px; border-radius: 5px; display: none; }
+.form-message.success { background-color: #d4edda; color: var(--success-color); }
+.form-message.error { background-color: #f8d7da; color: var(--error-color); }
 
 
 /* ---------------------------------- */
-/* ESTILOS ESPECÍFICOS DO MODAL DE CONFIRMAÇÃO (MANTIDOS) */
+/* Estilos Específicos do Modal Mensal (PADRÃO CLAUSE) */
 /* ---------------------------------- */
-.small-modal {
-    max-width: 400px;
-    text-align: center;
+
+/* 1. Ajuste do layout de pesquisa do Mês/Ano (Padronizado com Clause) */
+.monthly-search-group {
+    margin-bottom: 20px;
 }
 
-#deleteMessage {
-    margin: 20px 0;
-    font-size: 1.1em;
-    color: var(--text-dark);
+.search-input-wrapper {
+    display: flex; /* Alinha o input e o botão lado a lado */
+    gap: 10px;
+    align-items: flex-end; /* Garante que estejam alinhados pela base */
 }
 
-.modal-actions {
-    display: flex;
-    justify-content: space-around;
+#rnMesReferencia {
+    flex-grow: 1;
+    max-width: 200px; /* Limita a largura do campo de Mês/Ano */
+}
+
+.action-btn.small-action {
+    padding: 10px 15px; /* Ajuste para ser proporcional ao input */
+    font-size: 1em;
+    width: auto;
+    white-space: nowrap;
+    margin: 0;
+}
+
+/* 2. Grid de campos do formulário mensal (4 colunas) */
+.data-grid-4-cols {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
     gap: 15px;
-    margin-top: 25px;
+    margin-top: 15px;
 }
-.modal-actions .action-btn {
-    width: 100%;
+.data-grid-4-cols .input-group {
+    margin-bottom: 0;
 }
-.modal-actions .primary-action {
-    background-color: var(--secondary-color);
+.data-grid-4-cols .input-group input {
+    /* Diminui o padding do input no grid para que os campos fiquem menores */
+    padding: 8px 10px;
+}
+/* Estilo para campos desabilitados */
+#rnMonthlyDataFields input[disabled], #rnMonthlyContractName[disabled] {
+    background-color: #e9ecef;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+/* Ações do Modal de Edição de Status (Padrão Clause) */
+.modal-actions-edit {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* ---------------------------------- */
+/* Media Queries (Responsividade) */
+/* ---------------------------------- */
+@media (max-width: 1200px) {
+    .large-modal { max-width: 900px; }
+    .data-grid-4-cols {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+@media (max-width: 950px) {
+    .large-modal { max-width: 98%; }
+    .data-grid-4-cols {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .main-content {
+        padding: 20px;
+    }
+}
+@media (max-width: 768px) {
+    .sidebar { width: 100%; height: auto; position: relative; }
+    .main-content { margin-left: 0; }
+    .contracts-grid {
+        grid-template-columns: 1fr;
+    }
+    .search-input-wrapper {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    #rnMesReferencia {
+        max-width: 100%;
+    }
 }

@@ -5,10 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7d79809c-8bab-4b33-a110-025983aa6406" name="Changes" comment="Deploy Netlify pronto. Estrutura final e limpeza de código Flask">
+      <change afterPath="$PROJECT_DIR$/Menu/Inventario/Relatorio.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Menu/Inventario/Relatorio.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Menu/Inventario/Relatorio.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Menu/Inventario/Ciclico.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Ciclico.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Inventario/Ciclico.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Ciclico.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Menu/Inventario/Inventario.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Inventario.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Inventario/Inventario.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Inventario.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Menu/Inventario/RN.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/RN.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Inventario/RN.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/RN.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Inventario/styleCiclico.css" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/styleCiclico.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Inventario/styleInv.css" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/styleInv.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Inventario/styleRN.css" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/styleRN.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Menu.css" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Menu.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Menu.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Menu.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Menu/Permissoes/Permissoes.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Permissoes/Permissoes.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Menu/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/dashboard.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
@@ -57,6 +69,7 @@
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Silvagabrieln/OneDrive - CEVA Logistics/Inventario APP/Inv Sistem 1.0&quot;,
     &quot;onboarding.tips.debug.path&quot;: &quot;C:/Users/Silvagabrieln/OneDrive - CEVA Logistics/Desktop/Inv Sistem/Inv Sistem 1.0/src/main/java/com/ceva/Main.java&quot;,
     &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
@@ -77,19 +90,6 @@
       <recent name="C:\Users\Silvagabrieln\OneDrive - CEVA Logistics\Desktop\Inv Sistem\Inv Sistem 1.0" />
       <recent name="C:\Users\Silvagabrieln\OneDrive - CEVA Logistics\Desktop\Inv Sistem\Inv Sistem 1.0\proxy" />
     </key>
-  </component>
-  <component name="RunManager">
-    <configuration default="true" type="JetRunConfigurationType">
-      <module name="Inv Sistem 1.0" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
-      <module name="Inv Sistem 1.0" />
-      <option name="filePath" />
-      <method v="2" />
-    </configuration>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">

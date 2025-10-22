@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <base href='/Inv-Sistem/'>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Inventário - CEVA Logistics</title>
@@ -37,8 +36,8 @@
         </a>
       </div>
 
-      <div class="sidebar-item disabled">
-        <a href="#">
+      <div class="sidebar-item">
+        <a href="Relatorio.html">
           <i class="fas fa-file-alt"></i> Relatório
         </a>
       </div>
@@ -153,62 +152,66 @@
           </div>
           <div class="input-group">
             <label for="stockValue">Valor do Estoque (R$)</label>
-            <input type="number" id="stockValue" step="0.01" value="0.00">
+            <input type="text" id="stockValue" step="0.01" value="0,00" class="money-input">
           </div>
+
+          <input type="hidden" id="cycleCount">
+
           <div class="input-group">
-            <label for="partNumbersCounted">Itens Contados</label>
+            <label for="partNumbersCounted">Locações Contadas</label>
             <input type="number" id="partNumbersCounted" value="0" min="0">
           </div>
 
           <div class="input-group">
-            <label for="partNumbersCorrect">Itens Corretos</label>
+            <label for="partNumbersCorrect">Locações Corretas</label>
             <input type="number" id="partNumbersCorrect" value="0" min="0">
           </div>
           <div class="input-group">
             <label for="countedValue">Valor Contado (R$)</label>
-            <input type="number" id="countedValue" step="0.01" value="0.00">
+            <input type="text" id="countedValue" step="0.01" value="0,00" class="money-input">
           </div>
           <div class="input-group">
-            <label for="positiveValue">Var. Positiva (R$)</label>
-            <input type="number" id="positiveValue" step="0.01" value="0.00">
+            <label for="positiveValue">Valor Positivo (R$)</label>
+            <input type="text" id="positiveValue" step="0.01" value="0,00" class="money-input">
           </div>
           <div class="input-group">
-            <label for="negativeValue">Var. Negativa (R$)</label>
-            <input type="number" id="negativeValue" step="0.01" value="0.00">
-          </div>
-
-          <div class="input-group">
-            <label for="grossVariationValue">Var. Bruta (R$)</label>
-            <input type="number" id="grossVariationValue" step="0.01" value="0.00">
-          </div>
-          <div class="input-group">
-            <label for="netVariationValue">Var. Líquida (R$)</label>
-            <input type="number" id="netVariationValue" step="0.01" value="0.00">
-          </div>
-          <div class="input-group">
-            <label for="netPercent">% Líquido</label>
-            <input type="number" id="netPercent" step="0.01" value="0.00">
-          </div>
-          <div class="input-group">
-            <label for="grossPercent">% Bruto</label>
-            <input type="number" id="grossPercent" step="0.01" value="0.00">
+            <label for="negativeValue">Valor Negativo (R$)</label>
+            <input type="text" id="negativeValue" step="0.01" value="0,00" class="money-input">
           </div>
 
           <div class="input-group">
-            <label for="targetNet">Target Líquido</label>
-            <input type="number" id="targetNet" step="0.01" value="0.00">
+            <label for="grossVariationValue">Gross Variation Value (R$)</label>
+            <input type="text" id="grossVariationValue" step="0.01" value="0,00" readonly>
           </div>
           <div class="input-group">
-            <label for="accuracyItem">Ac. Item</label>
-            <input type="number" id="accuracyItem" step="0.01" value="0.00">
+            <label for="netVariationValue">Net Variation Value (R$)</label>
+            <input type="text" id="netVariationValue" step="0.01" value="0,00" readonly>
+          </div>
+
+          <div class="input-group">
+            <label for="net">NET (%)</label>
+            <input type="text" id="net" step="0.01" value="0,00" readonly>
           </div>
           <div class="input-group">
-            <label for="accuracyPecas">Ac. Peças</label>
-            <input type="number" id="accuracyPecas" step="0.01" value="0.00">
+            <label for="gross">Gross (%)</label>
+            <input type="text" id="gross" step="0.01" value="0,00" readonly>
+          </div>
+
+          <div class="input-group">
+            <label for="targetNet">Target NET (%)</label>
+            <input type="text" id="targetNet" step="0.01" value="0,00" class="money-input">
           </div>
           <div class="input-group">
-            <label for="accuracyLocacao">Ac. Locação</label>
-            <input type="number" id="accuracyLocacao" step="0.01" value="0.00">
+            <label for="accuracyItem">Accuracy Item (%)</label>
+            <input type="text" id="accuracyItem" step="0.01" value="0,00" readonly>
+          </div>
+          <div class="input-group">
+            <label for="accuracyPecas">Accuracy Peças (%)</label>
+            <input type="text" id="accuracyPecas" step="0.01" value="0,00" readonly>
+          </div>
+          <div class="input-group">
+            <label for="accuracyLocacao">Accuracy Locação (%)</label>
+            <input type="text" id="accuracyLocacao" step="0.01" value="0,00" readonly>
           </div>
         </div>
 
@@ -242,6 +245,39 @@
         <i class="fas fa-trash-alt"></i> Sim, Excluir
       </button>
     </div>
+  </div>
+</div>
+<div id="editStatusModal" class="modal">
+  <div class="modal-content small-modal">
+    <span class="close-btn edit-status-close-btn">&times;</span>
+    <h2 id="editStatusTitle">Editar Status do Contrato</h2>
+
+    <form id="editStatusForm">
+      <input type="hidden" id="editContractIdInput">
+      <input type="hidden" id="editContractNameInput">
+
+      <p>Contrato: <strong id="currentContractName"></strong></p>
+      <p>Status Atual: <strong id="currentStatusDisplay"></strong></p>
+
+      <div class="input-group" style="margin-top: 20px;">
+        <label for="newContractStatus">Novo Status</label>
+        <select id="newContractStatus" required>
+          <option value="ATIVO">ATIVO</option>
+          <option value="INATIVO">INATIVO</option>
+          <option value="CONCLUIDO">CONCLUÍDO</option>
+        </select>
+      </div>
+
+      <div class="modal-actions-edit">
+        <button type="button" id="cancelEditBtn" class="action-btn">
+          <i class="fas fa-times"></i> Cancelar
+        </button>
+        <button type="submit" class="action-btn primary-action">
+          <i class="fas fa-check"></i> Salvar Status
+        </button>
+      </div>
+      <p id="editStatusFormMessage" class="form-message"></p>
+    </form>
   </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
