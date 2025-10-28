@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Cíclico - CEVA Logistics</title>
+
+    <link rel="stylesheet" href="styleInv.css">
+    <link rel="stylesheet" href="Dash.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@300;400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+
+</head>
+<body>
+<div class="app-layout">
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h3>CEVA Inventário</h3>
+        </div>
+        <nav class="sidebar-menu">
+
+            <div class="sidebar-item dropdown-rotinas" id="rotinasDropdown">
+                <a href="#" class="dropdown-toggle">
+                    <i class="fas fa-list-ul"></i> Rotinas <i class="fas fa-chevron-down dropdown-icon"></i>
+                </a>
+                <div class="dropdown-content">
+                    <a href="Ciclico.html" id="btnCiclico"><i class="fas fa-redo-alt"></i> Cíclico</a>
+                    <a href="Inventario.html" id="btnClause"><i class="fas fa-balance-scale"></i> Clause</a>
+                    <a href="RN.html" id="btnRN"><i class="fas fa-tags"></i> RN </a>
+                </div>
+            </div>
+
+            <div class="sidebar-item">
+                <a href="Dash.html" class="active">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </a>
+            </div>
+
+            <div class="sidebar-item">
+                <a href="Consulta.html">
+                    <i class="fas fa-search"></i> CONSULTA
+                </a>
+            </div>
+            <div class="sidebar-item">
+                <a href="Relatorio.html">
+                    <i class="fas fa-file-alt"></i> Relatório
+                </a>
+            </div>
+
+            <div class="sidebar-item">
+                <a href="../Menu.html">
+                    <i class="fas fa-arrow-circle-left"></i> Voltar (Menu)
+                </a>
+            </div>
+
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="content-header">
+            <h1>Dashboard Cíclico (GRADE)</h1>
+        </header>
+
+        <div class="dashboard-controls">
+
+            <div class="input-group-filter">
+                <label for="contractSelect">Contrato:</label>
+                <select id="contractSelect">
+                    <option value="">Carregando Contratos...</option>
+                </select>
+            </div>
+
+            <div class="input-group-filter">
+                <label for="monthSelect">Mês:</label>
+                <select id="monthSelect">
+                    <option value="">Selecione o Contrato</option>
+                </select>
+            </div>
+
+            <div class="input-group-filter">
+                <label for="yearSelect">Ano:</label>
+                <select id="yearSelect">
+                    <option value="">Selecione o Contrato</option>
+                </select>
+            </div>
+
+            <div class="controls-actions">
+                <button id="updateDashBtn" class="action-btn primary-action">
+                    <i class="fas fa-sync-alt"></i> Atualizar Dashboard
+                </button>
+            </div>
+        </div>
+        <div id="loadingDashMessage" class="loading-message">
+            <p>Selecione o Contrato e o Mês para carregar o Dashboard.</p>
+        </div>
+
+        <div id="dashboardContent" style="display:none;">
+
+            <div class="kpi-grid">
+
+                <div class="kpi-card">
+                    <span class="kpi-label">PRAZO</span>
+                    <span class="kpi-value" id="kpiPrazo">N/A</span>
+                </div>
+
+                <div class="kpi-card">
+                    <span class="kpi-label">TOTAL LOCAÇÕES MÊS</span>
+                    <span class="kpi-value" id="kpiTotalLocacoes">N/A</span>
+                </div>
+
+                <div class="kpi-card">
+                    <span class="kpi-label">KPI REALIZADO</span>
+                    <span class="kpi-value" id="kpiRealizado">N/A</span>
+                </div>
+
+                <div class="kpi-card">
+                    <span class="kpi-label">LOC INC (Locações Incorretas)</span>
+                    <span class="kpi-value" id="kpiLocInc">N/A</span>
+                </div>
+
+            </div>
+
+            <div class="charts-grid">
+
+                <div class="chart-container bar-chart">
+
+                    <div class="chart-header">
+                        <h2>Contagem Diária (Realizado)</h2>
+
+                        <div id="chartSettingsContainer" class="chart-settings-dropdown">
+                            <i id="chartSettingsIcon" class="fas fa-cog" title="Configurações do Gráfico"></i>
+
+                            <div id="chartSettingsMenu" class="settings-menu">
+
+                                <h6>Séries (Desenhos):</h6>
+
+                                <label class="setting-item">
+                                    <input type="checkbox" id="chkContagem">
+                                    <span class="legend-color" style="background-color: var(--color-secondary);"></span>
+                                    Colunas (Contagem)
+                                </label>
+
+                                <label class="setting-item">
+                                    <input type="checkbox" id="chkPlanejado">
+                                    <span class="legend-line line-orange"></span>
+                                    Planejado
+                                </label>
+
+                                <label class="setting-item">
+                                    <input type="checkbox" id="chkStatus">
+                                    <span class="legend-line line-purple"></span>
+                                    Status
+                                </label>
+
+                                <hr>
+
+                                <h6>Visualização (Colunas/Linhas):</h6>
+
+                                <label class="setting-item">
+                                    <input type="checkbox" id="chkDataLabels">
+                                    <i class="fas fa-hashtag" style="color: var(--color-secondary);"></i>
+                                    Mostrar Números
+                                </label>
+
+                                <label class="setting-item">
+                                    <input type="checkbox" id="chkGrid">
+                                    <i class="fas fa-border-all" style="color: var(--text-color-muted);"></i>
+                                    Grade de Fundo
+                                </label>
+
+                                <label class="setting-item">
+                                    <input type="checkbox" id="chkEixoY">
+                                    <i class="fas fa-chart-bar" style="color: var(--text-color-muted);"></i>
+                                    Eixo Y Vertical
+                                </label>
+
+                                <label class="setting-item">
+                                    <input type="checkbox" id="chkDiaSemana">
+                                    <i class="fas fa-calendar-alt" style="color: var(--text-color-muted);"></i>
+                                    Eixo X (Dia-Semana)
+                                </label>
+
+                                <label class="setting-item">
+                                    <input type="checkbox" id="chkLogScale">
+                                    <i class="fas fa-chart-area" style="color: var(--text-color-muted);"></i>
+                                    Escala Logarítmica (Eixo Y)
+                                </label>
+
+                                <hr>
+
+                                <div class="setting-group">
+                                    <h6>Gráfico de Pizza:</h6>
+
+                                    <label class="setting-item">
+                                        <input type="checkbox" id="chkDonutPizza">
+                                        <i class="fas fa-circle-notch" style="color: var(--color-secondary);"></i>
+                                        Vazio no Meio (Rosca)
+                                    </label>
+
+                                    <div class="form-check d-flex justify-content-between align-items-center setting-item">
+                                        <input class="form-check-input" type="checkbox" id="chkDataLabelsPizza" style="margin-right: 8px;">
+                                        <label class="form-check-label flex-grow-1" for="chkDataLabelsPizza" style="margin-right: 10px;">
+                                            Mostrar Números (KPI)
+                                        </label>
+
+                                        <div id="toggleCorLabelsPizza" class="dropdown-local ml-2">
+                                            <a class="dropdown-toggle" href="#" role="button" title="Cor do Número">
+                                                <i class="fas fa-palette dropdown-icon" style="font-size: 1.0em; color: var(--text-color-muted);"></i>
+                                            </a>
+                                            <ul class="dropdown-menu-local color-picker-menu">
+                                                <li>
+                                                    <div class="form-check setting-item" style="padding-left: 0;">
+                                                        <input class="form-check-input" type="radio" name="labelColorPizza" id="radioCorLabelPreto" checked>
+                                                        <label class="form-check-label" for="radioCorLabelPreto" style="color: #333;">
+                                                            Preto
+                                                        </label>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="form-check setting-item" style="padding-left: 0;">
+                                                        <input class="form-check-input" type="radio" name="labelColorPizza" id="radioCorLabelBranco">
+                                                        <label class="form-check-label" for="radioCorLabelBranco" style="color: #333;">
+                                                            Branco
+                                                        </label>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <canvas id="contagemDiariaChart" style="height: 220px;"></canvas>
+                </div>
+                <div class="chart-container pie-chart">
+                    <h2>Realizado vs Pendente (%)</h2>
+                    <canvas id="realizadoPendenteChart"></canvas>
+                </div>
+
+            </div>
+
+            <p id="dataLastUpdate" class="last-update">Última atualização: N/A</p>
+        </div>
+
+    </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="Dash.js"></script>
+</body>
+</html>

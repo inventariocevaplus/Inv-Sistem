@@ -1,14 +1,15 @@
 /* =======================================================
-   Relatorio.css
-   Estilos específicos para a página de Geração de Relatórios
+   Relatorio.css (AJUSTADO PARA CONSISTÊNCIA EXATA COM Consulta.css)
    ======================================================= */
 
-/* Estilos de layout da área principal */
+/* ------------------------------------------- */
+/* ESTILOS DO PAINEL DE CONFIGURAÇÃO - OTIMIZAÇÃO DE ESPAÇO */
+/* ------------------------------------------- */
 .report-panel {
     background-color: var(--box-bg, #ffffff);
-    padding: 20px;
+    padding: 15px; /* Reduzido de 20px */
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Sombra mais suave */
 }
 
 /* Grid para organizar os blocos de configuração */
@@ -16,85 +17,92 @@
     display: grid;
     /* Padrão para telas menores/médias: 2 colunas */
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    gap: 15px; /* Reduzido de 20px */
 }
 
-/* Estilo para cada bloco de configuração */
+/* Estilo para cada bloco de configuração (input-group equivalente) */
 .config-block {
-    padding: 15px;
+    padding: 10px; /* Consistente com Consulta.css */
     border: 1px solid var(--light-grey, #e0e0e0);
     border-radius: 6px;
     background-color: var(--light-grey, #f7f7f7);
 }
 
 .config-block h2 {
-    font-size: 1.1em;
+    /* CORREÇÃO: Peso de fonte igual ao .input-group label (600) */
+    font-size: 1em;
     color: var(--primary-color, #001f3f);
-    border-bottom: 2px solid var(--primary-color, #001f3f);
+    border-bottom: 1px solid var(--primary-color, #001f3f); /* Consistente com Consulta.css */
     padding-bottom: 5px;
     margin-top: 0;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
+    font-weight: 600; /* ALINHADO COM A ESCRITA DA CONSULTA */
 }
 
 /* Estilos para grupos de Checkbox/Radio */
 .checkbox-group, .radio-group {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px; /* Consistente com Consulta.css */
 }
 
 .checkbox-group label, .radio-group label {
     display: flex;
     align-items: center;
     cursor: pointer;
-    font-size: 0.95em;
+    font-size: 0.9em; /* Consistente com Consulta.css */
 }
 
 .checkbox-group input, .radio-group input {
     margin-right: 8px;
-    transform: scale(1.1);
+    transform: scale(1.0);
 }
 
 /* Bloco de Contratos */
 .contracts-block {
-    grid-column: 1 / 3; /* Ocupa as duas colunas padrão */
+    grid-column: 1 / 3;
 }
 
 /* Bloco Mês/Ano e Botão */
 .month-year-block {
-    grid-column: 1 / 3; /* Ocupa as duas colunas padrão */
+    grid-column: 1 / 3;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 10px;
 }
 
 .select-group {
     display: flex;
-    gap: 10px;
+    gap: 8px; /* Consistente com Consulta.css */
     position: relative;
 }
 
+/* Estilo para selects padrão (se forem usados) */
 .form-select {
-    padding: 8px 12px;
+    padding: 6px 10px; /* Consistente com Consulta.css */
     border: 1px solid #ccc;
     border-radius: 4px;
     flex-grow: 1;
+    min-height: 34px; /* Consistente com Consulta.css */
+    font-size: 0.9em;
 }
 
 /* ------------------------------------------- */
-/* ESTILOS DE COMPONENTES CUSTOMIZADOS (Base)  */
+/* ESTILOS DE COMPONENTES CUSTOMIZADOS (Selects) */
 /* ------------------------------------------- */
 
 .select-styled {
     background-color: white;
-    padding: 8px 12px;
+    padding: 6px 10px; /* Consistente com Consulta.css */
     border: 1px solid #ccc;
     border-radius: 4px;
     cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    min-height: 40px;
+    min-height: 34px; /* Consistente com Consulta.css */
+    font-size: 0.9em; /* Consistente com Consulta.css */
+    flex-grow: 1;
 }
 
 .select-options {
@@ -104,7 +112,7 @@
     z-index: 100;
     background-color: white;
     border: 1px solid #ccc;
-    max-height: 250px;
+    max-height: 150px; /* Consistente com Consulta.css */
     overflow-y: auto;
     display: none;
     padding: 0;
@@ -116,10 +124,10 @@
 }
 
 .select-option-item {
-    padding: 10px;
+    padding: 8px 10px; /* Consistente com Consulta.css */
     cursor: pointer;
     transition: background-color 0.1s;
-    font-size: 0.95em;
+    font-size: 0.9em; /* Consistente com Consulta.css */
     display: flex;
     align-items: center;
 }
@@ -128,27 +136,29 @@
     background-color: #e9ecef;
 }
 
+/* Estilo de seleção - Mantido o estilo de Consulta.css */
 .select-option-item.selected {
-    background-color: var(--primary-color-light, #cce5ff);
-    color: var(--primary-color, #001f3f);
+    background-color: var(--primary-color, #001f3f);
+    color: white;
     font-weight: bold;
 }
-/* Fim dos estilos base de componentes customizados */
+
+.custom-select-contract-container .select-option-item input[type="checkbox"] {
+    display: none !important;
+}
 
 
 /* ------------------------------------------- */
 /* AJUSTES ESPECÍFICOS: Mês/Ano (Abre para CIMA) */
 /* ------------------------------------------- */
 .custom-select-month-container,
-.custom-select-year-container { /* Adiciona a nova classe do Ano */
+.custom-select-year-container {
     position: relative;
     flex-grow: 1;
 }
 
-/* Aplica o posicionamento para cima para ambas as classes de container */
 .custom-select-month-container .select-options,
 .custom-select-year-container .select-options {
-    /* 💥 AJUSTE CHAVE REFORÇADO: Abre para CIMA */
     bottom: 100% !important;
     top: unset !important;
 
@@ -168,22 +178,17 @@
 }
 
 .custom-select-contract-container .select-options {
-    /* 💥 AJUSTE: Abre para BAIXO */
     top: 100%;
-    bottom: unset; /* Garante que 'bottom' não anule o 'top' */
+    bottom: unset;
     border-top: none;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 0 0 4px 4px; /* Arredondamento na parte de baixo */
+    border-radius: 0 0 4px 4px;
 }
 
+/* Ajusta a fonte e padding dos itens do contrato */
 .custom-select-contract-container .select-option-item {
-    padding: 8px 12px;
+    padding: 8px 10px;
     font-size: 0.9em;
-}
-
-.custom-select-contract-container .select-option-item input[type="checkbox"] {
-    margin-right: 10px;
-    transform: scale(1.1);
 }
 
 
@@ -193,7 +198,7 @@
 
 .primary-action {
     padding: 10px 15px;
-    font-weight: bold;
+    font-weight: 700; /* Botão de ação principal mantém peso forte */
     font-size: 1em;
     background-color: var(--primary-color, #001f3f);
     color: white;
@@ -201,6 +206,7 @@
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.2s;
+    height: 38px; /* Consistente com Consulta.css */
 }
 
 .primary-action:hover {
@@ -216,14 +222,37 @@
 /* Ajuste de layout para telas grandes (4 colunas) */
 @media (min-width: 900px) {
     .report-config-grid {
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: 200px 1fr 1fr 200px;
+        gap: 15px;
     }
 
     /* Redefinindo o posicionamento na grid de 4 colunas: */
     .bases-block { grid-column: 1 / 2; }
-    .mode-block { grid-column: 2 / 3; }
-    .month-year-block { grid-column: 3 / 5; } /* Ocupa as duas colunas da direita */
 
-    /* Contratos embaixo dos dois primeiros blocos */
+    .mode-block { grid-column: 2 / 3; }
+
+    /* Mês/Ano */
+    .month-year-block {
+        grid-column: 3 / 5;
+        display: grid;
+        grid-template-columns: 1fr 1fr 200px;
+        gap: 8px;
+    }
+
+    /* Contratos */
     .contracts-block { grid-column: 1 / 3; }
+
+    /* Alinha o select-group dentro do month-year-block */
+    .month-year-block .select-group {
+        grid-column: 1 / 3;
+    }
+
+    /* Botão de Ação Primária */
+    .month-year-block .primary-action {
+        grid-column: 3 / 4;
+        align-self: end;
+        padding: 0;
+        height: 34px;
+        font-size: 0.9em;
+    }
 }

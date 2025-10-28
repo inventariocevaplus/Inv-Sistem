@@ -189,7 +189,7 @@ button:disabled {
     text-decoration: underline;
 }
 
-/* Mensagens de Status */
+/* Mensagens de Status (Mantido para fallback) */
 .login-message {
     margin-top: 25px;
     padding: 12px;
@@ -210,6 +210,44 @@ button:disabled {
     background-color: #f8d7da;
     color: #721c24;
     border: 1px solid #f5c6cb;
+}
+
+
+/* ================================================= */
+/* ESTILOS DO TOAST (Aviso Temporário) - NOVIDADE */
+/* ================================================= */
+
+.toast-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.95em;
+    font-weight: 600;
+    transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+}
+
+.toast-notification i {
+    margin-right: 10px;
+    font-size: 1.2em;
+}
+
+/* Classes de Animação */
+.toast-hidden {
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+.toast-visible {
+    opacity: 1;
+    transform: translateX(0);
 }
 
 /* Footer */

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerenciamento de Permissões - CEVA Logistics</title>
+    <title>Gerenciamento de Usuários - CEVA Logistics</title>
 
     <link rel="stylesheet" href="../Menu.css">
     <link rel="stylesheet" href="Permissoes.css">
@@ -21,7 +21,7 @@
 
         <nav class="sidebar-nav">
 
-            <a href="../dashboard.html" class="nav-button interactive-btn" id="btnVoltarMenu">
+            <a href="../Menu.html" class="nav-button interactive-btn" id="btnVoltarMenu">
                 <span class="icon-text-wrap">
                     <i class="fas fa-arrow-circle-left"></i>
                     <span>Voltar (Menu)</span>
@@ -35,8 +35,8 @@
 
         <div id="permissionsContainer" class="rotina-container">
             <header class="content-header">
-                <h1>Gerenciamento de Usuários e Permissões</h1>
-                <p>Ajuste as permissões de acesso e funções dos usuários do sistema.</p>
+                <h1>Gerenciamento de Usuários</h1>
+                <p>Use a engrenagem (<i class="fas fa-cog"></i>) no seu próprio card para gerenciar seu perfil e credenciais.</p>
             </header>
 
             <div id="usersList" class="user-permissions-grid">
@@ -47,36 +47,43 @@
     </main>
 </div>
 
-<div id="editPermissionsModal" class="modal">
-    <div class="modal-content large-modal">
-        <span class="close-btn edit-close-btn">&times;</span>
-        <h2 id="modalTitle">Editar Permissões para [Nome do Usuário]</h2>
-        <form id="editPermissionsForm">
-            <h3>Função (Role)</h3>
+<div id="userProfileModal" class="modal">
+    <div class="modal-content small-modal">
+        <span class="close-btn profile-close-btn">&times;</span>
+        <h2 id="modalTitle">Meu Perfil e Segurança</h2>
+        <p class="text-muted">Ajuste seu e-mail e sua senha de acesso.</p>
+
+        <form id="editProfileForm">
+
+            <h3>Informações da Conta</h3>
             <div class="input-group">
-                <label for="userRole">Nível de Acesso Rápido:</label>
-                <select id="userRole">
-                    <option value="MASTER">Master (Sem Restrições)</option>
-                    <option value="ADM">Administrador</option>
-                    <option value="OPERACAO">Operação</option>
-                </select>
+                <label for="newEmail">E-mail:</label>
+                <input type="email" id="newEmail" required>
             </div>
 
-            <h3>Permissões de Ação</h3>
-            <div id="actionPermissions" class="permissions-grid"></div>
+            <h3 style="margin-top: 10px;">Troca de Senha</h3>
+            <p class="text-muted small-text">Preencha os campos abaixo apenas se desejar trocar a senha.</p>
 
-            <h3>Acesso às Telas</h3>
-            <div id="screenAccess" class="permissions-grid"></div>
+            <div class="input-group">
+                <label for="oldPassword">Senha Antiga:</label>
+                <input type="password" id="oldPassword" placeholder="Obrigatório para alterar a senha">
+            </div>
+
+            <div class="input-group">
+                <label for="newPassword">Nova Senha (Mínimo 6 caracteres):</label>
+                <input type="password" id="newPassword">
+            </div>
+            <div class="input-group">
+                <label for="confirmPassword">Confirme a Nova Senha:</label>
+                <input type="password" id="confirmPassword">
+            </div>
 
             <div class="permission-actions-footer">
-                <button type="button" id="changePasswordBtn" class="action-btn secondary-action">
-                    <i class="fas fa-key"></i> Solicitar Troca de Senha
-                </button>
                 <button type="submit" class="action-btn primary-action">
-                    <i class="fas fa-save"></i> Salvar Permissões
+                    <i class="fas fa-save"></i> Salvar Alterações
                 </button>
             </div>
-            <p id="permissionFormMessage" class="form-message"></p>
+            <p id="profileFormMessage" class="form-message"></p>
             <input type="hidden" id="editingUserId">
         </form>
     </div>

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CEVA Logistics - Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@300;400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="Menu.css">
+
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+            integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+    />
+
+    <style>
+        /* Fundo escurecido */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none; /* Começa escondido */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        /* Janela flutuante da modal */
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 350px;
+            transform: translateY(-50px);
+            animation: slideIn 0.3s forwards;
+        }
+
+        .modal-content h3 {
+            color: #051039; /* Azul Marinho (Cor Principal) */
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .modal-content p {
+            color: #555;
+            margin-bottom: 25px;
+        }
+
+        .modal-actions button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+
+        #confirmLogoutBtn {
+            background-color: #FF6600; /* Laranja CEVA */
+            color: white;
+        }
+
+        #confirmLogoutBtn:hover {
+            background-color: #cc5200;
+        }
+
+        #cancelLogoutBtn {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        #cancelLogoutBtn:hover {
+            background-color: #e0e0e0;
+        }
+
+        @keyframes slideIn {
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard-container">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-area">
+                <h1 class="logo-text">CEVA <span class="text-highlight">MENU</span></h1>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <button class="nav-button interactive-btn" id="btnInventario">
+                <span class="icon-text-wrap">
+                    <i class="fas fa-boxes"></i>
+                    <span>INVENTÁRIO</span>
+                </span>
+            </button>
+
+            <button class="nav-button interactive-btn" id="btnMapping">
+                <span class="icon-text-wrap">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <span>MAPPING</span>
+                </span>
+            </button>
+            <button class="nav-button interactive-btn" id="btnCadastro" disabled>
+                <span class="icon-text-wrap">
+                    <i class="fas fa-user-plus"></i>
+                    <span>CADASTRO</span>
+                </span>
+            </button>
+
+            <button class="nav-button interactive-btn" id="btnPermissoes" disabled>
+                <span class="icon-text-wrap">
+                    <i class="fas fa-user-shield"></i>
+                    <span>PERMISSÕES</span>
+                </span>
+            </button>
+        </nav>
+
+        <div class="sidebar-footer">
+
+            <div class="user-profile">
+                <i class="fas fa-user-circle user-icon"></i>
+                <span id="userName">Carregando...</span> </div>
+
+            <a href="#" class="nav-button logout-btn" id="btnSair">
+                <span class="icon-text-wrap">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>SAIR</span>
+                </span>
+            </a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="content-header">
+            <h1>Bem-vindo(a) ao Sistema Interno da CEVA Logistics!</h1>
+            <p>Use o menu lateral para navegar entre os módulos.</p>
+        </header>
+
+        <section class="info-card">
+            <h4>✅ Resumo das Mudanças de Segurança:</h4>
+            <ul>
+                <li>
+                    <strong>Proteção de Senhas Inviolável:</strong> Implementamos o **Hashing Criptográfico (bcrypt)**. As senhas agora são armazenadas em um formato ilegível e irreversível, protegendo os dados de todos os usuários em caso de comprometimento do banco.
+                </li>
+                <li>
+                    <strong>Verificação Segura (RPC):</strong> O processo de login foi movido para uma **Função Secreta no Servidor (RPC)**. O navegador só envia a tentativa de login, mas a verificação real da senha ocorre dentro do Supabase, bloqueando tentativas de invasão via console.
+                </li>
+                <li>
+                    <strong>Controle de Acesso e Auditoria:</strong> O sistema agora registra explicitamente a **Sessão Ativa** de cada usuário no banco, permitindo monitoramento em tempo real e a base para o controle de permissões por função (`MASTER`, `LEITOR`, etc.).
+                </li>
+            </ul>
+
+            <hr style="margin: 20px 0; border: 0; border-top: 1px dashed #ccc;">
+
+            <h3>🚀 Próxima Etapa: Desenvolvimento do Módulo INVENTÁRIO e MAPPING</h3>
+            <p>O módulo de **INVENTÁRIO** e o novo módulo **MAPPING** serão o foco do nosso desenvolvimento. Clique nos botões laterais para explorá-los.</p>
+            <ul>
+                <li>**MAPPING (Novo):** Será usado para visualização e gerenciamento de endereços e estrutura de armazém.</li>
+                <li>**INVENTÁRIO:** Será o sistema de consulta e gestão de estoque.</li>
+            </ul>
+        </section>
+    </main>
+</div>
+
+<div id="logoutModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3>Confirmar Saída</h3>
+        <p>Tem certeza que deseja encerrar a sessão e voltar para a tela de Login?</p>
+        <div class="modal-actions">
+            <button id="cancelLogoutBtn">Cancelar</button>
+            <button id="confirmLogoutBtn">Sim, Sair</button>
+        </div>
+    </div>
+</div>
+<script>
+    // =========================================================================
+    // CONFIGURAÇÃO SUPABASE (Necessário para o Logout no Banco de Dados)
+    // =========================================================================
+    const SUPABASE_URL = 'https://kidpprfegedkjifbwkju.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtpZHBwcmZlZ2Vka2ppZmJ3a2p1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA1OTE5NjQsImV4cCI6MjA3NjE2Nzk2NH0.OkpgPHJtFIKyicX_qeOSMVHMk58Bppf0SzyZAPgWzLw';
+
+    const { createClient } = supabase;
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // =========================================================================
+
+    /**
+     * Função que executa todo o processo de Logout.
+     */
+    async function performLogout(userProfile) {
+        // 1. Logout no Banco de Dados (Melhoria de Segurança)
+        try {
+            // 1.1. Remove a sessão ativa da tabela 'active_sessions'
+            const { error: deleteError } = await supabaseClient
+                .from('active_sessions')
+                .delete()
+                .eq('user_id', userProfile.user_id)
+                .limit(1)
+                .select();
+
+            if (deleteError) {
+                console.warn("Aviso: Falha ao remover sessão ativa no DB (Verifique RLS de DELETE).", deleteError);
+            }
+
+            // 1.2. Atualizar status do usuário para "User Inativo" na tabela 'cadastros'
+            await supabaseClient
+                .from('cadastros')
+                .update({ status: 'User Inativo' })
+                .eq('id', userProfile.user_id)
+                .limit(1);
+
+        } catch (dbError) {
+            console.error("Erro durante a tentativa de logout no banco:", dbError);
+            // Continua o logout do frontend mesmo se o DB falhar
+        }
+
+        // 2. Logout no Frontend: Limpa os dados de sessão
+        localStorage.removeItem('user_session_data');
+
+        // 3. Redirecionamento Final
+        window.location.href = '../index.html';
+    }
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const userNameSpan = document.getElementById('userName');
+        const btnSair = document.getElementById('btnSair');
+
+        // ⭐ Elementos da Modal
+        const logoutModal = document.getElementById('logoutModal');
+        const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+        const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
+
+
+        // 1. VERIFICAÇÃO DE SESSÃO
+        const sessionData = localStorage.getItem('user_session_data');
+
+        if (!sessionData) {
+            window.location.href = '../index.html';
+            return; // Interrompe a execução do script
+        }
+
+        const userProfile = JSON.parse(sessionData);
+
+        // 2. EXIBIÇÃO DO NOME DO USUÁRIO
+        // Melhora a formatação do nome (Primeira letra maiúscula)
+        let username = userProfile.usuario.toLowerCase();
+        username = username.charAt(0).toUpperCase() + username.slice(1);
+        userNameSpan.textContent = username;
+
+
+        // 3. LÓGICA DE LOGOUT (Chamando a modal)
+        btnSair.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Mostra a modal customizada
+            logoutModal.classList.add('show');
+        });
+
+        // 4. LÓGICA DA MODAL
+
+        // Ação de Cancelar: Oculta a modal
+        cancelLogoutBtn.addEventListener('click', () => {
+            logoutModal.classList.remove('show');
+        });
+
+        // Ação de Confirmar: Executa o logout
+        confirmLogoutBtn.addEventListener('click', () => {
+            logoutModal.classList.remove('show');
+            // Chama a função de logout com a lógica de Supabase/redirecionamento
+            performLogout(userProfile);
+        });
+
+        // 5. LÓGICA DE REDIRECIONAMENTO DE MÓDULOS
+        const btnInventario = document.getElementById('btnInventario');
+        btnInventario.addEventListener('click', () => {
+             window.location.href = './Inventario/Inventario.html';
+        });
+
+        // ⭐ NOVO: Botão Mapping
+        const btnMapping = document.getElementById('btnMapping');
+        btnMapping.addEventListener('click', () => {
+             window.location.href = './Mapping/Mapping.html';
+        });
+
+        const btnPermissoes = document.getElementById('btnPermissoes');
+        btnPermissoes.addEventListener('click', () => {
+             window.location.href = './Permissoes/Permissoes.html';
+        });
+
+        const btnCadastro = document.getElementById('btnCadastro');
+        btnCadastro.addEventListener('click', () => {
+             console.log('Botão Cadastro clicado. Módulo ainda não implementado.');
+        });
+    });
+</script>
+
+<script src="Menu.js"></script>
+</body>
+</html>

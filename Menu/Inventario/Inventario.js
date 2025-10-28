@@ -5,6 +5,12 @@
 // 2. CORREÇÃO DA LÓGICA DE CÁLCULO e I/O (Input/Output) para lidar corretamente
 //    com VÍRGULA (,) na interface (leitura) e PONTO (.) para cálculos e Supabase (escrita).
 // 3. Funções de cálculo de acurácia (Net/Gross) mantidas.
+// 4. CORREÇÃO DO ERRO 406: Uso de .filter() na busca por reference_month.
+// 5. CORREÇÃO PREVENTIVA DE SINTAXE: O HTML do card foi colocado em uma única linha para
+//    evitar o erro 'Invalid or unexpected token' em ambientes hostis.
+// 6. NOVO AJUSTE: O campo Accuracy Locação (%) agora é EDITÁVEL (INPUT). Sua fórmula foi movida para Accuracy Item (%) (OUTPUT).
+// 7. CORREÇÃO DE SYNTAX ERROR: Garantia de sintaxe perfeita nas declarações de constantes.
+// 8. REFORÇO: Accuracy Peças (%) e Target NET (%) também adicionados aos listeners como campos editáveis (INPUT).
 // =========================================================================
 
 // 🚨 CREDENCIAIS SUPABASE (MANTIDAS)
@@ -12,11 +18,9 @@ const SUPABASE_URL = 'https://kidpprfegedkjifbwkju.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtpZHBwcmZlZ2Vka2ppZmJ3a2p1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA1OTE5NjQsImV4cCI6MjA3NjE2Nzk2NH0.OkpgPHJtFIKyicX_qeOSMVHMk58Bppf0SzyZAPgWzLw';
 
 const { createClient } = supabase;
-
 // Acesso ao token de sessão (se existir) para autenticação
 const sessionDataJSON = localStorage.getItem('user_session_data');
 let accessToken = SUPABASE_ANON_KEY;
-
 if (sessionDataJSON) {
     try {
         const userData = JSON.parse(sessionDataJSON);
@@ -37,7 +41,6 @@ const MONTHLY_DATA_TABLE = 'inventory_details';
 
 let userPermissions = {};
 let contractToDeleteId = null;
-
 // =======================================================
 // REFERÊNCIAS DO DOM (REFORÇADAS E CORRIGIDAS)
 // =======================================================
@@ -91,19 +94,16 @@ const editStatusFormMessage = getElement('editStatusFormMessage');
 const partNumbersInStockInput = getElement('partNumbersInStock');
 const piecesInStockInput = getElement('piecesInStock');
 const stockValueInput = getElement('stockValue');
-const cycleCountInput = getElement('cycleCount'); // <--- ESTE ID PRECISA EXISTIR NO HTML
+const cycleCountInput = getElement('cycleCount');
 const partNumbersCorrectInput = getElement('partNumbersCorrect');
-
-// 🚨 CORREÇÃO DO ERRO: Declaração da variável 'partNumbersCountedInput'
 const partNumbersCountedInput = getElement('partNumbersCounted');
-
 const countedValueInput = getElement('countedValue');
 const positiveValueInput = getElement('positiveValue');
 const negativeValueInput = getElement('negativeValue');
 const grossVariationValueInput = getElement('grossVariationValue');
 const netVariationValueInput = getElement('netVariationValue');
-const netPercentInput = getElement('net'); // <--- ESTE ID PRECISA EXISTIR NO HTML
-const grossPercentInput = getElement('gross'); // <--- ESTE ID PRECISA EXISTIR NO HTML
+const netPercentInput = getElement('net');
+const grossPercentInput = getElement('gross');
 const targetNetInput = getElement('targetNet');
 const accuracyItemInput = getElement('accuracyItem');
 const accuracyPecasInput = getElement('accuracyPecas');
@@ -125,7 +125,8 @@ function formatToTwoDecimals(value) {
 const parseInputFloat = (inputElement) => {
     if (!inputElement) return 0.00;
     // Tenta trocar a vírgula por ponto (o que é o padrão de input no Brasil)
-    const value = inputElement.value ? inputElement.value.replace(',', '.') : '0';
+    const value = inputElement.value ?
+    inputElement.value.replace(',', '.') : '0';
     return parseFloat(value) || 0.00;
 };
 
@@ -137,7 +138,7 @@ const parseInputInt = (inputElement) => {
 
 
 // =======================================================
-// LÓGICA DE CÁLCULO AUTOMÁTICO (FUNÇÃO CORRIGIDA FINAL)
+// LÓGICA DE CÁLCULO AUTOMÁTICO (FUNÇÃO AJUSTADA)
 // =======================================================
 
 function calculateInventoryMetrics() {
@@ -146,24 +147,27 @@ function calculateInventoryMetrics() {
     const negativeValue = parseInputFloat(negativeValueInput);
     const countedValue = parseInputFloat(countedValueInput);
 
-    // Variáveis de entrada (inteiros) - CORREÇÃO AQUI
-    const partNumbersCorrect = parseInputInt(partNumbersCorrectInput); // Locações Corretas
-    const partNumbersCounted = parseInputInt(partNumbersCountedInput); // Locações Contadas (CORRETO)
-    const cycleCount = parseInputInt(cycleCountInput); // Mantido, mas não usado na fórmula abaixo
+    // Variáveis de ENTRADA (Lidos como INPUT para salvamento, mas não usados para calcular os campos abaixo)
+    const accuracyLocacao = parseInputFloat(accuracyLocacaoInput);
+    const accuracyPecas = parseInputFloat(accuracyPecasInput);
+    const targetNet = parseInputFloat(targetNetInput);
+
+    // Variáveis de entrada (inteiros)
+    const partNumbersCorrect = parseInputInt(partNumbersCorrectInput);
+    const partNumbersCounted = parseInputInt(partNumbersCountedInput);
+    const cycleCount = parseInputInt(cycleCountInput);
 
 
     let grossVariationValue = 0;
     let netVariationValue = 0;
     let netPercent = 0;
     let grossPercent = 0;
-    let accuracyLocacao = 0;
+    let accuracyItem = 0; // MODIFICADO: Campo CALCULADO
 
     // 1. Gross Variation Value
     grossVariationValue = positiveValue + negativeValue;
-
     // 2. Net Variation Value
     netVariationValue = positiveValue - negativeValue;
-
     // 3. NET (%) (ACURÁCIA)
     if (countedValue > 0) {
         const absoluteNetVariation = Math.abs(netVariationValue);
@@ -182,23 +186,23 @@ function calculateInventoryMetrics() {
         grossPercent = 100.00;
     }
 
-    // 5. Accuracy Locação (%) = (Part Numbers Correct / Locações Contadas) * 100
-    if (partNumbersCounted > 0) { // <-- AGORA USA O CAMPO partNumbersCounted (Locações Contadas)
-        accuracyLocacao = (partNumbersCorrect / partNumbersCounted) * 100;
-        if (accuracyLocacao > 100) accuracyLocacao = 100;
+    // 5. Accuracy Item (%) = (Part Numbers Correct / Locações Contadas) * 100
+    if (partNumbersCounted > 0) {
+        accuracyItem = (partNumbersCorrect / partNumbersCounted) * 100;
+        if (accuracyItem > 100) accuracyItem = 100;
     } else {
-        accuracyLocacao = 100.00;
+        accuracyItem = 100.00;
     }
 
 
     // 6. Atualiza os campos de saída com 2 casas decimais e VÍRGULA para exibição
     const formatValue = (val) => formatToTwoDecimals(val).replace('.', ',');
-
     if (grossVariationValueInput) grossVariationValueInput.value = formatValue(grossVariationValue);
     if (netVariationValueInput) netVariationValueInput.value = formatValue(netVariationValue);
     if (netPercentInput) netPercentInput.value = formatValue(netPercent);
     if (grossPercentInput) grossPercentInput.value = formatValue(grossPercent);
-    if (accuracyLocacaoInput) accuracyLocacaoInput.value = formatValue(accuracyLocacao);
+    // Atualiza o campo CALCULADO (accuracyItemInput)
+    if (accuracyItemInput) accuracyItemInput.value = formatValue(accuracyItem);
 }
 
 
@@ -243,7 +247,8 @@ function checkAndDisplayNavigation() {
 function displayMessage(element, message, isSuccess) {
     if (!element) return;
     element.textContent = message;
-    element.className = `form-message ${isSuccess ? 'success' : 'error'}`;
+    element.className = `form-message ${isSuccess ?
+    'success' : 'error'}`;
     element.style.display = 'block';
     setTimeout(() => element.style.display = 'none', 3000);
 }
@@ -265,13 +270,11 @@ function formatMonthYearToDate(mesAno) {
 
 function openMonthlyDataModal(contractName, contractId) {
     if (!monthlyDataModal) return;
-
     // Limpa e inicializa os campos de controle
     monthlyDataForm.reset();
     if (monthlyContractNameInput) monthlyContractNameInput.value = contractName;
     if (contractIdInput) contractIdInput.value = contractId;
     if (dataRecordIdInput) dataRecordIdInput.value = '';
-
     // Esconde os campos de dados até que o mês seja pesquisado
     if (monthlyDataFieldsDiv) monthlyDataFieldsDiv.style.display = 'none';
     if (monthlyFormMessage) monthlyFormMessage.style.display = 'none';
@@ -284,17 +287,15 @@ function openMonthlyDataModal(contractName, contractId) {
     // Define os valores padrão (0 ou 0,00)
     [
         partNumbersInStockInput, piecesInStockInput, cycleCountInput,
-        partNumbersCorrectInput, targetNetInput, accuracyItemInput,
-        accuracyPecasInput, partNumbersCountedInput
+        partNumbersCorrectInput, accuracyItemInput, partNumbersCountedInput
     ].forEach(input => { if (input) input.value = 0; });
-
     // Campos R$ e % usam "0,00" para exibição inicial
     [
         stockValueInput, countedValueInput, positiveValueInput,
         negativeValueInput, grossVariationValueInput, netVariationValueInput,
-        netPercentInput, grossPercentInput, accuracyLocacaoInput
+        netPercentInput, grossPercentInput, accuracyLocacaoInput,
+        accuracyPecasInput, targetNetInput
     ].forEach(input => { if (input) input.value = '0,00'; });
-
     calculateInventoryMetrics(); // Inicializa os campos calculados
 
     monthlyDataModal.style.display = 'block';
@@ -302,9 +303,9 @@ function openMonthlyDataModal(contractName, contractId) {
 
 async function searchAndLoadMonthlyData() {
     const contractId = contractIdInput ? contractIdInput.value : null;
-    const contractName = monthlyContractNameInput ? monthlyContractNameInput.value : '';
+    const contractName = monthlyContractNameInput ?
+    monthlyContractNameInput.value : '';
     const mesReferencia = mesReferenciaInput ? mesReferenciaInput.value.trim() : '';
-
     if (!mesReferencia || !/^\d{2}\/\d{4}$/.test(mesReferencia)) {
         displayMessage(monthlyFormMessage, 'Formato do Mês/Ano inválido (MM/AAAA).', false);
         return;
@@ -315,17 +316,15 @@ async function searchAndLoadMonthlyData() {
     if (!referenceDate) return;
 
     if (monthlyFormMessage) monthlyFormMessage.style.display = 'none';
-
     // 1. Pesquisa na tabela de dados mensais
     const { data: monthlyData, error } = await supabaseClient
         .from(MONTHLY_DATA_TABLE)
         .select('*')
         .eq('contract_id', contractId)
-        .eq('reference_month', referenceDate)
+        .filter('reference_month', 'eq', referenceDate) // 💥 CORREÇÃO PARA O ERRO 406
         .single();
-
     if (error && error.code !== 'PGRST116') { // PGRST116 é "No rows found"
-        displayMessage(monthlyFormMessage, `Erro ao buscar dados mensais: ${error.message}`, false);
+        displayMessage(monthlyFormMessage, `Erro ao buscar dados mensais: ${error.message}. Verifique as políticas de RLS (Row Level Security) de SELECT na tabela 'inventory_details'.`, false);
         return;
     }
 
@@ -341,37 +340,35 @@ async function searchAndLoadMonthlyData() {
         if (dataRecordIdInput) dataRecordIdInput.value = monthlyData.id;
 
         // Preenche os campos de INPUT (Conversão de PONTO para VÍRGULA para exibição)
-        if (partNumbersInStockInput) partNumbersInStockInput.value = monthlyData.part_numbers_in_stock || 0;
+        if (partNumbersInStockInput) partNumbersInStockInput.value = monthlyData.part_numbers_in_stock ||
+        0;
         if (piecesInStockInput) piecesInStockInput.value = monthlyData.pieces_in_stock || 0;
         if (cycleCountInput) cycleCountInput.value = monthlyData.cycle_count || 0;
         if (partNumbersCorrectInput) partNumbersCorrectInput.value = monthlyData.part_numbers_correct || 0;
         if (partNumbersCountedInput) partNumbersCountedInput.value = monthlyData.part_numbers_counted || 0;
-
-
         // Campos R$ e % (Float)
         const formatFloatForDisplay = (val) => formatToTwoDecimals(val).replace('.', ',');
-
         if (stockValueInput) stockValueInput.value = formatFloatForDisplay(monthlyData.stock_value);
         if (countedValueInput) countedValueInput.value = formatFloatForDisplay(monthlyData.counted_value);
         if (positiveValueInput) positiveValueInput.value = formatFloatForDisplay(monthlyData.positive_value);
         if (negativeValueInput) negativeValueInput.value = formatFloatForDisplay(monthlyData.negative_value);
-
-        // Campos calculados
+        // Campos calculados (R$ e %)
         if (grossVariationValueInput) grossVariationValueInput.value = formatFloatForDisplay(monthlyData.gross_variation_value);
         if (netVariationValueInput) netVariationValueInput.value = formatFloatForDisplay(monthlyData.net_variation_value);
         if (netPercentInput) netPercentInput.value = formatFloatForDisplay(monthlyData.net_percent);
         if (grossPercentInput) grossPercentInput.value = formatFloatForDisplay(monthlyData.gross_percent);
+
+        // CAMPOS EDITÁVEIS (INPUTS)
         if (accuracyLocacaoInput) accuracyLocacaoInput.value = formatFloatForDisplay(monthlyData.accuracy_locacao);
-
-        // Outros campos
-        if (targetNetInput) targetNetInput.value = formatFloatForDisplay(monthlyData.target_net);
-        if (accuracyItemInput) accuracyItemInput.value = formatFloatForDisplay(monthlyData.accuracy_item);
         if (accuracyPecasInput) accuracyPecasInput.value = formatFloatForDisplay(monthlyData.accuracy_pecas);
+        if (targetNetInput) targetNetInput.value = formatFloatForDisplay(monthlyData.target_net);
+
+        // Campo CALCULADO (OUTPUT)
+        if (accuracyItemInput) accuracyItemInput.value = formatFloatForDisplay(monthlyData.accuracy_item);
 
 
-        // Dispara o cálculo para garantir a precisão dos campos derivados
+        // Dispara o cálculo para garantir a precisão dos campos derivados (e sobrescrever accuracyItemInput)
         calculateInventoryMetrics();
-
         displayMessage(monthlyFormMessage, 'Dados existentes carregados. Modo Edição.', true);
     } else {
         // Dados NÃO encontrados: Modo INSERÇÃO
@@ -391,14 +388,13 @@ async function saveMonthlyData(e) {
 
     // Antes de salvar, garantimos que o cálculo foi executado para ter os valores finais
     calculateInventoryMetrics();
-
     const recordId = dataRecordIdInput ? dataRecordIdInput.value : null;
     const contractId = contractIdInput ? contractIdInput.value : null;
     const mesReferencia = mesReferenciaInput ? mesReferenciaInput.value : null;
 
     if (!contractId || !mesReferencia) {
-         displayMessage(monthlyFormMessage, "Erro: ID do Contrato ou Mês de Referência faltando.", false);
-         return;
+        displayMessage(monthlyFormMessage, "Erro: ID do Contrato ou Mês de Referência faltando.", false);
+        return;
     }
 
     // Mapeamento dos dados para o Supabase (usando PONTO decimal e snake_case)
@@ -411,6 +407,8 @@ async function saveMonthlyData(e) {
         pieces_in_stock: parseInputInt(piecesInStockInput),
         stock_value: parseInputFloat(stockValueInput),
         cycle_count: parseInputInt(cycleCountInput),
+
+
         part_numbers_correct: parseInputInt(partNumbersCorrectInput),
         part_numbers_counted: parseInputInt(partNumbersCountedInput), // Novo campo
         counted_value: parseInputFloat(countedValueInput),
@@ -421,15 +419,17 @@ async function saveMonthlyData(e) {
         gross_variation_value: parseInputFloat(grossVariationValueInput),
         net_variation_value: parseInputFloat(netVariationValueInput),
         net_percent: parseInputFloat(netPercentInput),
+
+
         gross_percent: parseInputFloat(grossPercentInput),
+        // CAMPOS EDITÁVEIS (INPUTS)
         accuracy_locacao: parseInputFloat(accuracyLocacaoInput),
-
-        // Outros campos de %
-        target_net: parseInputFloat(targetNetInput),
-        accuracy_item: parseInputFloat(accuracyItemInput),
         accuracy_pecas: parseInputFloat(accuracyPecasInput),
-    };
+        target_net: parseInputFloat(targetNetInput),
 
+        // Campo CALCULADO (OUTPUT)
+        accuracy_item: parseInputFloat(accuracyItemInput),
+    };
     let error = null;
 
     if (recordId) {
@@ -448,11 +448,10 @@ async function saveMonthlyData(e) {
     }
 
     if (error) {
-        displayMessage(monthlyFormMessage, `Falha ao salvar dados: ${error.message}`, false);
+        displayMessage(monthlyFormMessage, `Falha ao salvar dados: ${error.message}. Verifique as políticas de RLS (Row Level Security) de INSERT/UPDATE na tabela 'inventory_details'.`, false);
         console.error('Supabase Save Error:', error);
     } else {
         displayMessage(monthlyFormMessage, 'Dados mensais salvos com sucesso!', true);
-
         // Fecha o modal após o salvamento
         setTimeout(() => {
             if (monthlyDataModal) monthlyDataModal.style.display = 'none';
@@ -477,14 +476,12 @@ function openEditStatusModal(contractId, contractName, currentStatus) {
     if (currentContractName) currentContractName.textContent = contractName;
     if (currentStatusDisplay) currentStatusDisplay.textContent = currentStatus;
     if (newContractStatus) newContractStatus.value = currentStatus;
-
     if (editStatusFormMessage) editStatusFormMessage.style.display = 'none';
     if (editStatusModal) editStatusModal.style.display = 'block';
 }
 
 async function saveEditStatus(e) {
     e.preventDefault();
-
     const contractId = editContractIdInput ? editContractIdInput.value : null;
     const contractName = editContractNameInput ? editContractNameInput.value : '';
     const newStatus = newContractStatus ? newContractStatus.value : '';
@@ -499,13 +496,11 @@ async function saveEditStatus(e) {
         .from(TARGET_TABLE_NAME)
         .update({ status: newStatus })
         .eq('id', contractId);
-
     if (error) {
         displayMessage(editStatusFormMessage, `Falha ao atualizar o status: ${error.message}`, false);
         console.error('Supabase Update Error:', error);
     } else {
         displayMessage(editStatusFormMessage, `Status de "${contractName}" atualizado para ${newStatus}!`, true);
-
         // Recarrega a lista e fecha o modal
         loadClauseContracts();
         setTimeout(() => {
@@ -521,10 +516,10 @@ async function saveEditStatus(e) {
 
 async function loadClauseContracts(searchTerm = '') {
     if (!hasPermission('can_consult')) {
-        if(contractsListDiv) contractsListDiv.innerHTML = `<p style="color:red;">Você não tem permissão para consultar dados.</p>`;
+        if (contractsListDiv) contractsListDiv.innerHTML = `<p style="color:red;">Você não tem permissão para consultar dados.</p>`;
         return;
     }
-    if(loadingMessage) loadingMessage.textContent = 'Carregando contratos...';
+    if (loadingMessage) loadingMessage.textContent = 'Carregando contratos...';
     let query = supabaseClient.from(TARGET_TABLE_NAME).select('*');
     if (searchTerm) {
         query = query.or(`nome_contrato.ilike.%${searchTerm}%,analista_responsavel.ilike.%${searchTerm}%`);
@@ -532,8 +527,8 @@ async function loadClauseContracts(searchTerm = '') {
 
     let { data: contracts, error } = await query;
     if (error) {
-        if(contractsListDiv) contractsListDiv.innerHTML = `<p style="color:red;">Erro ao carregar contratos: ${error.message}</p>`;
-        if(loadingMessage) loadingMessage.textContent = '';
+        if (contractsListDiv) contractsListDiv.innerHTML = `<p style="color:red;">Erro ao carregar contratos: ${error.message}</p>`;
+        if (loadingMessage) loadingMessage.textContent = '';
         return;
     }
 
@@ -541,11 +536,12 @@ async function loadClauseContracts(searchTerm = '') {
     if (contracts && contracts.length > 0) {
         contracts.forEach(contract => contractsListDiv.appendChild(createContractCard(contract)));
     } else {
-        if (contractsListDiv) contractsListDiv.innerHTML = '<p style="color:var(--text-muted);">Nenhum contrato encontrado. Adicione um novo!</p>';
+        if (contractsListDiv) contractsListDiv.innerHTML = '<p style="color:var(--text-muted);">Nenhum contrato encontrado.\n Adicione um novo!</p>';
     }
 
-    if(loadingMessage) loadingMessage.textContent = '';
-    if (addContractBtn) addContractBtn.style.display = hasPermission('can_send_data') ? 'block' : 'none';
+    if (loadingMessage) loadingMessage.textContent = '';
+    if (addContractBtn) addContractBtn.style.display = hasPermission('can_send_data') ?
+    'block' : 'none';
 }
 
 function createContractCard(contract) {
@@ -553,30 +549,24 @@ function createContractCard(contract) {
     card.className = 'contract-card';
     card.setAttribute('data-id', contract.id);
     card.setAttribute('data-name', contract.nome_contrato);
-
     const statusClass = contract.status || 'INATIVO';
 
     // Botão de Edição Rápida (Engrenagem)
     const editButtonHTML = hasPermission('can_edit_data') ?
-        `<button class="edit-status-btn" title="Editar Status Rápido"><i class="fas fa-cog"></i></button>` : '';
+    `<button class="edit-status-btn" title="Editar Status Rápido"><i class="fas fa-cog"></i></button>` : '';
 
     // Botão de Exclusão
     const deleteButtonHTML = hasPermission('can_delete_data') ?
-        `<button class="delete-btn" title="Excluir Contrato"><i class="fas fa-times"></i></button>` : '';
+    `<button class="delete-btn" title="Excluir Contrato"><i class="fas fa-times"></i></button>` : '';
 
     // Container para os botões no canto superior direito
     const actionsHTML = `<div class="card-actions">${editButtonHTML}${deleteButtonHTML}</div>`;
-
-
     const isClickable = hasPermission('can_edit_data') || hasPermission('can_consult');
     card.classList.toggle('clickable', isClickable);
 
-    // Estrutura HTML do Card
-    card.innerHTML = `<div class="status-bar ${statusClass}"></div>
-                      <div class="contract-name">${contract.nome_contrato || 'Sem Nome'}</div>
-                      <div class="contract-analyst">Analista: ${contract.analista_responsavel || 'N/A'}</div>
-                      ${actionsHTML}`;
-
+    // Estrutura HTML do Card (AGORA EM UMA ÚNICA LINHA DE TEMPLATE LITERAL)
+    card.innerHTML = `<div class="status-bar ${statusClass}"></div><div class="contract-name">${contract.nome_contrato ||
+    'Sem Nome'}</div><div class="contract-analyst">Analista: ${contract.analista_responsavel || 'N/A'}</div>${actionsHTML}`;
 
     // Lógica para o botão de exclusão
     if (hasPermission('can_delete_data')) {
@@ -593,14 +583,13 @@ function createContractCard(contract) {
     // Lógica de clique para o botão de Edição (Engrenagem)
     if (hasPermission('can_edit_data')) {
         const editBtn = card.querySelector('.edit-status-btn');
-            editBtn.addEventListener('click', (e) => {
-                e.stopPropagation(); // Impede o clique no cartão
+        editBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Impede o clique no cartão
 
-                // Pega o status do elemento DOM criado
-                const currentStatus = card.querySelector('.status-bar').classList[1] || 'INATIVO';
-                openEditStatusModal(contract.id, contract.nome_contrato, currentStatus);
-            });
-
+            // Pega o status do elemento DOM criado
+            const currentStatus = card.querySelector('.status-bar').classList[1] || 'INATIVO';
+            openEditStatusModal(contract.id, contract.nome_contrato, currentStatus);
+        });
     }
 
 
@@ -610,6 +599,8 @@ function createContractCard(contract) {
                 // Ação principal: Abrir o modal de dados mensais
                 openMonthlyDataModal(contract.nome_contrato, contract.id);
             } else {
+
+
                 alert(`Visualizar detalhes do contrato: ${contract.nome_contrato || 'Desconhecido'}`);
             }
         });
@@ -619,17 +610,26 @@ function createContractCard(contract) {
 }
 
 async function deleteContract() {
-    if (!hasPermission('can_delete_data')) { alert("Erro: Você não tem permissão para deletar dados."); if (deleteConfirmModal) deleteConfirmModal.style.display = 'none'; return; }
+    if (!hasPermission('can_delete_data')) {
+        alert("Erro: Você não tem permissão para deletar dados.");
+        if (deleteConfirmModal) deleteConfirmModal.style.display = 'none';
+        return;
+    }
     if (!contractToDeleteId) return;
-
     // 1. Deleta os dados mensais associados (usando o contract_id)
     const { error: monthlyError } = await supabaseClient.from(MONTHLY_DATA_TABLE).delete().eq('contract_id', contractToDeleteId);
-    if (monthlyError) { console.warn("Aviso: Falha ao deletar dados mensais, mas prosseguindo com o contrato principal.", monthlyError); }
+    if (monthlyError) {
+        console.warn("Aviso: Falha ao deletar dados mensais, mas prosseguindo com o contrato principal.", monthlyError);
+    }
 
 
     const { error } = await supabaseClient.from(TARGET_TABLE_NAME).delete().eq('id', contractToDeleteId);
-
-    if (error) { alert(`Falha ao excluir contrato: ${error.message}`); } else { loadClauseContracts(); console.log(`Contrato ${contractToDeleteId} excluído com sucesso.`); }
+    if (error) {
+        alert(`Falha ao excluir contrato: ${error.message}`);
+    } else {
+        loadClauseContracts();
+        console.log(`Contrato ${contractToDeleteId} excluído com sucesso.`);
+    }
 
     contractToDeleteId = null;
     if (deleteConfirmModal) deleteConfirmModal.style.display = 'none';
@@ -637,26 +637,32 @@ async function deleteContract() {
 
 function setupFormSubmit() {
     if (!addContractForm) return;
-
     addContractForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        if (!hasPermission('can_send_data')) { displayMessage(formMessage, "Erro: Você não tem permissão para adicionar novos dados.", false); return; }
+        if (!hasPermission('can_send_data')) {
+            displayMessage(formMessage, "Erro: Você não tem permissão para adicionar novos dados.", false);
+            return;
+        }
 
         const contractNameInput = document.getElementById('contractName');
         const contractStatusInput = document.getElementById('contractStatus');
+
         const analystNameInput = document.getElementById('analystName');
 
         const newContract = {
             nome_contrato: contractNameInput ? contractNameInput.value : '',
+
             status: contractStatusInput ? contractStatusInput.value : 'INATIVO',
             analista_responsavel: analystNameInput ? analystNameInput.value : '',
         };
 
         const { error } = await supabaseClient.from(TARGET_TABLE_NAME).insert([newContract]);
 
-        if (error) {
+        if (error)
+        {
             displayMessage(formMessage, `Erro ao salvar: ${error.message}`, false);
         } else {
+
             displayMessage(formMessage, 'Contrato salvo com sucesso!', true);
             addContractForm.reset();
             const addContractModal = document.getElementById('addContractModal');
@@ -670,11 +676,13 @@ function setupAddContractListener() {
     const addContractModal = document.getElementById('addContractModal');
     if (addContractBtn && addContractModal) {
         addContractBtn.addEventListener('click', () => {
-             if (hasPermission('can_send_data')) {
+            if (hasPermission('can_send_data')) {
                 addContractModal.style.display = 'block';
             } else {
                 alert("Você não tem permissão para adicionar novos contratos.");
             }
+
+
         });
     }
 }
@@ -682,11 +690,15 @@ function setupAddContractListener() {
 function setupSearchListener() {
     const searchInput = document.getElementById('searchInput');
     const searchBtn = document.getElementById('searchBtn');
-
-    if (searchBtn && searchInput) { searchBtn.addEventListener('click', () => loadClauseContracts(searchInput.value.trim())); }
+    if (searchBtn && searchInput) {
+        searchBtn.addEventListener('click', () => loadClauseContracts(searchInput.value.trim()));
+    }
     if (searchInput) {
         searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') { e.preventDefault(); loadClauseContracts(searchInput.value.trim()); }
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                loadClauseContracts(searchInput.value.trim());
+            }
         });
     }
 }
@@ -698,20 +710,23 @@ function setupSearchListener() {
 
 function setupModalListeners() {
     const addContractModal = document.getElementById('addContractModal');
-
     // Modal de Exclusão
     if (confirmDeleteBtn) confirmDeleteBtn.addEventListener('click', deleteContract);
-    if (cancelDeleteBtn) cancelDeleteBtn.addEventListener('click', () => { contractToDeleteId = null; if (deleteConfirmModal) deleteConfirmModal.style.display = 'none'; });
-
+    if (cancelDeleteBtn) cancelDeleteBtn.addEventListener('click', () => {
+        contractToDeleteId = null;
+        if (deleteConfirmModal) deleteConfirmModal.style.display = 'none';
+    });
     // Fecha Modais (EXCETO monthlyDataModal)
     [deleteConfirmModal, addContractModal, editStatusModal].forEach(modal => {
         if (modal) {
             modal.querySelectorAll('.close-btn').forEach(btn => btn.addEventListener('click', () => modal.style.display = 'none'));
             // Adiciona listener para fechar ao clicar fora, mas somente nestes modais
-            window.addEventListener('click', (event) => { if (event.target === modal) modal.style.display = 'none'; });
+            window.addEventListener('click', (event) => {
+                if (event.target === modal) modal.style.display
+        = 'none';
+            });
         }
     });
-
     // O monthlyDataModal só fecha com o botão interno (X ou Cancelar)
     if (monthlyDataModal) {
         monthlyDataModal.querySelectorAll('.close-btn').forEach(btn => btn.addEventListener('click', () => monthlyDataModal.style.display = 'none'));
@@ -739,8 +754,12 @@ function setupMonthlyFormListeners() {
         monthlyDataForm.addEventListener('submit', saveMonthlyData);
         if (mesReferenciaInput) {
             mesReferenciaInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') { e.preventDefault(); searchAndLoadMonthlyData(); }
-            });
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    searchAndLoadMonthlyData();
+                }
+
+             });
         }
     }
 
@@ -760,13 +779,17 @@ function setupMonthlyFormListeners() {
         countedValueInput,
         partNumbersCorrectInput,
         cycleCountInput,
-        // Adicionando outros campos de valor que podem afetar o cálculo R$ (embora não diretamente nas fórmulas finais)
+        // Adicionando outros campos de valor que podem
         stockValueInput,
         partNumbersInStockInput,
         piecesInStockInput,
-        partNumbersCountedInput
-    ];
+        partNumbersCountedInput,
 
+        // CAMPOS AGORA EDITÁVEIS, ADICIONADOS AOS LISTENERS PARA GARANTIR LEITURA E RECÁLCULO
+        accuracyLocacaoInput,
+        accuracyPecasInput,
+        targetNetInput,
+    ];
     calculationFields.forEach(input => {
         if (input) {
             // Usa 'input' para capturar mudanças ao digitar, colar ou usar setas
@@ -792,6 +815,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (dropdownToggle) {
             dropdownToggle.addEventListener('click', (e) => {
                 e.preventDefault();
+
+
                 rotinasDropdown.classList.toggle('open');
                 const icon = rotinasDropdown.querySelector('.dropdown-icon');
                 if (icon) {
@@ -805,7 +830,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     userPermissions = loadUserPermissions();
     // Acesso completo ao Supabase já é feito no topo via 'accessToken'
-    const hasAnyAccess = userPermissions.access_clause || userPermissions.access_ciclico || userPermissions.access_rn || userPermissions.access_permissions;
+    const hasAnyAccess = userPermissions.access_clause ||
+    userPermissions.access_ciclico || userPermissions.access_rn || userPermissions.access_permissions;
 
     if (!hasAnyAccess) {
         const mainContent = document.querySelector('.main-content');

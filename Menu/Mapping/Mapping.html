@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CEVA Logistics - Mapeamento Contratual</title>
+    <link rel="stylesheet" href="../Menu.css">
+    <link rel="stylesheet" href="Mapping.css">
+
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+            integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+    />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+</head>
+<body>
+<div class="dashboard-container">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-area">
+                <h1 class="logo-text">CEVA <span class="text-highlight">MAPPING</span></h1>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <button class="nav-button active" id="btnInventoryMapping">
+                <span class="icon-text-wrap">
+                    <i class="fas fa-file-contract"></i>
+                    <span>INVENTORY MAPPING</span>
+                </span>
+            </button>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-profile" id="userProfileButton" onclick="showUserProfile()">
+                <i class="fas fa-user-circle user-icon"></i>
+                <span id="userName">Carregando...</span>
+            </div>
+            <a href="../Menu.html" class="nav-button logout-btn">
+                <span class="icon-text-wrap">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>VOLTAR AO MENU</span>
+                </span>
+            </a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="custom-nav-header">
+            <div class="header-info">
+                <h1>Mapeamento Contratual e de Gestão</h1>
+                <p>Detalhes internos do contrato e gerenciamento da operação.</p>
+            </div>
+
+            <nav class="sub-nav-links">
+                <a href="#" class="nav-link active" id="linkGrade">
+                    <i class="fas fa-table"></i> GRADE
+                </a>
+                <a href="#" class="nav-link" id="linkDash">
+                    <i class="fas fa-chart-bar"></i> DASH
+                </a>
+                <a href="#" class="nav-link" id="linkAnalista">
+                    <i class="fas fa-user-tie"></i> ANALISTA
+                </a>
+            </nav>
+        </div>
+
+        <section class="data-tools">
+            <div class="search-area">
+                <input type="text" id="searchInput" placeholder="Pesquisa Geral..." style="width: 180px;">
+                <button id="searchBtn"><i class="fas fa-search"></i></button>
+            </div>
+
+            <div class="add-area">
+                <input type="text" id="inputContrato" placeholder="Nome do Novo Contrato" style="width: 250px;">
+                <button id="addContractBtn" class="add-btn icon-only">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <button id="saveAllBtn" class="add-btn icon-only" title="Salvar todas as alterações (Novas e Editadas)">
+                    <i class="fas fa-save"></i>
+                </button>
+            </div>
+
+            <button id="downloadBtn" class="download-btn">
+                <i class="fas fa-download"></i> Baixar Relatório (CSV)
+            </button>
+        </section>
+
+        <section id="resultsArea" style="margin-top: 20px;">
+            <div class="table-wrapper">
+                <table id="dataTable" class="contract-grade">
+                    <thead>
+                    <tr id="tableHeaderRow">
+                    </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="Mapping.js"></script>
+</div>
+
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeDeleteModal()">&times;</span>
+        <h2>Confirmação de Exclusão</h2>
+        <p>Você está prestes a EXCLUIR permanentemente o contrato:</p>
+        <p id="contractToDeleteName" style="font-weight: bold; color: var(--primary-color); margin: 10px 0;"></p>
+        <p>Esta ação não pode ser desfeita. Deseja continuar?</p>
+        <div class="modal-actions">
+            <button id="confirmDeleteBtn" class="confirm-btn">Sim, Excluir</button>
+            <button id="cancelDeleteBtn" class="cancel-btn">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<div id="toastNotification" class="toast-hidden">
+    <i class="fas fa-check-circle"></i>
+    <span id="toastMessage">Salvamento Realizado!</span>
+</div>
+
+</body>
+</html>

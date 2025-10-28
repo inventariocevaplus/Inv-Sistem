@@ -1,9 +1,8 @@
 // =========================================================================
-// Relatorio.js (Geração de Relatórios) - LÓGICA COMPLETA DE EXPORTAÇÃO
-// 🚀 AJUSTADO: Seletor de Ano convertido para dropdown customizado (Abre para CIMA).
-// 🚀 AJUSTE PRINCIPAL: Inclusão de TODAS as colunas das bases de detalhe.
-// 🚀 CORRIGIDO: Preenchimento de dados ausentes com 0 / 'N/A'.
-// 🚀 CORRIGIDO: Exportação de valores numéricos em formato puro para formatação no Excel.
+// Relatorio.js (Geração de Relatórios) - VERSÃO APENAS RN E CLAUSE
+// -------------------------------------------------------------------------
+// 💥 FINAL VERSION: Código otimizado, removendo todo o escopo CÍCLICO.
+// -------------------------------------------------------------------------
 // =========================================================================
 
 // 🚨 CREDENCIAIS SUPABASE (Substitua se necessário)
@@ -15,7 +14,7 @@ const MESES = [
     "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
 ];
 
-// --- Lógica de Token de Sessão ---
+// --- Lógica de Token de Sessão (Mantida) ---
 const sessionDataJSON = localStorage.getItem('user_session_data');
 let accessToken = SUPABASE_ANON_KEY;
 let userPermissions = {};
@@ -35,14 +34,14 @@ if (sessionDataJSON) {
 const { createClient } = supabase;
 const supabaseClient = createClient(SUPABASE_URL, accessToken);
 
-// ⚠️ TABELAS DE CONTRATOS
+// ⚠️ TABELAS DE CONTRATOS (Apenas RN e Clause)
 const TABLE_RN_CONTRATOS = 'rn_contratos';
 const TABLE_CLAUSE_CONTRATOS = 'contratos';
-const TABLE_CICLICO_CONTRATOS = 'ciclico_contratos';
+// REMOVIDO: const TABLE_CICLICO_CONTRATOS = 'ciclico_contratos';
 
 // 💥 ESTADOS GLOBAIS
 let selectedMonthsData = [];
-let selectedYearValue = new Date().getFullYear().toString(); // NOVA VARIÁVEL GLOBAL
+let selectedYearValue = new Date().getFullYear().toString();
 let allUniqueContractsMap = {};
 let selectedContractsData = [];
 
@@ -50,7 +49,6 @@ let selectedContractsData = [];
 // DADOS FIXOS: DEFINIÇÃO DE COLUNAS COMPLETAS
 // =======================================================
 
-// Colunas detalhadas da base Clause (inventory_details), excluindo meta fields
 const CLAUSE_DETAIL_COLUMNS = [
     'accuracy_item', 'accuracy_locacao', 'accuracy_pecas', 'counted_value',
     'cycle_count', 'gross_percent', 'gross_variation_value', 'negative_value',
@@ -59,32 +57,18 @@ const CLAUSE_DETAIL_COLUMNS = [
     'positive_value', 'stock_value', 'target_net'
 ];
 
-// Colunas detalhadas da base RN (rn_details), excluindo meta fields
 const RN_DETAIL_COLUMNS = [
     'acuracia_mes', 'erros_percent', 'meta', 'nil_picking', 'nilpi_percent',
     'qtd_erros', 'qtd_linhas', 'repi_percent', 'repicking'
 ];
 
-// Colunas detalhadas da base Cíclico (ciclico_grade_dados), excluindo meta fields
-const CICLICO_DETAIL_COLUMNS = [
-    'acompanhamento_plano', 'dias_inventario', 'dias_uteis_ciclo', 'locacoes_incorretas',
-    'pecas_contadas', 'pecas_incorretas', 'plano_acumulado', 'plano_locacoes',
-    'realizado_acumulado', 'realizado_locacoes', 'status_plano', 'total_locacoes'
-];
+// REMOVIDO: CICLICO_ALL_COLUMNS e COMPILED_CICLICO_HEADERS
 
 // Cabeçalho Compilado Final (RN + Clause)
 const COMPILED_RN_CLAUSE_HEADERS = [
     'Mês/Ano', 'ID Contrato', 'Contrato', 'Analista',
-    // RN Colunas
     ...RN_DETAIL_COLUMNS.map(col => `RN_${col}`),
-    // Clause Colunas
     ...CLAUSE_DETAIL_COLUMNS.map(col => `Clause_${col}`)
-];
-
-// Cabeçalho Cíclico Final
-const COMPILED_CICLICO_HEADERS = [
-    'Mês/Ano', 'ID Contrato', 'Contrato',
-    ...CICLICO_DETAIL_COLUMNS
 ];
 
 
@@ -93,60 +77,52 @@ const COMPILED_CICLICO_HEADERS = [
 // =======================================================
 
 /**
- * Converte um valor para número, tratando o separador decimal brasileiro
- * (vírgula) e retorna 0 se for vazio/inválido.
- * ⚠️ Importante: Para o Excel, precisamos que o número use o ponto (.) como decimal.
- * @param {string|number} value - O valor a ser convertido.
- * @returns {number} O valor numérico formatado para Excel (com ponto) ou 0.
+ * Converte um valor para número e retorna 0 se for vazio/inválido.
  */
 function parseNumericValue(value) {
-    if (typeof value === 'number') return value;
-
-    let strValue = String(value || '0').trim();
-
-    // Substitui vírgula por ponto se o valor vier formatado pelo Mock/Base
-    strValue = strValue.replace(',', '.');
-
-    const parsed = parseFloat(strValue);
-
-    return isNaN(parsed) ? 0 : parsed;
+    if (value === null || value === undefined || value === '') return 0;
+    const num = Number(value.toString().replace(/[^0-9.-]/g, ''));
+    return isNaN(num) ? 0 : num;
 }
 
 /**
- * Gera um valor mockado para um campo específico, tratando tipos (simula o retorno da base).
+ * Gera um valor mockado para um campo específico.
+ * (Função mantida, mas a lógica de mock cíclico não será usada)
  */
 function generateMockValue(columnName) {
-    // Valores numéricos: percentuais (0-100) ou monetários (0-15000)
-    if (columnName.includes('accuracy') || columnName.includes('percent') || columnName.includes('acuracia') || columnName.includes('meta')) {
-        return parseNumericValue((Math.random() * 99 + 1).toFixed(2)); // Ex: 95.23
-    }
-    if (columnName.includes('value') || columnName.includes('stock')) {
-        return parseNumericValue((Math.random() * 15000).toFixed(2)); // Ex: 1250.75
-    }
-
-    // Valores inteiros: contagens
-    if (columnName.includes('qtd') || columnName.includes('numbers') || columnName.includes('pecas') || columnName.includes('locacoes') || columnName.includes('dias') || columnName.includes('cycle') || columnName.includes('picking') || columnName.includes('total_locacoes')) {
+    // Valores Inteiros (Contagens) - ALEATÓRIO
+    if (columnName.includes('qtd') || columnName.includes('numbers') || columnName.includes('pecas') || columnName.includes('cycle') || columnName.includes('picking')) {
         return Math.floor(Math.random() * 5000) || 0;
     }
 
-    // Arrays/JSONB (Retorna valor simbólico para visualização no Excel)
-    if (columnName.includes('plano') || columnName.includes('realizado') || columnName.includes('locacoes_incorretas') || columnName.includes('pecas_incorretas') || columnName.includes('dias_inventario') || columnName.includes('acompanhamento_plano') || columnName.includes('status_plano')) {
-        return '[Array/JSON Data]';
+    // Valores Numéricos com Decimal (Percentuais) - ALEATÓRIO
+    if (columnName.includes('accuracy') || columnName.includes('percent') || columnName.includes('acuracia') || columnName.includes('meta') || columnName.includes('value') || columnName.includes('stock') || columnName.includes('variation')) {
+        return parseNumericValue((Math.random() * 99 + 1).toFixed(2));
     }
 
-    // Default para texto ou outros
+    // Datas/Strings Genéricas
+    if (columnName === 'mes_referencia') {
+        return '2025-10-MOCK';
+    }
+    if (columnName === 'contract_name') {
+        return 'CONTRATO MOCK';
+    }
+    if (columnName === 'data_geracao') {
+        return new Date().toISOString();
+    }
+
+    // Default
     return 'N/A';
 }
 
+
 // =======================================================
-// LÓGICA DE POPULAR SELETORES DE MÊS/ANO (CUSTOMIZADA)
+// LÓGICA DE POPULAR SELETORES DE MÊS/ANO E CONTRATOS
 // =======================================================
 
 function populateMonthSelectors() {
     const monthDisplay = document.getElementById('monthSelectDisplay');
     const monthOptionsContainer = document.getElementById('monthSelectOptions');
-
-    // NOVOS ELEMENTOS DO ANO
     const yearDisplay = document.getElementById('yearSelectDisplay');
     const yearOptionsContainer = document.getElementById('yearSelectOptions');
 
@@ -189,15 +165,15 @@ function populateMonthSelectors() {
 
     monthDisplay.addEventListener('click', () => {
         monthOptionsContainer.classList.toggle('open');
-        yearOptionsContainer.classList.remove('open'); // Fecha o ano se abrir o mês
+        yearOptionsContainer.classList.remove('open');
     });
 
-    // --- LÓGICA DO ANO CUSTOMIZADO (NOVO) ---
+    // --- LÓGICA DO ANO CUSTOMIZADO ---
     yearOptionsContainer.innerHTML = '';
     const currentYear = new Date().getFullYear();
+    selectedYearValue = String(currentYear); // Redefine para o ano atual
     yearDisplay.textContent = selectedYearValue;
 
-    // Gera anos: +/- 2 anos do ano atual
     for (let i = -2; i <= 2; i++) {
         const year = currentYear + i;
         const yearValue = String(year);
@@ -212,13 +188,11 @@ function populateMonthSelectors() {
         }
 
         item.addEventListener('click', () => {
-            // Limpa a seleção anterior
             Array.from(yearOptionsContainer.children).forEach(child => child.classList.remove('selected'));
-
             item.classList.add('selected');
             selectedYearValue = yearValue;
             yearDisplay.textContent = yearValue;
-            yearOptionsContainer.classList.remove('open'); // Fecha o dropdown
+            yearOptionsContainer.classList.remove('open');
         });
 
         yearOptionsContainer.appendChild(item);
@@ -226,19 +200,16 @@ function populateMonthSelectors() {
 
     yearDisplay.addEventListener('click', () => {
         yearOptionsContainer.classList.toggle('open');
-        monthOptionsContainer.classList.remove('open'); // Fecha o mês se abrir o ano
+        monthOptionsContainer.classList.remove('open');
     });
 
-    // --- LÓGICA DE FECHAR AO CLICAR FORA ---
     document.addEventListener('click', (e) => {
         const monthContainer = document.querySelector('.custom-select-month-container');
         const yearContainer = document.querySelector('.custom-select-year-container');
 
-        // Fecha Mês
         if (monthContainer && !monthContainer.contains(e.target)) {
             monthOptionsContainer.classList.remove('open');
         }
-        // Fecha Ano
         if (yearContainer && !yearContainer.contains(e.target)) {
             yearOptionsContainer.classList.remove('open');
         }
@@ -256,12 +227,9 @@ function updateMonthDisplay(displayElement) {
     }
 }
 
-
-// =======================================================
-// LÓGICA DE CONTRATOS (DEDUPLICADA e CUSTOM DROPDOWN)
-// (Mantida inalterada)
-// =======================================================
-
+/**
+ * Carrega a lista de contratos de RN e Clause.
+ */
 async function loadContractList() {
     const display = document.getElementById('contractSelectDisplay');
     const optionsContainer = document.getElementById('contractSelectOptions');
@@ -269,10 +237,10 @@ async function loadContractList() {
     display.textContent = 'Buscando contratos...';
     optionsContainer.innerHTML = '';
 
+    // Apenas RN e Clause
     const contractTables = [
         { name: TABLE_RN_CONTRATOS, source: 'RN' },
         { name: TABLE_CLAUSE_CONTRATOS, source: 'Clause' },
-        { name: TABLE_CICLICO_CONTRATOS, source: 'Cíclico' }
     ];
 
     allUniqueContractsMap = {};
@@ -280,6 +248,7 @@ async function loadContractList() {
 
     for (const table of contractTables) {
         try {
+            // Assume que RN e Clause usam 'id' e 'nome_contrato'
             const { data, error } = await supabaseClient
                 .from(table.name)
                 .select('id, nome_contrato')
@@ -410,20 +379,21 @@ function sheet_from_array_of_arrays(data, headers) {
         for(let C = range.s.c; C <= range.e.c; ++C) {
             const cell_address = XLSX.utils.encode_cell({c:C, r:R});
             const cell = ws[cell_address];
+            const header = headers[C];
 
-            if (cell && cell.v !== undefined && typeof cell.v === 'number') {
-                const header = headers[C];
+            if (cell && cell.v !== undefined) {
 
-                // Regras de formatação estendidas para novos campos
-                if (header.includes('value') || header.includes('stock_value') || header.includes('gross_variation_value') || header.includes('negative_value') || header.includes('positive_value')) {
-                    // Formato de Moeda/Decimal para Valor
-                    cell.z = '#,##0.00';
-                } else if (header.includes('percent') || header.includes('acuracia') || header.includes('accuracy') || header.includes('meta')) {
-                    // Formato de Percentual (assumindo que o valor mockado é 0-100)
-                    cell.z = '#,##0.00';
-                } else if (header.includes('qtd') || header.includes('numbers') || header.includes('pecas') || header.includes('locacoes') || header.includes('dias') || header.includes('cycle') || header.includes('picking')) {
-                    // Formato de Número Inteiro para Contagens
-                    cell.z = '#,##0';
+                // REMOVIDA LÓGICA DE TRATAMENTO DE ARRAY CÍCLICO (CICLICO_ALL_COLUMNS)
+
+                // --- FORMATAÇÃO NUMÉRICA ---
+                if (typeof cell.v === 'number') {
+                    if (header.includes('value') || header.includes('stock_value') || header.includes('gross_variation_value') || header.includes('negative_value') || header.includes('positive_value')) {
+                        cell.z = '#,##0.00';
+                    } else if (header.includes('percent') || header.includes('acuracia') || header.includes('accuracy') || header.includes('meta')) {
+                        cell.z = '#,##0.00';
+                    } else if (header.includes('qtd') || header.includes('numbers') || header.includes('pecas') || header.includes('cycle') || header.includes('picking') || header.includes('ID Contrato')) {
+                        cell.z = '#,##0';
+                    }
                 }
             }
         }
@@ -443,41 +413,40 @@ function downloadXLSX(dataSheets) {
         XLSX.utils.book_append_sheet(wb, sheet, sheetName);
     }
 
-    /* Escreve o arquivo */
     XLSX.writeFile(wb, `Relatorio_Compilado_Completo_${new Date().toISOString().slice(0, 10)}.xlsx`);
 }
 
 /**
- * SIMULAÇÃO: Busca dados de múltiplas bases e meses, gerando TODAS as colunas.
+ * SIMULAÇÃO: Busca dados de múltiplas bases e meses. (Apenas Mock)
  */
 async function fetchReportData(selectedBases, selectedMonths, selectedContracts, selectedYear) {
-    const reportData = { clause: [], rn: [], ciclico: [] };
+    // REMOVIDO: const reportData = { clause: [], rn: [], ciclico: [] };
+    const reportData = { clause: [], rn: [] };
 
-    // Simulação da estrutura das bases de detalhe
     const mockData = (base) => {
         const columnsToMock = base === 'CLAUSE' ? CLAUSE_DETAIL_COLUMNS :
                               base === 'RN' ? RN_DETAIL_COLUMNS :
-                              CICLICO_DETAIL_COLUMNS;
+                              []; // Nunca deve chegar aqui
 
         return selectedMonths.flatMap(monthNumber => {
             const mesAno = `${monthNumber}/${selectedYear}`;
             return selectedContracts.flatMap(contract => {
-                const baseKey = base === 'CLAUSE' ? 'Clause' : base === 'RN' ? 'RN' : 'Cíclico';
+                const baseKey = base === 'CLAUSE' ? 'Clause' : 'RN';
                 const contractId = contract.ids[baseKey];
 
-                // Se o contrato não existe nessa base, ele não seria retornado.
                 if (!contractId) return [];
 
                 const dataRow = {
                     'Mês/Ano': mesAno,
                     'ID Contrato': contractId,
-                    'Contrato': contract.name,
-                    'Analista': 'Analista Mock',
+                    'contract_name': contract.name,
                 };
 
-                // Gera mock para TODAS as colunas da base
+                // Preenche as colunas específicas da base
                 columnsToMock.forEach(col => {
-                    dataRow[col] = generateMockValue(col);
+                    if (dataRow[col] === undefined) {
+                        dataRow[col] = generateMockValue(col);
+                    }
                 });
 
                 return [dataRow];
@@ -487,11 +456,54 @@ async function fetchReportData(selectedBases, selectedMonths, selectedContracts,
 
     if (selectedBases.includes('CLAUSE')) reportData.clause = mockData('CLAUSE');
     if (selectedBases.includes('RN')) reportData.rn = mockData('RN');
-    if (selectedBases.includes('CICLICO')) reportData.ciclico = mockData('CICLICO');
+    // REMOVIDO: Lógica de mock CICLICO
 
-    // Não precisamos passar 'headers' pelo retorno, usamos as constantes globais
     return { data: reportData };
 }
+
+/**
+ * Função auxiliar para compilar RN e Clause.
+ */
+function compileRnClauseRow(rawData, contract, mesAno, selectedBases) {
+    const clauseId = contract.ids['Clause'];
+    const rnId = contract.ids['RN'];
+    const primaryId = clauseId || rnId;
+
+    if (!primaryId) return null;
+
+    const clauseData = rawData.clause.find(c => c['ID Contrato'] === clauseId && c['Mês/Ano'] === mesAno);
+    const rnData = rawData.rn.find(r => r['ID Contrato'] === rnId && r['Mês/Ano'] === mesAno);
+
+    const compiledRow = {
+        'Mês/Ano': mesAno,
+        'ID Contrato': primaryId,
+        'Contrato': contract.name,
+        'Analista': (clauseData || rnData)?.Analista || 'N/A',
+    };
+
+    let hasAnyData = false;
+
+    // Preenche todas as colunas RN
+    RN_DETAIL_COLUMNS.forEach(col => {
+        const value = rnData ? rnData[col] : 0;
+        compiledRow[`RN_${col}`] = parseNumericValue(value);
+        if (rnData) hasAnyData = true;
+    });
+
+    // Preenche todas as colunas Clause
+    CLAUSE_DETAIL_COLUMNS.forEach(col => {
+        const value = clauseData ? clauseData[col] : 0;
+        compiledRow[`Clause_${col}`] = parseNumericValue(value);
+        if (clauseData) hasAnyData = true;
+    });
+
+    if (hasAnyData || selectedBases.includes('CLAUSE') || selectedBases.includes('RN')) {
+        return compiledRow;
+    }
+    return null;
+}
+
+// REMOVIDO: Função processCiclicoRow
 
 /**
  * Função principal para gerar e baixar o relatório.
@@ -499,17 +511,16 @@ async function fetchReportData(selectedBases, selectedMonths, selectedContracts,
 async function handleGenerateReport() {
     // 1. Coleta de Filtros
     const basesCheckboxGroup = document.getElementById('basesCheckboxGroup');
-    const selectedBases = Array.from(basesCheckboxGroup.querySelectorAll('input:checked')).map(cb => cb.value);
+    // Filtra apenas RN e CLAUSE
+    const selectedBases = Array.from(basesCheckboxGroup.querySelectorAll('input:checked')).map(cb => cb.value).filter(v => v !== 'CICLICO');
 
     const mode = document.querySelector('input[name="mode"]:checked').value;
-
     const selectedContracts = getSelectedContractsForQuery();
-
     const selectedMonths = selectedMonthsData;
-    const selectedYear = selectedYearValue; // 💥 NOVO: Usa a variável global
+    const selectedYear = selectedYearValue;
 
     // Validações
-    if (selectedBases.length === 0) return alert("Selecione ao menos uma Base de Dados.");
+    if (selectedBases.length === 0) return alert("Selecione ao menos uma Base de Dados (RN ou Clause).");
     if (selectedContracts.length === 0) return alert("Selecione ao menos um Contrato.");
     if (selectedMonths.length === 0) return alert("Selecione ao menos um Mês de Referência.");
     if (!selectedYear) return alert("Selecione um Ano de Referência.");
@@ -518,115 +529,61 @@ async function handleGenerateReport() {
     // 2. Busca de Dados
     const { data: rawData } = await fetchReportData(selectedBases, selectedMonths, selectedContracts, selectedYear);
 
-    // 3. Processamento/Compilação dos Dados (Modo Compilado)
+    // 3. Processamento/Compilação dos Dados
     const sheetsToExport = {};
 
+    // REMOVIDO: Lógica de processamento CÍCLICO
+
+    // ===========================================
+    // MODO 1: COMPILADO (Apenas RN + CLAUSE)
+    // ===========================================
     if (mode === 'compilado') {
-        // --- 3a. Compilação RN + CLAUSE ---
-        const basesClauseRn = ['CLAUSE', 'RN'].filter(base => selectedBases.includes(base));
 
-        if (basesClauseRn.length > 0) {
-            const compiledClauseRn = [];
+        const compiledClauseRn = [];
+        for (const monthNumber of selectedMonths) {
+            const mesAno = `${monthNumber}/${selectedYear}`;
+            for (const contract of selectedContracts) {
+                const row = compileRnClauseRow(rawData, contract, mesAno, selectedBases);
+                if (row) {
+                    compiledClauseRn.push(row);
+                }
+            }
+        }
+        if (compiledClauseRn.length > 0) {
+             sheetsToExport['RN_Clause_Compilado'] = sheet_from_array_of_arrays(compiledClauseRn, COMPILED_RN_CLAUSE_HEADERS);
+        }
 
-            // Loop por cada combinação Mês/Ano e Contrato
+        if (Object.keys(sheetsToExport).length === 0) {
+             alert("Nenhum dado encontrado para as bases e contratos selecionados.");
+        }
+
+    // ===========================================
+    // MODO 2: DIVERSAS (Apenas RN/CLAUSE)
+    // ===========================================
+    } else if (mode === 'diversas') {
+
+        // --- Geração de Abas Individuais RN/CLAUSE ---
+        for (const contract of selectedContracts) {
+            // Certifica que o nome da aba não tem mais que 31 caracteres
+            const sheetName = contract.name.substring(0, 31);
+            const contractData = [];
+
             for (const monthNumber of selectedMonths) {
                 const mesAno = `${monthNumber}/${selectedYear}`;
-
-                for (const contract of selectedContracts) {
-                    const clauseId = contract.ids['Clause'];
-                    const rnId = contract.ids['RN'];
-                    const primaryId = clauseId || rnId;
-
-                    if (!primaryId) continue;
-
-                    // Tenta encontrar dados no mockData
-                    const clauseData = rawData.clause.find(c => c['ID Contrato'] === clauseId && c['Mês/Ano'] === mesAno);
-                    const rnData = rawData.rn.find(r => r['ID Contrato'] === rnId && r['Mês/Ano'] === mesAno);
-
-                    // A linha base deve ser criada mesmo que não haja dados para garantir o 0
-                    const compiledRow = {
-                        'Mês/Ano': mesAno,
-                        'ID Contrato': primaryId,
-                        'Contrato': contract.name,
-                        'Analista': (clauseData || rnData)?.Analista || 'N/A', // Pega Analista do que tiver dado
-                    };
-
-                    let hasAnyData = false;
-
-                    // Preenche todas as colunas RN
-                    RN_DETAIL_COLUMNS.forEach(col => {
-                        const value = rnData ? rnData[col] : 0;
-                        compiledRow[`RN_${col}`] = (typeof value === 'string' && value.includes('Array')) ? value : parseNumericValue(value);
-                        if (rnData) hasAnyData = true;
-                    });
-
-                    // Preenche todas as colunas Clause
-                    CLAUSE_DETAIL_COLUMNS.forEach(col => {
-                        const value = clauseData ? clauseData[col] : 0;
-                        compiledRow[`Clause_${col}`] = (typeof value === 'string' && value.includes('Array')) ? value : parseNumericValue(value);
-                        if (clauseData) hasAnyData = true;
-                    });
-
-                    // Adiciona a linha ao relatório (deve vir mesmo que vazia, se a base foi selecionada)
-                    if (hasAnyData || selectedBases.includes('CLAUSE') || selectedBases.includes('RN')) {
-                        compiledClauseRn.push(compiledRow);
-                    }
+                const row = compileRnClauseRow(rawData, contract, mesAno, selectedBases);
+                if (row) {
+                    contractData.push(row);
                 }
             }
 
-            if (compiledClauseRn.length > 0) {
-                 sheetsToExport['RN_Clause_Compilado'] = sheet_from_array_of_arrays(compiledClauseRn, COMPILED_RN_CLAUSE_HEADERS);
+            if (contractData.length > 0) {
+                sheetsToExport[sheetName] = sheet_from_array_of_arrays(contractData, COMPILED_RN_CLAUSE_HEADERS);
             }
         }
 
-        // --- 3b. Compilação CÍCLICO ---
-        if (selectedBases.includes('CICLICO')) {
-             const processedCiclico = [];
-
-             for (const monthNumber of selectedMonths) {
-                const mesAno = `${monthNumber}/${selectedYear}`;
-
-                for (const contract of selectedContracts) {
-                    const contractId = contract.ids['Cíclico'];
-
-                    if (!contractId) continue;
-
-                    const ciclicoData = rawData.ciclico.find(r => r['ID Contrato'] === contractId && r['Mês/Ano'] === mesAno);
-
-                    const processedRow = {
-                        'Mês/Ano': mesAno,
-                        'ID Contrato': contractId,
-                        'Contrato': contract.name,
-                        'Analista': ciclicoData?.Analista || 'N/A',
-                    };
-
-                    // Garante que todas as colunas Cíclico são incluídas e formatadas
-                    CICLICO_DETAIL_COLUMNS.forEach(col => {
-                        const value = ciclicoData ? ciclicoData[col] : 0;
-
-                        // Se for um array/jsonb, mantém a string ou define 'N/A'. Se for numérico, define 0.
-                        const isArrayOrText = (typeof value === 'string' && value.includes('Array')) || col.includes('acompanhamento_plano') || col.includes('dias_inventario') || col.includes('locacoes_incorretas') || col.includes('pecas_incorretas') || col.includes('plano_acumulado') || col.includes('status_plano');
-
-                        processedRow[col] = ciclicoData
-                            ? isArrayOrText ? value : parseNumericValue(value)
-                            : isArrayOrText ? 'N/A' : 0;
-                    });
-
-                    // Adiciona a linha se houver dados ou se a base CÍCLICO foi selecionada
-                    if (ciclicoData || selectedBases.includes('CICLICO')) {
-                         processedCiclico.push(processedRow);
-                    }
-                }
-            }
-
-             if (processedCiclico.length > 0) {
-                 sheetsToExport['Ciclico_Compilado'] = sheet_from_array_of_arrays(processedCiclico, COMPILED_CICLICO_HEADERS);
-             }
+        if (Object.keys(sheetsToExport).length === 0) {
+             alert("Nenhum dado encontrado para as bases e contratos selecionados.");
         }
-
-    } else if (mode === 'diversas') {
-        alert("O modo 'Diversas' não está implementado. Focando no modo 'Compilado'.");
-        return;
     }
 
     // 4. Exportação (Gera XLSX)

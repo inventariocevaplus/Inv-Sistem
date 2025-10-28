@@ -93,6 +93,12 @@
     animation-duration: 0.4s;
 }
 
+/* 🚨 NOVO ESTILO: MODAL MENOR PARA PERFIL 🚨 */
+.small-modal {
+    max-width: 450px;
+    margin-top: 10%; /* Move mais para o centro */
+}
+
 /* Animação de entrada */
 @keyframes animatetop {
     from {top: -300px; opacity: 0}
@@ -124,12 +130,14 @@
     font-weight: 600;
 }
 
-.input-group select {
+.input-group input[type="email"],
+.input-group input[type="password"] {
     width: 100%;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
     box-sizing: border-box;
+    font-size: 1em;
 }
 
 h3 {

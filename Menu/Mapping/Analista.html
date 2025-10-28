@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CEVA Logistics - Gestão de Analistas</title>
+
+  <link rel="stylesheet" href="../Menu.css">
+  <link rel="stylesheet" href="Mapping.css">
+  <link rel="stylesheet" href="Analista.css">
+
+  <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+  />
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div class="dashboard-container">
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-area">
+        <h1 class="logo-text">CEVA <span class="text-highlight">MAPPING</span></h1>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="Analista.html" class="nav-button active" id="btnInventoryMapping">
+                <span class="icon-text-wrap">
+                    <i class="fas fa-user-tie"></i>
+                    <span>GESTÃO DE ANALISTAS</span>
+                </span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-profile" id="userProfileButton" onclick="showUserProfile()">
+        <i class="fas fa-user-circle user-icon"></i>
+        <span id="userName">Carregando...</span>
+      </div>
+      <a href="../Menu.html" class="nav-button logout-btn">
+                <span class="icon-text-wrap">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>VOLTAR AO MENU</span>
+                </span>
+      </a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="custom-nav-header">
+      <div class="header-info">
+        <h1>Painel de Gestão de Analistas</h1>
+        <p>Visualização e gestão dos responsáveis por contrato.</p>
+      </div>
+
+      <nav class="sub-nav-links">
+        <a href="Mapping.html" class="nav-link">
+          <i class="fas fa-table"></i> GRADE
+        </a>
+        <a href="Dashboard.html" class="nav-link">
+          <i class="fas fa-chart-bar"></i> DASH
+        </a>
+        <a href="Analista.html" class="nav-link active">
+          <i class="fas fa-user-tie"></i> ANALISTA
+        </a>
+      </nav>
+    </div>
+    <section id="analistaContent" class="info-card">
+      <h2>Analistas Ativos por Contrato</h2>
+      <p class="loading-analistas">Carregando a lista de analistas...</p>
+      <div class="analistas-grid" id="analistasContainer">
+      </div>
+    </section>
+
+  </main>
+
+  <div id="toastNotification" class="toast-hidden">
+    <i class="fas fa-check-circle"></i>
+    <span id="toastMessage">Ação Realizada!</span>
+  </div>
+
+  <div id="userProfileModal" class="ceva-modal-backdrop" style="display:none;">
+    <div class="ceva-modal-container modal-small">
+      <div class="ceva-modal-header">
+        <span class="analyst-name-title" style="color: white; font-size: 1.3em;"><i class="fas fa-user-circle"></i> Meu Perfil</span>
+        <span class="close-btn" onclick="closeUserProfileModal()">&times;</span>
+      </div>
+
+      <div class="ceva-modal-body">
+        <div class="profile-info-grid">
+          <div class="info-item">
+            <label>Usuário:</label>
+            <span id="profileUserName" class="profile-data-value">N/A</span>
+          </div>
+          <div class="info-item">
+            <label>Cargo/Role:</label>
+            <span id="profileUserRole" class="profile-data-value">N/A</span>
+          </div>
+          <div class="info-item full-width">
+            <label>E-mail (Supabase):</label>
+            <span id="profileUserEmail" class="profile-data-value">N/A</span>
+          </div>
+          <div class="info-item full-width">
+            <label>ID da Sessão:</label>
+            <span id="profileUserUUID" class="profile-data-value-discreet">N/A</span>
+          </div>
+        </div>
+
+        <button class="logout-profile-btn" onclick="logoutUser()">
+          <i class="fas fa-sign-out-alt"></i> Sair / Encerrar Sessão
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="analystDetailsModal" class="ceva-modal-backdrop" style="display:none;">
+    <div class="ceva-modal-container modal-large">
+
+      <div class="ceva-modal-header">
+        <span id="analystNameDisplay" class="analyst-name-title" style="color: white; font-size: 1.3em;"><i class="fas fa-user-tie"></i> NOME ANALISTA</span>
+        <span class="close-btn" onclick="closeAnalystDetailsModal()">&times;</span>
+      </div>
+
+      <div class="analyst-discreet-info-bar">
+        <label>Cargo:</label> <span id="analystDiscreetInfo">N/A</span>
+      </div>
+
+      <div class="contract-nav-bar" id="analystContractNavBar">
+        <p style="color: var(--text-muted); font-style: italic;">Carregando contratos...</p>
+      </div>
+      <div class="ceva-modal-body">
+
+        <h3 class="contracts-title">Contrato Selecionado: <span id="currentContractName">N/A</span></h3>
+
+        <div id="analystContractsDetail">
+          <p>Selecione um contrato acima para ver os detalhes.</p>
+        </div>
+
+      </div>
+
+      <div class="ceva-modal-footer">
+        <label class="discreet-label">Habilidades Chave:</label>
+        <span id="analystSkills" class="skills-tag-container">N/A</span>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="Analista.js"></script>
+
+</body>
+</html>

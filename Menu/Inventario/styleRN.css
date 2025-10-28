@@ -387,3 +387,7 @@ body {
         max-width: 100%;
     }
 }
+
+.sidebar-item.disabled { pointer-events: none; }
+.sidebar-item.disabled a { color: rgba(255, 255, 255, 0.3); }
+.sidebar-item.disabled a:hover { background-color: transparent; }

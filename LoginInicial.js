@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     message.style.display = 'block';
 
                     setTimeout(() => {
-                        window.location.href = './dashboard.html';
+                        window.location.href = './Menu.html';
                     }, 1500);
                 } else {
                      // Falha ao criar a sessão ativa

@@ -569,7 +569,7 @@ function setupFormSubmit() {
             const realizadoLocacoesArray = [];
             const locacoesIncorretasArray = [];
             const pecasContadasArray = [];
-            const pecasIncorretasArray = [];
+            const pecasIncorretasArray = []; // <--- Variável declarada (Correta)
 
             // Inicializa os arrays com o Plano Calculado e zero para as métricas editáveis
             DIAS_DE_TRABALHO.forEach(() => {
@@ -581,7 +581,7 @@ function setupFormSubmit() {
                 realizadoLocacoesArray.push(0);
                 locacoesIncorretasArray.push(0);
                 pecasContadasArray.push(0);
-                pecas_incorretasArray.push(0);
+                pecasIncorretasArray.push(0); // <--- CORREÇÃO APLICADA: Nome ajustado para pecasIncorretasArray
             });
             // ----------------------------------------------------
 

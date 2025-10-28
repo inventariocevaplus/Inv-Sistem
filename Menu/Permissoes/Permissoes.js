@@ -1,262 +1,300 @@
 // =========================================================================
-// Permissoes.js (CÓDIGO FINAL E CORRIGIDO - REMOVE FALSO POSITIVO)
+// Permissoes.js (AJUSTADO PARA TROCA DE SENHA DO PRÓPRIO USUÁRIO)
 // =========================================================================
 const SUPABASE_URL = 'https://kidpprfegedkjifbwkju.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtpZHBwcmZlZ2Vka2ppZmJ3a2p1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA1OTE5NjQsImV4cCI6MjA3NjE2Nzk2NH0.OkpgPHJtFIKyicX_qeOSMVHMk58Bppf0SzyZAPgWzLw';
 
 const { createClient } = supabase;
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-let supabaseClient;
-const userSessionData = localStorage.getItem('user_session_data');
-let masterId = null;
+let userProfile = null;
+let masterId = null; // Usado para identificar permissão de Master (embora o foco agora seja auto-edição)
 
-// 1. Obtém o ID e a Role do usuário logado
-if (userSessionData) {
-    try {
-        const userProfile = JSON.parse(userSessionData);
-        // Só considera MASTER se a role for MASTER
-        if (userProfile.role === 'MASTER') {
-            masterId = userProfile.id;
+// =========================================================================
+// FUNÇÕES AUXILIARES
+// =========================================================================
+
+function displayFormMessage(message, isSuccess, element = document.getElementById('profileFormMessage')) {
+    element.textContent = message;
+    element.className = `form-message ${isSuccess ? 'success' : 'error'}`;
+    element.style.display = 'block';
+    setTimeout(() => element.style.display = 'none', 5000); // Aumentei o tempo
+}
+
+// =========================================================================
+// FUNÇÕES DE DADOS E CARREGAMENTO
+// =========================================================================
+
+/**
+ * 1. FUNÇÃO CRÍTICA: Carrega a sessão e inicializa a página
+ */
+async function setupPermissionsPage() {
+    console.log("Iniciando a verificação de sessão...");
+
+    // Tenta carregar os dados de perfil (role, user_id, etc) que você salvou no Login.js
+    const userSessionData = localStorage.getItem('user_session_data');
+    const { data: { session } } = await supabaseClient.auth.getSession();
+
+    if (userSessionData && session) {
+        try {
+            userProfile = JSON.parse(userSessionData);
+
+            // Define o ID do Master se o usuário tiver a permissão
+            if (userProfile.can_change_perms === true) {
+                masterId = userProfile.user_id;
+            }
+
+            // Garante que o usuário logado esteja autenticado para a troca de senha
+            await supabaseClient.auth.setSession(session);
+
+        } catch (e) {
+            console.error("Falha ao analisar JSON de perfil no localStorage. Acesso bloqueado.", e);
+            return;
         }
-    } catch (e) {
-        console.error("Falha ao analisar JSON de sessão.", e);
+    } else {
+        console.warn("❌ Usuário não logado ou sessão expirada. Ações limitadas.");
+    }
+
+    // Carrega a lista de usuários para que o usuário logado possa clicar no seu card
+    loadUsersAndPermissions();
+}
+
+/**
+ * 2. FUNÇÃO: Carrega todos os usuários da tabela 'cadastros'
+ */
+async function loadUsersAndPermissions() {
+    const usersListDiv = document.getElementById('usersList');
+    usersListDiv.innerHTML = '<p id="usersLoadingMessage" class="text-muted">Carregando usuários e permissões...</p>';
+
+    // Seleciona as colunas essenciais
+    let { data: users, error } = await supabaseClient
+        .from('cadastros')
+        .select('id, usuario, role, status, email');
+        // Nota: A coluna 'id' DEVE ser o UUID do Supabase Auth para ligar o perfil.
+
+    if (error) {
+        usersListDiv.innerHTML = `<p style="color:red;">Erro ao carregar usuários: ${error.message}. (Verifique RLS de SELECT na tabela 'cadastros')</p>`;
+        return;
+    }
+
+    usersListDiv.innerHTML = '';
+    if (users && users.length > 0) {
+        users.forEach(user => {
+            usersListDiv.appendChild(createUserCard(user));
+        });
+    } else {
+        usersListDiv.innerHTML = '<p class="text-muted">Nenhum usuário encontrado na tabela de cadastros.</p>';
     }
 }
 
-// 2. Inicialização do Cliente
-// Inicializa com a chave ANON para evitar o erro 401.
-supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-console.log("Supabase Client inicializado com chave ANON. MASTER ID (UI):", masterId);
-
 
 // =========================================================================
-// O RESTANTE DO CÓDIGO
+// FUNÇÕES DE UI E MODAL
 // =========================================================================
 
-// Definições de Permissões para Geração da UI
-const ACTION_PERMISSIONS = [
-    { key: 'can_delete_data', label: 'Excluir Dados' },
-    { key: 'can_edit_data', label: 'Editar Dados' },
-    { key: 'can_send_data', label: 'Enviar/Adicionar Dados' },
-    { key: 'can_consult', label: 'Consultar Dados' },
-    { key: 'can_change_perms', label: 'Alterar Permissões' },
-    { key: 'can_add_user', label: 'Adicionar Novo Usuário' },
-    { key: 'can_delete_users', label: 'Excluir Usuários' },
-];
+function createUserCard(user) {
+    const card = document.createElement('div');
+    card.className = 'user-card';
+    card.setAttribute('data-user-id', user.id); // UUID
 
-const SCREEN_ACCESS = [
-    { key: 'access_clause', label: 'Contratos (Clause)' },
-    { key: 'access_ciclico', label: 'Inventário Cíclico' },
-    { key: 'access_rn', label: 'Reserva Normal (RN)' },
-    { key: 'access_permissions', label: 'Gerenciar Permissões' },
-];
+    const userName = user.usuario || 'Usuário Não Configurado';
+    const userRole = user.role || 'Não Definido';
+    const userStatus = user.status || 'Sem Status';
 
-// Mapeamento de Funções (Roles) para Permissões Padrão (Templates)
-const ROLE_PERMISSIONS = {
-    MASTER: {
-        can_delete_data: true, can_edit_data: true, can_send_data: true, can_consult: true,
-        can_change_perms: true, can_add_user: true, can_delete_users: true,
-        access_clause: true, access_ciclico: true, access_rn: true, access_permissions: true
-    },
-    ADM: {
-        can_delete_data: true, can_edit_data: true, can_send_data: true, can_consult: true,
-        can_change_perms: false, can_add_user: false, can_delete_users: false,
-        access_clause: true, access_ciclico: true, access_rn: false, access_permissions: true
-    },
-    OPERACAO: {
-        can_delete_data: false, can_edit_data: false, can_send_data: true, can_consult: true,
-        can_change_perms: false, can_add_user: false, can_delete_users: false,
-        access_clause: true, access_ciclico: false, access_rn: false, access_permissions: false
+    card.innerHTML = `
+        <div class="user-info">
+            <div class="user-name">${userName}</div>
+            <div class="user-role">Função: <strong>${userRole}</strong></div>
+            <div class="user-status">Status: ${userStatus}</div>
+        </div>
+        <button class="user-action-btn edit-perms-btn" title="Editar Permissões">
+            <i class="fas fa-cog"></i>
+        </button>
+    `;
+
+    const editBtn = card.querySelector('.edit-perms-btn');
+    editBtn.style.opacity = '0.5';
+    editBtn.style.cursor = 'not-allowed';
+    editBtn.title = 'Apenas o próprio usuário pode editar seu perfil.';
+
+
+    // 🚨 LÓGICA DE ATIVAÇÃO DA ENGRENAGEM: Ativa SOMENTE para o usuário logado
+    if (userProfile && user.id === userProfile.user_id) {
+         editBtn.style.opacity = '1';
+         editBtn.style.cursor = 'pointer';
+         editBtn.title = 'Editar Meu Perfil e Senha';
+         editBtn.addEventListener('click', () => {
+            openEditProfileModal(user); // Abre a modal de edição de perfil
+        });
     }
-};
+
+    return card;
+}
+
+
+function openEditProfileModal(user) {
+    const modalTitle = document.getElementById('modalTitle');
+    const editingUserIdInput = document.getElementById('editingUserId');
+    const newEmailInput = document.getElementById('newEmail');
+    const modalProfile = document.getElementById('userProfileModal');
+
+    // Limpa a modal
+    document.getElementById('editProfileForm').reset();
+    document.getElementById('profileFormMessage').style.display = 'none';
+
+    // Preenche os dados
+    modalTitle.textContent = `Meu Perfil e Segurança (${user.usuario})`;
+
+    // O ID de cadastro/auth
+    editingUserIdInput.value = user.id;
+
+    // Preenche o email atual
+    newEmailInput.value = user.email || '';
+
+    modalProfile.style.display = 'block';
+}
 
 
 document.addEventListener('DOMContentLoaded', () => {
+
+    // Inicia o processo de autenticação e carregamento
+    setupPermissionsPage();
+
     // Referências do DOM
-    const modalEditPerms = document.getElementById('editPermissionsModal');
-    const closeBtnEditPerms = document.querySelector('.edit-close-btn');
-    const editPermissionsForm = document.getElementById('editPermissionsForm');
-    const actionPermissionsDiv = document.getElementById('actionPermissions');
-    const screenAccessDiv = document.getElementById('screenAccess');
-    const userRoleSelect = document.getElementById('userRole');
-    const editingUserIdInput = document.getElementById('editingUserId');
-    const modalTitle = document.getElementById('modalTitle');
-    const usersListDiv = document.getElementById('usersList');
-
-    loadUsersAndPermissions();
-
-    function displayFormMessage(message, isSuccess, element = document.getElementById('permissionFormMessage')) {
-        element.textContent = message;
-        element.className = `form-message ${isSuccess ? 'success' : 'error'}`;
-        element.style.display = 'block';
-        setTimeout(() => element.style.display = 'none', 3000);
-    }
-
-    function generatePermissionCheckboxes(container, permissionsArray, currentPerms = {}) {
-        container.innerHTML = '';
-        permissionsArray.forEach(perm => {
-            const div = document.createElement('div');
-            const id = `perm_${perm.key}`;
-            div.innerHTML = `
-                <input type="checkbox" id="${id}" name="${perm.key}" ${!!currentPerms[perm.key] ? 'checked' : ''}>
-                <label for="${id}">${perm.label}</label>
-            `;
-            container.appendChild(div);
-        });
-    }
-
-    async function loadUsersAndPermissions() {
-        const usersListDiv = document.getElementById('usersList');
-        usersListDiv.innerHTML = '<p id="usersLoadingMessage" class="text-muted">Carregando usuários e permissões...</p>';
-
-        // SELECT deve funcionar livremente devido à RLS aberta no DB
-        let { data: users, error } = await supabaseClient
-            .from('cadastros')
-            .select('*');
-
-        if (error) {
-            usersListDiv.innerHTML = `<p style="color:red;">Erro ao carregar usuários: ${error.message}.</p>`;
-            return;
-        }
-        usersListDiv.innerHTML = '';
-        if (users && users.length > 0) {
-            users.forEach(user => {
-                usersListDiv.appendChild(createUserCard(user));
-            });
-        } else {
-            usersListDiv.innerHTML = '<p class="text-muted">Nenhum usuário encontrado na tabela de cadastros.</p>';
-        }
-    }
-
-    function createUserCard(user) {
-        const card = document.createElement('div');
-        card.className = 'user-card';
-        card.setAttribute('data-user-id', user.id);
-
-        const userName = user.usuario || 'Usuário Não Configurado';
-        const userRole = user.role || 'Não Definido';
-        const userStatus = user.status || 'Sem Status';
-
-        card.innerHTML = `
-            <div class="user-info">
-                <div class="user-name">${userName}</div>
-                <div class="user-role">Função: <strong>${userRole}</strong></div>
-                <div class="user-status">Status: ${userStatus}</div>
-            </div>
-            <button class="user-action-btn edit-perms-btn" title="Editar Permissões">
-                <i class="fas fa-cog"></i>
-            </button>
-        `;
-
-        const editBtn = card.querySelector('.edit-perms-btn');
-        editBtn.style.opacity = '1';
-        editBtn.style.cursor = 'pointer';
-
-        // Melhoria de UI: Bloqueia o botão se não for MASTER
-        if (masterId) {
-            editBtn.addEventListener('click', () => {
-                openEditPermissionsModal(user);
-            });
-        } else {
-            editBtn.style.opacity = '0.5';
-            editBtn.style.cursor = 'not-allowed';
-            editBtn.title = 'Apenas usuários MASTER podem editar.';
-        }
+    const modalProfile = document.getElementById('userProfileModal');
+    const closeBtnProfile = document.querySelector('.profile-close-btn');
+    const editProfileForm = document.getElementById('editProfileForm');
 
 
-        return card;
-    }
-
-
-    function openEditPermissionsModal(user) {
-        modalTitle.textContent = `Editar Permissões para ${user.usuario || 'Usuário'}`;
-        editingUserIdInput.value = user.id;
-
-        userRoleSelect.value = user.role || 'OPERACAO';
-
-        generatePermissionCheckboxes(actionPermissionsDiv, ACTION_PERMISSIONS, user);
-        generatePermissionCheckboxes(screenAccessDiv, SCREEN_ACCESS, user);
-
-        userRoleSelect.onchange = (e) => {
-            const role = e.target.value;
-            const template = ROLE_PERMISSIONS[role];
-            generatePermissionCheckboxes(actionPermissionsDiv, ACTION_PERMISSIONS, template);
-            generatePermissionCheckboxes(screenAccessDiv, SCREEN_ACCESS, template);
-        };
-
-        modalEditPerms.style.display = 'block';
-    }
-
-    closeBtnEditPerms.addEventListener('click', () => {
-        modalEditPerms.style.display = 'none';
-        editPermissionsForm.reset();
+    // Fechar Modal
+    closeBtnProfile.addEventListener('click', () => {
+        modalProfile.style.display = 'none';
+        editProfileForm.reset();
     });
     window.addEventListener('click', (event) => {
-        if (event.target === modalEditPerms) {
-            modalEditPerms.style.display = 'none';
+        if (event.target === modalProfile) {
+            modalProfile.style.display = 'none';
         }
     });
 
     // =======================================================
-    // FUNÇÃO DE SUBMISSÃO FINAL
+    // FUNÇÃO DE SUBMISSÃO FINAL (Troca de Senha/Email)
     // =======================================================
-    editPermissionsForm.addEventListener('submit', async (e) => {
+    editProfileForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const userId = editingUserIdInput.value;
-        const role = userRoleSelect.value;
-        const permissionFormMessage = document.getElementById('permissionFormMessage');
-        permissionFormMessage.style.display = 'none';
 
-        if (!userId) {
-            displayFormMessage('Erro interno: ID do usuário a ser editado não foi capturado.', false, permissionFormMessage);
+        const currentEmail = userProfile ? userProfile.email : '';
+        const newEmail = document.getElementById('newEmail').value.trim();
+        const oldPassword = document.getElementById('oldPassword').value.trim();
+        const newPassword = document.getElementById('newPassword').value.trim();
+        const confirmPassword = document.getElementById('confirmPassword').value.trim();
+        const profileFormMessage = document.getElementById('profileFormMessage');
+        profileFormMessage.style.display = 'none';
+
+        const dbUserId = document.getElementById('editingUserId').value;
+
+
+        // --- 1. VALIDAÇÕES DE ESTADO ---
+        if (!userProfile) {
+             displayFormMessage('Erro: Sessão não encontrada. Por favor, faça login novamente.', false, profileFormMessage);
+             return;
+        }
+
+        // --- 2. VALIDAÇÕES DE SENHA ---
+        const changingPassword = newPassword && confirmPassword;
+
+        if (changingPassword) {
+            if (!oldPassword) {
+                 displayFormMessage('Você deve informar a senha antiga para poder trocá-la.', false, profileFormMessage);
+                 return;
+            }
+            if (newPassword.length < 6) {
+                 displayFormMessage('A nova senha deve ter no mínimo 6 caracteres.', false, profileFormMessage);
+                 return;
+            }
+            if (newPassword !== confirmPassword) {
+                displayFormMessage('A nova senha e a confirmação não coincidem.', false, profileFormMessage);
+                return;
+            }
+        }
+
+        const emailChanged = newEmail !== currentEmail;
+
+        if (!emailChanged && !changingPassword) {
+            displayFormMessage('Nenhum campo foi alterado. Nada para salvar.', false, profileFormMessage);
             return;
         }
 
-        // Bloqueio de front-end para não-MASTER
-        if (!masterId) {
-            displayFormMessage('Erro: Sessão MASTER não ativa. Você não pode salvar.', false, permissionFormMessage);
+        displayFormMessage('<i class="fas fa-spinner fa-spin"></i> Salvando alterações de perfil...', true, profileFormMessage);
+
+        // --- 3. VERIFICAÇÃO DA SENHA ANTIGA (Simulação no Front-end para fins didáticos, mas NÃO SEGURA) ---
+        // Se você não tem o campo de senha no DB (o que é correto), esta verificação FALHARÁ,
+        // pois você não tem o hash da senha antiga. O correto é usar o endpoint de login para reautenticação.
+
+        // 🚨 COMO SEU PEDIDO É INSEGURO, AQUI ESTÁ A IMPLEMENTAÇÃO SEGUINDO A REQUISIÇÃO (MAIS PRÓXIMA)
+        // O Supabase NÃO PERMITE ler a senha do auth.users, então faremos uma RE-AUTENTICAÇÃO.
+
+        if (changingPassword) {
+             // Tenta autenticar o usuário com a senha antiga
+             const { error: signInError } = await supabaseClient.auth.signInWithPassword({
+                 email: currentEmail, // O email atual é o que está logado
+                 password: oldPassword,
+             });
+
+             if (signInError) {
+                 if (signInError.message.includes('Invalid login credentials')) {
+                      displayFormMessage('A senha antiga informada está incorreta.', false, profileFormMessage);
+                      return;
+                 } else {
+                      displayFormMessage(`Erro na verificação da senha antiga: ${signInError.message}.`, false, profileFormMessage);
+                      return;
+                 }
+             }
+             // Se passou, o usuário foi reautenticado, e podemos prosseguir com o update
+        }
+
+
+        // --- 4. PREPARAÇÃO DO PAYLOAD E CHAMADA DE AUTH (Supabase) ---
+        const updateAuthData = {};
+        if (emailChanged) updateAuthData.email = newEmail;
+        if (changingPassword) updateAuthData.password = newPassword;
+
+        const { data: { user }, error: authError } = await supabaseClient.auth.updateUser(updateAuthData);
+
+        if (authError) {
+            console.error("ERRO CRÍTICO NO AUTH (Supabase):", authError);
+            displayFormMessage(`Erro ao atualizar credenciais: ${authError.message}.`, false, profileFormMessage);
             return;
         }
 
-        const updateData = { role: role };
+        // --- 5. ATUALIZAÇÃO DO EMAIL NO DB DE CADASTROS (Se alterado) ---
+        if (emailChanged) {
+            const { error: dbError } = await supabaseClient
+                .from('cadastros')
+                .update({ email: newEmail })
+                .eq('id', dbUserId);
 
-        // Coleta todas as permissões marcadas (TRUE ou FALSE)
-        [...ACTION_PERMISSIONS, ...SCREEN_ACCESS].forEach(perm => {
-            const checkbox = document.getElementById(`perm_${perm.key}`);
-            updateData[perm.key] = checkbox ? checkbox.checked : false;
-        });
-
-        // DEBUG
-        console.log("--- DEBUG UPDATE PERMISSÕES ---");
-        console.log("MASTER ID Logado:", masterId);
-        console.log("ID do Usuário a Atualizar:", userId);
-        console.log("Dados de Update:", updateData);
-        console.log("------------------------------");
-
-
-        const { error } = await supabaseClient
-            .from('cadastros')
-            .update(updateData)
-            .eq('id', userId);
-
-        if (error) {
-            // Se esta mensagem aparecer, o problema é algum erro de DB ou o TRIGGER rejeitou.
-            console.error("ERRO CRÍTICO NO UPDATE (O Supabase Rejeitou):", error);
-            displayFormMessage(`Erro ao salvar permissões: ${error.message}.`, false, permissionFormMessage);
-        } else {
-            // Atualiza a UI SOMENTE COM OS DADOS FINAIS DO BANCO DE DADOS
-            console.log("UPDATE ENVIADO E ACEITO PELO SUPABASE.");
-            displayFormMessage('Permissões atualizadas com sucesso! Recarregando dados...', true, permissionFormMessage);
-
-            // ESTA É A LINHA CRÍTICA: RECARREGA OS DADOS DO BANCO PARA CONFIRMAR A MUDANÇA
-            await loadUsersAndPermissions();
-
-            setTimeout(() => { modalEditPerms.style.display = 'none'; }, 1000);
+            if (dbError) {
+                 console.error("ERRO NO UPDATE DA TABELA CADASTROS:", dbError);
+                 displayFormMessage('Sucesso na troca de senha, mas houve erro ao atualizar o email na tabela "cadastros".', false, profileFormMessage);
+                 setTimeout(() => { modalProfile.style.display = 'none'; }, 2000);
+                 await loadUsersAndPermissions();
+                 return;
+            }
         }
-    });
 
-    document.getElementById('changePasswordBtn').addEventListener('click', () => {
-        alert('Recurso de Troca de Senha: Em um sistema real, isso requer um endpoint de administrador.');
-    });
+        // --- 6. SUCESSO ---
+        displayFormMessage('Perfil e credenciais atualizadas com sucesso! Recarregando lista...', true, profileFormMessage);
 
+        // Atualiza a sessão local para refletir o novo email
+        if (emailChanged) {
+            const updatedProfile = { ...userProfile, email: newEmail };
+            localStorage.setItem('user_session_data', JSON.stringify(updatedProfile));
+            userProfile = updatedProfile;
+        }
+
+        await loadUsersAndPermissions();
+
+        setTimeout(() => { modalProfile.style.display = 'none'; }, 1000);
+    });
 });

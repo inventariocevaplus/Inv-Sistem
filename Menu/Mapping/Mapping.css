@@ -1,0 +1,510 @@
+/* Importa o estilo principal do menu para reutilização de variáveis */
+@import url('../Menu.css');
+
+/* ================================================================= */
+/* ESTILOS ESPECÍFICOS DO MÓDULO MAPPING */
+/* ================================================================= */
+
+/* Estrutura do Conteúdo Principal */
+.mapping-content {
+    background-color: var(--box-bg);
+    padding: 25px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-subtle);
+    margin-top: 0;
+}
+
+/* NOVO ESTILO: Container para o título da Grade e o botão Salvar */
+.grade-header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.mapping-content h2 {
+    color: var(--primary-color);
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.mapping-content p {
+    margin-top: 5px;
+    margin-bottom: 15px;
+    color: var(--text-color-medium);
+    font-size: 0.9em;
+}
+
+
+/* ================================================================= */
+/* ESTILOS PARA NAVEGAÇÃO CUSTOMIZADA (GRADE, DASH, ANALISTA) */
+/* ================================================================= */
+.custom-nav-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 20px;
+}
+
+.header-info h1 {
+    margin: 0;
+    color: var(--text-color-dark);
+    font-size: 1.8em;
+}
+
+.header-info p {
+    margin-top: 5px;
+    color: var(--text-color-medium);
+    font-size: 0.9em;
+}
+
+.sub-nav-links {
+    display: flex;
+    gap: 15px;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: var(--text-color-medium);
+    font-weight: 600;
+    padding: 8px 15px;
+    border-radius: 4px;
+    transition: color 0.2s, background-color 0.2s;
+    border-bottom: 3px solid transparent;
+}
+
+.nav-link:hover {
+    color: var(--primary-color);
+}
+
+.nav-link.active {
+    color: var(--primary-color);
+    border-bottom: 3px solid var(--primary-color);
+}
+
+.nav-link i {
+    margin-right: 5px;
+}
+
+/* ================================================================= */
+/* ESTILOS PARA A BARRA DE PESQUISA/DOWNLOAD (data-tools) */
+/* ================================================================= */
+.data-tools {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: var(--box-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-subtle);
+}
+
+.search-area {
+    display: flex;
+    gap: 10px;
+}
+
+.add-area {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+/* Regra para uniformizar o estilo de TODOS os inputs na barra de ferramentas */
+#searchInput, #inputContrato {
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    transition: border-color 0.2s;
+}
+
+#searchInput:focus, #inputContrato:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+/* Larguras específicas */
+#searchInput {
+    width: 180px;
+}
+#inputContrato {
+    width: 250px;
+}
+
+
+/* Estilo dos Botões de Ação */
+#searchBtn {
+    background-color: var(--secondary-color);
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#searchBtn:hover {
+    background-color: #040e2b;
+}
+
+.download-btn {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: opacity 0.2s;
+}
+
+.download-btn:hover {
+    opacity: 0.9;
+}
+
+/* Botão Download/Salvar Apenas com Ícone */
+.download-btn.icon-only {
+    width: 40px;
+    padding: 10px 0;
+}
+
+.download-btn.icon-only i {
+    margin: 0;
+}
+
+/* Botão Adicionar (add-btn) */
+.add-btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.add-btn:hover {
+    background-color: #218838;
+}
+
+/* Botão Adicionar Apenas com Ícone */
+.add-btn.icon-only {
+    width: 40px;
+    padding: 10px 0;
+}
+
+.add-btn.icon-only i {
+    margin: 0;
+}
+
+/* Sobrescreve o estilo do botão Salvar para usar a cor do botão de pesquisa (ou uma cor escura) */
+#saveAllBtn {
+    background-color: var(--secondary-color); /* Usa o azul escuro da variável */
+}
+
+#saveAllBtn:hover {
+    background-color: #040e2b; /* Um tom ainda mais escuro no hover */
+}
+
+
+/* ================================================================= */
+/* ESTILOS PARA TABELA/GRADE (COM CORREÇÃO DE ALINHAMENTO) */
+/* ================================================================= */
+
+.table-wrapper {
+    /* SCROLL HORIZONTAL (Eixo X) - Aplica a barra de rolagem horizontal aqui */
+    overflow-x: auto;
+    width: 100%;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    direction: rtl; /* Permite rolar horizontalmente da direita para a esquerda */
+}
+
+.contract-grade {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    direction: ltr; /* Volta a direção do texto da tabela para o padrão */
+}
+
+/* ESSENCIAL: Garante que o cabeçalho e as linhas do corpo tenham as mesmas larguras */
+.contract-grade thead, .contract-grade tbody {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+/* **CORREÇÃO CRUCIAL:** Compensação da barra de rolagem no THEAD */
+.contract-grade thead {
+    /* Reduz a largura do thead em 17px (tamanho padrão da barra de rolagem)
+       para que o conteúdo das colunas no thead se alinhe com o conteúdo do tbody. */
+    width: calc(100% - 17px);
+}
+
+/* **AJUSTE ESSENCIAL 1: SCROLL VERTICAL NO CORPO (Y)** */
+#tableBody {
+    display: block; /* Essencial para aplicar altura e scroll */
+    max-height: 400px; /* Altura máxima para ativar o scroll. */
+    overflow-y: scroll; /* ATIVA A BARRA DE ROLAGEM VERTICAL (Y) */
+    overflow-x: hidden;
+}
+
+/* As linhas (tr) dentro do corpo (tbody) devem ser display: table também para funcionar com table-layout: fixed */
+.contract-grade tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+
+/* MODIFICAÇÃO CENTRAL: Define a largura Padrão e Ativa a Quebra de Linha */
+.contract-grade th, .contract-grade td {
+    padding: 7px 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+    font-size: 0.85em;
+    /* Padrão de Largura para a maioria das colunas */
+    width: 150px;
+    min-width: 150px;
+    /* Garante que o conteúdo de dados não quebre linha */
+    white-space: nowrap;
+    vertical-align: middle; /* Alinhamento padrão: Centralizado */
+    height: 100%; /* Garante que a célula se expanda com o conteúdo */
+}
+
+/* SOBRESCRITA: Quebra de Texto para os Cabeçalhos e Alinhamento */
+.contract-grade th {
+    white-space: normal; /* Permite a quebra de linha */
+    word-wrap: break-word; /* Força a quebra de palavras longas */
+    vertical-align: middle; /* Centraliza verticalmente o texto quebrado */
+}
+
+/* ================================================================= */
+/* BLOCO: LÓGICA DE QUEBRA DE TEXTO E AUTO-ALTURA PARA CÉLULAS EDITÁVEIS */
+/* ================================================================= */
+.contract-grade td[contenteditable="true"] {
+    white-space: normal !important; /* SOBRESCRITA CRÍTICA: Permite que o texto quebre a linha */
+    word-break: break-word;        /* Garante a quebra de palavras/strings muito longas */
+    vertical-align: middle;        /* Centraliza o texto verticalmente */
+    min-height: 20px;              /* Garante uma altura mínima visível */
+}
+/* ================================================================= */
+
+
+/* ================================================================= */
+/* REMOÇÃO DA COLUNA CONGELADA (CONTRATOS) */
+/* ================================================================= */
+
+.contract-grade th:nth-child(1), .contract-grade td:nth-child(1) {
+    /* REMOVE A FIXAÇÃO DA PRIMEIRA COLUNA */
+    position: static;
+    left: auto;
+    z-index: auto;
+    /* Volta para o padrão de largura */
+    width: 150px;
+    min-width: 150px;
+    background-color: #f8f8f8; /* Mantém a cor de fundo apenas para o cabeçalho */
+}
+
+.contract-grade td:nth-child(1) {
+    background-color: white; /* Volta para o fundo branco */
+}
+
+/* Coluna Ações (Última Coluna) */
+.contract-grade th:last-child, .contract-grade td:last-child {
+    width: 80px;
+    min-width: 80px;
+}
+
+
+/* **AJUSTE 3: Estilo do Cabeçalho Fixo (Topo)** */
+.contract-grade th {
+    background-color: #f8f8f8;
+    color: var(--text-color-dark);
+    font-weight: 700;
+    /* Fixa o cabeçalho no topo (apesar do display: block no tbody) */
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+
+/* Estilo para a nova linha editável */
+.new-row td {
+    background-color: #fff3cd;
+}
+
+/* ================================================================= */
+/* ESTILOS DA MODAL DE CONFIRMAÇÃO (DELETE) */
+/* ================================================================= */
+
+/* Fundo escuro */
+.modal {
+    display: none; /* Escondido por padrão */
+    position: fixed;
+    z-index: 1000; /* Acima de todo o conteúdo */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4); /* Fundo preto semi-transparente */
+}
+
+/* Conteúdo da Modal */
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% do topo e centralizado */
+    padding: 25px;
+    border: 1px solid #888;
+    width: 400px; /* Largura fixa */
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+/* Botão de fechar (x) */
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 0.8; /* Ajuste para melhor alinhamento */
+}
+
+.close-btn:hover,
+.close-btn:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-actions {
+    margin-top: 20px;
+}
+
+.modal-actions button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    margin: 0 5px;
+    transition: opacity 0.2s;
+}
+
+.confirm-btn {
+    background-color: #dc3545; /* Vermelho para exclusão */
+    color: white;
+}
+
+.confirm-btn:hover {
+    background-color: #c82333;
+}
+
+.cancel-btn {
+    background-color: #6c757d; /* Cinza para cancelar */
+    color: white;
+}
+
+.cancel-btn:hover {
+    background-color: #5a6268;
+}
+
+/* ================================================================= */
+/* ESTILOS DO TOAST DE AVISO (SALVAMENTO) */
+/* ================================================================= */
+
+#toastNotification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #28a745; /* Verde de sucesso */
+    color: white;
+    padding: 15px 25px;
+    border-radius: 5px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+}
+
+.toast-hidden {
+    opacity: 0;
+    pointer-events: none; /* Garante que não interfira nos cliques */
+    transform: translateY(100%); /* Esconde inicialmente */
+}
+
+.toast-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+#toastNotification i {
+    font-size: 1.2em;
+}
+
+/* ================================================================= */
+/* ESTILOS ESPECÍFICOS DO MÓDULO ANALISTA (Combinado com Mapping.css) */
+/* ================================================================= */
+
+/* Contêiner que envolve a grade de botões (Usado dentro de #analistasContainer) */
+.analistas-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 20px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background-color: white; /* Fundo branco para destaque */
+    box-shadow: var(--shadow-subtle);
+}
+
+/* Estilo do botão de cada analista */
+.analista-btn {
+    background-color: var(--box-bg); /* Cor de fundo suave */
+    color: var(--text-color-dark);
+    border: 1px solid var(--border-color);
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-transform: uppercase;
+}
+.analista-btn:hover {
+    background-color: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.analista-btn i {
+    color: var(--primary-color);
+    transition: color 0.2s;
+}
+.analista-btn:hover i {
+    color: white;
+}
+
+/* Estilo para o container que envolve o grid de analistas */
+.info-card {
+    /* Garante que o container do analista (analistasContainer)
+       tenha padding e background para destacar (usado no HTML/JS) */
+    padding: 20px;
+    background-color: var(--box-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-subtle);
+}
+
+.loading-analistas {
+    color: var(--text-color-medium);
+}

@@ -1,0 +1,484 @@
+/* Custom Properties (Cores Base) */
+:root {
+    /* Baseado no seu CSS de Login */
+    --color-primary: #FF6600; /* Laranja CEVA (Mantido para o lado do KPI) */
+    --color-primary-dark: #cc5200;
+    --color-secondary: #051039; /* AZUL MARINHO (Realizado/Colunas) */
+    --color-success: #00B3A8;
+    --color-danger: #FF0000; /* VERMELHO VIVO (Pendente/Incorreto) */
+    --color-secondary-dark: #03081e; /* Novo: Para o botão secundário */
+
+    --color-status-planejado: #8A2BE2; /* Roxo (Cor do Status) */
+
+    --text-color: #333333;
+    --text-color-muted: #6c757d;
+    --color-background-card: #f9f9f9;
+    --color-border: #e9ecef;
+}
+
+/* ------------------------------------------- */
+/* ESTILOS DE LAYOUT (Ajustado para Filtros)  */
+/* ------------------------------------------- */
+
+/* Estilo para os controles de filtro (Compacto) */
+.dashboard-controls {
+    display: flex;
+    /* ⭐ AJUSTE: Permite que o grupo de botões vá para o final ⭐ */
+    justify-content: space-between;
+    gap: 15px;
+    align-items: flex-end;
+    margin-bottom: 15px;
+    padding: 10px 15px;
+    background-color: white;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.input-group-filter {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group-filter label {
+    font-weight: 600;
+    margin-bottom: 3px;
+    font-size: 0.8em;
+    color: var(--text-color);
+    white-space: nowrap; /* Garante que o texto não quebre */
+}
+
+.input-group-filter select {
+    padding: 6px 10px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background-color: white;
+    min-width: 120px; /* Reduzido levemente para caber mais filtros */
+    font-size: 0.85em;
+    cursor: pointer;
+}
+
+/* Container para os Botões no Canto Direito */
+.controls-actions {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+}
+
+/* Botão de Ação Primário */
+.action-btn.primary-action {
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    padding: 7px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85em;
+    transition: background-color 0.2s;
+    white-space: nowrap;
+}
+
+.action-btn.primary-action:hover {
+    background-color: var(--color-primary-dark);
+}
+
+/* Botão de Ação Secundário (Print/Câmera) REMOVIDO */
+
+/* --- KPIs - Layout de 4 Colunas (Compacto) --- */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.kpi-card {
+    background-color: white;
+    border-left: 5px solid var(--color-primary);
+    padding: 10px 15px;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    text-align: left;
+}
+
+/* Cores de destaque para consistência */
+.kpi-card:nth-child(4) { border-left-color: var(--color-danger); } /* Loc Inc: Vermelho */
+.kpi-card:nth-child(3) { border-left-color: var(--color-secondary); } /* KPI Realizado: Azul Marinho */
+
+/* Adiciona estilo para as setas do KPI Prazo */
+.kpi-value .text-success { color: var(--color-success); }
+.kpi-value .text-danger { color: var(--color-danger); }
+
+
+.kpi-label {
+    display: block;
+    font-size: 0.8em;
+    font-weight: 600;
+    margin-bottom: 3px;
+    color: var(--text-color-muted);
+    text-transform: uppercase;
+}
+
+.kpi-value {
+    display: block;
+    font-size: 1.6em;
+    font-weight: 700;
+    color: var(--color-secondary);
+}
+
+/* --- Gráficos - Layout e Altura Ajustados --- */
+.charts-grid {
+    /* ⭐ Adicionado para forçar o alinhamento de altura entre as células */
+    display: grid;
+    grid-template-columns: 7fr 3fr;
+    gap: 15px;
+    align-items: stretch;
+}
+
+/* ESTILO GERAL DO CONTAINER (Altura Padrão) */
+.chart-container {
+    background-color: white;
+    padding: 12px;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+
+    /* ⭐ Altura reduzida para 255px (aprox. 15%) */
+    max-height: 255px;
+    overflow: hidden;
+    position: relative; /* Essencial para posicionar a engrenagem */
+}
+
+/* O container do gráfico de barras (Barra) */
+.chart-container.bar-chart {
+    padding: 15px;
+    /* Mantém a altura consistente */
+    max-height: 255px;
+}
+
+.chart-container h2 {
+    font-size: 1.0em;
+    color: var(--color-secondary);
+    margin-bottom: 0;
+    padding-bottom: 0;
+    font-weight: 600;
+}
+
+/* NOVO: Container para Título e Engrenagem */
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 5px;
+}
+
+.last-update {
+    text-align: right;
+    margin-top: 10px;
+    color: var(--text-color-muted);
+    font-size: 0.7em;
+}
+
+/* ------------------------------------------- */
+/* ESTILOS DO MENU DE CONFIGURAÇÃO (MANTIDO) */
+/* ------------------------------------------- */
+
+.chart-settings-dropdown {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 10;
+}
+
+#chartSettingsIcon {
+    font-size: 1.2rem;
+    color: var(--text-color-muted);
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+#chartSettingsIcon:hover {
+    color: var(--color-primary);
+}
+
+/* O Menu Dropdown */
+.settings-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 30px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+    /* ⭐ AJUSTE AQUI: padding-bottom (30px) para criar o espaço extra no final da lista */
+    padding: 10px 10px 180px 10px;
+
+    min-width: 230px;
+    animation: fadeIn 0.3s;
+
+    /* PROPRIEDADES PARA ROLAGEM */
+    max-height: 280px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.settings-menu.show {
+    display: block;
+}
+
+.settings-menu h6 {
+    font-size: 0.75em;
+    color: var(--color-secondary);
+    font-weight: 700;
+    text-transform: uppercase;
+    padding-bottom: 3px;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.settings-menu hr {
+    margin: 8px 0;
+    border-top: 1px solid #f0f0f0;
+}
+
+/* Estilo para cada item de configuração */
+.setting-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    font-size: 0.8em;
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+.setting-item input[type="checkbox"],
+.setting-item input[type="radio"] {
+    margin-right: 8px;
+    width: 14px;
+    height: 14px;
+}
+
+/* Estilos para desenhar as linhas e cores da legenda no menu */
+.setting-item .fas, .setting-item .legend-color, .setting-item .legend-line {
+    width: 15px;
+    height: 10px;
+    margin-right: 8px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* Desenho da Coluna (Cor Sólida) */
+.legend-color {
+    border-radius: 2px;
+}
+
+/* Desenho das Linhas Tracejadas */
+.legend-line {
+    border-top-width: 2px;
+    border-top-style: dashed;
+    height: 0;
+    border: none;
+    border-bottom: 2px dashed;
+}
+
+.line-orange {
+    border-bottom-color: var(--color-primary); /* Laranja CEVA */
+}
+
+.line-purple {
+    border-bottom-color: var(--color-status-planejado); /* Roxo */
+}
+
+/* Animação simples para o menu */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ------------------------------------------- */
+/* NOVOS ESTILOS PARA O CONTROLE DE COR DA PIZZA (MANTIDO) */
+/* ------------------------------------------- */
+
+/* Container do Dropdown de Cor */
+.dropdown-local {
+    position: relative;
+    display: inline-block;
+}
+
+/* Estado aberto */
+.dropdown-local.open .dropdown-menu-local {
+    display: block;
+}
+
+/* Botão/Toggle que abre o dropdown (o ícone da paleta) */
+.dropdown-local .dropdown-toggle {
+    display: inline-block;
+    padding: 2px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+    line-height: 1;
+}
+
+.dropdown-local .dropdown-toggle:hover {
+    background-color: #f0f0f0;
+}
+
+/* O menu que aparece (Lista de opções de cor) */
+.dropdown-menu-local {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 5px 0;
+    list-style: none;
+    min-width: 100px;
+    z-index: 20;
+}
+
+/* Itens de cor */
+.dropdown-menu-local li {
+    padding: 0 10px;
+}
+
+.dropdown-menu-local li:hover {
+    background-color: #f8f8f8;
+}
+
+/* Estilo para os radio buttons dentro do menu de cor */
+.color-picker-menu .setting-item {
+    padding: 3px 0;
+    margin-bottom: 0;
+    justify-content: flex-start;
+}
+
+.color-picker-menu .setting-item input[type="radio"] {
+    margin-right: 5px;
+    transform: translateY(-1px);
+}
+
+/* ------------------------------------------- */
+/* AJUSTES PARA CENTRALIZAÇÃO DO GRÁFICO DE PIZZA (MANTIDO) */
+/* ------------------------------------------- */
+
+.chart-container.pie-chart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+
+    height: 100%;
+    max-height: 255px;
+}
+
+.chart-container.pie-chart canvas {
+    max-height: none !important;
+    margin: auto;
+    width: 100% !important;
+}
+
+.chart-container.pie-chart .chartjs-render-monitor {
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+
+/* ------------------------------------------- */
+/* AJUSTE NA LEGENDA DO GRÁFICO DE PIZZA (MANTIDO) */
+/* ------------------------------------------- */
+
+.chart-container.pie-chart .chartjs-legend ul {
+    display: inline-flex;
+    padding-left: 0;
+    margin: 5px auto 0 auto;
+    list-style: none;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.chart-container.pie-chart .chartjs-legend ul li {
+    margin: 0 10px;
+    white-space: nowrap;
+    font-size: 0.85em;
+    padding: 0;
+}
+
+.chart-container.pie-chart .chartjs-legend ul li span {
+    margin-right: 5px;
+}
+
+
+/* ------------------------------------------- */
+/* ESTILIZAÇÃO DA BARRA DE ROLAGEM (MANTIDO) */
+/* ------------------------------------------- */
+
+/* Para Chrome, Safari e Edge (Webkit) */
+.settings-menu::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.settings-menu::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+.settings-menu::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+/* Para Firefox (suporte limitado) */
+.settings-menu {
+    scrollbar-width: thin;
+    scrollbar-color: #ccc #f1f1f1;
+}
+
+
+/* ------------------------------------------- */
+/* Media Query (Adaptação para telas menores - MANTIDO) */
+/* ------------------------------------------- */
+
+@media (max-width: 992px) {
+    .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+    .chart-container.bar-chart {
+        max-height: none;
+        height: 350px;
+    }
+    .chart-container {
+        max-height: none;
+        height: 300px;
+    }
+    .settings-menu {
+        right: 0;
+        min-width: 95vw;
+        max-height: 80vh;
+        box-sizing: border-box;
+    }
+    .chart-container.pie-chart .chartjs-legend ul {
+        flex-wrap: wrap;
+    }
+    /* ⭐ NOVO: Quebra o container de filtros em 2 linhas em telas pequenas ⭐ */
+    .dashboard-controls {
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+    .controls-actions {
+        /* Garante que os botões vão para a próxima linha ou para a direita */
+        margin-left: auto;
+    }
+}

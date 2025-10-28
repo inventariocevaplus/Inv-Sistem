@@ -1,0 +1,404 @@
+/*
+ * Arquivo: Analista.css
+ * Estilos específicos para a tela de Gestão de Analistas, Modais e Toast
+ */
+
+/* ================================================================= */
+/* VARIÁVEIS DE CORES (Ajustadas para o padrão CEVA Azul/Vermelho) */
+/* ================================================================= */
+
+/* Replicando as variáveis do seu style.css para garantir consistência */
+:root {
+    --primary-color: #051039; /* Azul Marinho (Principal) */
+    --secondary-color: #FF0000; /* Vermelho (Destaque/Ação) */
+    --background-light: #f4f7f9; /* Fundo Quase Branco */
+    --text-dark: #212529; /* Texto Principal */
+    --text-muted: #6c757d;
+    --box-bg: #ffffff;
+    --border-radius: 6px;
+    --shadow-subtle: 0 4px 15px rgba(5, 16, 57, 0.1);
+}
+
+/* ================================================================= */
+/* ESTILOS ESPECÍFICOS DO MÓDULO ANALISTA (Botões) */
+/* ================================================================= */
+
+.info-card {
+    padding: 20px;
+    background-color: var(--box-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-subtle);
+    margin-top: 20px;
+}
+
+.analistas-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 20px;
+    border: 1px solid #ced4da;
+    border-radius: var(--border-radius);
+    background-color: var(--background-light);
+    margin-top: 15px;
+}
+
+.analista-btn {
+    background-color: var(--box-bg);
+    color: var(--text-dark);
+    border: 1px solid #ced4da;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-transform: uppercase;
+}
+.analista-btn:hover {
+    background-color: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.analista-btn i {
+    color: var(--secondary-color); /* Ícone em vermelho */
+    transition: color 0.2s;
+}
+.analista-btn:hover i {
+    color: white;
+}
+
+/* ================================================================= */
+/* ESTILOS DE MODAL BASE (USADO PARA AMBAS AS JANELAS) */
+/* ================================================================= */
+
+.ceva-modal-backdrop {
+    display: none;
+    position: fixed;
+    z-index: 1010;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.8);
+    animation: fadeIn 0.2s ease-out;
+}
+
+.ceva-modal-container {
+    background-color: var(--box-bg);
+    margin: 5% auto;
+    border-radius: 8px;
+    width: 95%;
+    max-width: 850px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    position: relative;
+    overflow: hidden;
+    animation: slideDown 0.3s ease-out;
+}
+
+.modal-small {
+    max-width: 450px; /* Para o perfil do usuário */
+}
+/* Adicionado: Classe para a modal de detalhes do analista */
+.ceva-modal-container.modal-large {
+    max-width: 800px;
+}
+
+
+.ceva-modal-header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.analyst-name-title {
+    font-size: 1.5em;
+    font-weight: 700;
+    text-transform: uppercase;
+    /* Alterado para cor branca para harmonizar com o header Azul Marinho */
+    color: white;
+}
+/* Mantendo o ícone em vermelho como destaque discreto */
+.analyst-name-title i {
+    color: var(--secondary-color);
+    margin-right: 10px;
+}
+
+
+.close-btn {
+    color: white;
+    font-size: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.close-btn:hover {
+    color: var(--secondary-color);
+}
+
+.ceva-modal-body {
+    padding: 25px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+/* ================================================================= */
+/* ESTILOS DO PERFIL DO USUÁRIO (REESTILIZADO) */
+/* ================================================================= */
+
+.profile-info-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 25px;
+    padding: 10px 0;
+}
+
+.info-item {
+    flex: 1 1 calc(50% - 7.5px);
+    padding: 8px 0;
+}
+
+.info-item.full-width {
+    flex: 1 1 100%;
+}
+
+.info-item label {
+    font-weight: 700;
+    color: var(--primary-color); /* Label em Azul Marinho */
+    display: block;
+    margin-bottom: 3px;
+    font-size: 0.85em;
+    text-transform: uppercase;
+}
+
+.profile-data-value {
+    font-weight: 500;
+    color: var(--text-dark);
+    font-size: 1em;
+    display: block;
+}
+
+.profile-data-value-discreet {
+    font-weight: 400;
+    color: var(--text-muted);
+    font-size: 0.85em;
+    font-style: italic;
+    display: block;
+}
+
+.logout-profile-btn {
+    width: 100%;
+    padding: 14px;
+    background-color: var(--secondary-color); /* Vermelho CEVA */
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: 700;
+    transition: background-color 0.3s;
+    text-transform: uppercase;
+}
+
+.logout-profile-btn:hover {
+    background-color: #cc0000;
+}
+
+
+/* ================================================================= */
+/* ESTILOS DE DETALHES DO ANALISTA (Customizado) */
+/* ================================================================= */
+
+.analyst-discreet-info-bar {
+    background-color: var(--background-light);
+    color: var(--text-dark);
+    padding: 8px 25px;
+    font-size: 0.95em;
+    font-weight: 400;
+    border-bottom: 1px solid #e0e6eb;
+}
+.analyst-discreet-info-bar label {
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-right: 5px;
+}
+.analyst-discreet-info-bar span {
+    text-transform: capitalize;
+}
+
+.contracts-title {
+    font-size: 1.1em;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid var(--secondary-color);
+    display: inline-block;
+}
+
+/* Customização dos Cards de Contrato */
+.contract-card {
+    background-color: var(--background-light);
+    border: 1px solid #ced4da;
+    border-left: 5px solid var(--secondary-color); /* Destaque lateral Vermelho */
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.contract-header {
+    font-size: 1.1em;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 5px;
+}
+
+.contract-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px 20px;
+    margin-top: 10px;
+}
+
+.detail-item {
+    padding: 5px 0;
+}
+
+.detail-item label {
+    font-weight: 600;
+    color: var(--text-muted);
+    display: block;
+    font-size: 0.75em;
+    margin-bottom: 2px;
+    text-transform: uppercase;
+}
+
+.detail-item span {
+    font-weight: 500;
+    color: var(--text-dark);
+    font-size: 0.9em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ceva-modal-footer {
+    padding: 15px 25px;
+    border-top: 1px solid #e0e0e0;
+    background-color: #eeeeee;
+}
+.discreet-label {
+    font-size: 0.85em;
+    color: var(--primary-color);
+    font-weight: 700;
+    display: block;
+    margin-bottom: 5px;
+}
+.skills-tag-container {
+    font-style: italic;
+    color: var(--text-dark);
+    text-transform: capitalize;
+    font-size: 0.9em;
+}
+
+
+/* ================================================================= */
+/* NOVO ESTILO: BARRA DE NAVEGAÇÃO DE CONTRATOS (DISCRETO/MESCLADO) */
+/* ================================================================= */
+
+.contract-nav-bar {
+    padding: 8px 25px 8px 25px;
+    /* Fundo ainda mais discreto: um cinza quase imperceptível que se funde */
+    background-color: #fcfcfc;
+    border-bottom: 1px solid #f0f0f0; /* Borda muito clara */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px; /* Mais espaçamento para respirar */
+    max-height: 120px;
+    overflow-y: auto;
+}
+
+.contract-nav-bar .contract-pill {
+    padding: 5px 0; /* Mais compacto, sem padding horizontal grande */
+    border: none; /* Remove a borda para mesclar */
+    background-color: transparent; /* Remove o fundo */
+    border-radius: 0;
+
+    color: var(--text-muted); /* Texto cinza suave */
+    font-size: 0.9em;
+    font-weight: 500; /* Menos negrito */
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: none; /* Remove todas as sombras */
+    white-space: nowrap;
+    position: relative; /* Para a linha de destaque */
+}
+
+.contract-nav-bar .contract-pill:hover {
+    background-color: transparent;
+    color: var(--primary-color); /* Azul marinho no hover para indicar interatividade */
+}
+
+.contract-nav-bar .contract-pill.active-pill {
+    color: var(--secondary-color); /* Vermelho CEVA para o ativo */
+    font-weight: 700;
+    pointer-events: none;
+
+    /* Linha Vermelha de Destaque */
+    border-bottom: 2px solid var(--secondary-color);
+    padding-bottom: 5px; /* Ajusta o padding para compensar a borda */
+}
+
+
+/* ================================================================= */
+/* ESTILOS DO TOAST */
+/* ================================================================= */
+
+#toastNotification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 5px;
+    color: white;
+    background-color: #28a745; /* Cor padrão para sucesso (verde) */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: opacity 0.3s, transform 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 1020;
+}
+
+.toast-hidden {
+    opacity: 0;
+    transform: translateY(100%);
+    pointer-events: none;
+}
+
+.toast-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

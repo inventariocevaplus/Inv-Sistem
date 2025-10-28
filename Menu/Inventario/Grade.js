@@ -1,6 +1,6 @@
 // =========================================================================
 // Grade.js (Grade de Inventário Cíclico) - LÓGICA DE GRADE ISOLADA
-// 🚀 VERSÃO FINAL CORRIGIDA: Status Plano = Realizado Acumulado - Plano Acumulado (Com Cor de Fundo).
+// 🚀 VERSÃO FINAL CORRIGIDA E ROBUSTA (Corrigido potencial erro de ReferenceError)
 // =========================================================================
 
 // Configuração de Tabela (Mantida localmente)
@@ -92,7 +92,6 @@ function getUrlParameter(name) {
  * Carrega o ID e Mês de Referência da URL.
  */
 function loadContractConfig() {
-// ... (código loadContractConfig existente) ...
     // 1. Tenta buscar ID e Mês da URL (prioridade após redirecionamento)
     contractId = getUrlParameter('id');
     mesReferencia = getUrlParameter('mes');
@@ -122,7 +121,6 @@ function loadContractConfig() {
  * Busca os dados da grade na tabela 'ciclico_grade_dados'.
  */
 async function loadGradeDataFromSupabase() {
-// ... (código loadGradeDataFromSupabase existente) ...
     if (!contractId || !mesReferencia) return false;
 
     // Colunas necessárias
@@ -164,12 +162,12 @@ async function loadGradeDataFromSupabase() {
     // 1. Constrói a lista de dias de trabalho
     DIAS_DE_TRABALHO = data.dias_inventario || [];
 
-    // 2. Armazena os Arrays
+    // 2. Armazena os Arrays GLOBAIS (Garantindo que os nomes estão corretos)
     plano_locacoes = data.plano_locacoes || [];
     realizado_locacoes = data.realizado_locacoes || [];
     locacoes_incorretas = data.locacoes_incorretas || [];
     pecas_contadas = data.pecas_contadas || [];
-    pecas_incorretas = data.pecas_incorretas || [];
+    pecas_incorretas = data.pecas_incorretas || []; // <-- CORRETO: usando o array global
 
     // Arrays Calculados (Carregados, mas serão recalculados)
     plano_acumulado = data.plano_acumulado || [];
@@ -190,7 +188,6 @@ async function loadGradeDataFromSupabase() {
  * Cria dinamicamente os cabeçalhos da grade (Dias da Semana e Dias do Mês).
  */
 function buildGradeHeader() {
-// ... (código buildGradeHeader existente) ...
     const rowDayOfWeek = document.getElementById('rowDayOfWeek');
     const rowDayOfMonth = document.getElementById('rowDayOfMonth');
     const dayNames = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
@@ -229,7 +226,6 @@ function buildGradeHeader() {
  * Preenche as linhas da grade com Plano e Inputs (para as métricas editáveis).
  */
 function fillDataCells() {
-// ... (código fillDataCells existente) ...
     const DYNAMIC_GRADE_MAPPING = {
         'rowPlano': { array: plano_locacoes, field: 'plano_locacoes', editable: false, format: 'number' },
         'rowPlanoAcumulado': { array: plano_acumulado, field: 'plano_acumulado', editable: false, format: 'number' },
@@ -296,7 +292,7 @@ function fillDataCells() {
         while (rowTotals.cells.length > 1) rowTotals.deleteCell(1);
         DIAS_DE_TRABALHO.forEach(() => {
             const cell = rowTotals.insertCell(-1);
-            // Definido como '0' no momento, o cálculo real será feito no updateGradeCalculationsAndKpis (mas vamos removê-lo de lá)
+            // Definido como '0' no momento
             cell.textContent = '0';
             cell.classList.add('total-cell');
         });
@@ -307,7 +303,6 @@ function fillDataCells() {
  * Formata o valor para exibição na célula.
  */
 function formatCellValue(value, formatType) {
-// ... (código formatCellValue existente) ...
     if (formatType === 'percent') {
         return `${(Number(value) || 0).toFixed(1)}%`;
     }
@@ -320,7 +315,6 @@ function formatCellValue(value, formatType) {
  * 🚀 AJUSTE CRÍTICO AQUI: Incluindo o KPI de Realizado (Total).
  */
 function updateKpiPanel(totalPlanoGeral, totalRealizadoGeral) {
-// ... (código updateKpiPanel existente) ...
     let realizadoPercent = 0;
 
     if (totalPlanoGeral > 0) {
@@ -354,7 +348,6 @@ function updateKpiPanel(totalPlanoGeral, totalRealizadoGeral) {
  * 🚀 CÁLCULO ATUALIZADO: Status Plano = Realizado Acumulado - Plano Acumulado.
  */
 function updateGradeCalculationsAndKpis() {
-// ... (código updateGradeCalculationsAndKpis existente) ...
     let planoAcumuladoTemp = 0;
     let realizadoAcumuladoTemp = 0;
     let totalPlanoGeral = 0;
@@ -434,10 +427,7 @@ function updateGradeCalculationsAndKpis() {
         });
     });
 
-    // 3. O bloco de atualização do Rodapé da Grade (rowTotals) foi removido aqui.
-    // O total é agora exibido no KPI Panel superior.
-
-    // 4. Atualizar o Painel de KPIs Acumulados (Gerais)
+    // 3. Atualizar o Painel de KPIs Acumulados (Gerais)
     updateKpiPanel(totalPlanoGeral, totalRealizadoGeral);
 }
 
@@ -445,7 +435,6 @@ function updateGradeCalculationsAndKpis() {
  * Lida com a mudança de valor em qualquer célula de input.
  */
 function handleInputChange(e) {
-// ... (código handleInputChange existente) ...
     const input = e.target;
     const arrayIndex = parseInt(input.getAttribute('data-index'), 10);
     const field = input.getAttribute('data-field');
@@ -471,7 +460,6 @@ function handleInputChange(e) {
  * Salva a estrutura completa dos arrays no Supabase.
  */
 async function saveChangesToSupabase() {
-// ... (código saveChangesToSupabase existente) ...
     const saveBtn = document.getElementById('saveChangesBtn');
     if (!saveBtn || saveBtn.disabled) return;
 

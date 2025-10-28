@@ -2,6 +2,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnInventario = document.getElementById('btnInventario');
     const btnSair = document.getElementById('btnSair');
     const btnPermissoes = document.getElementById('btnPermissoes');
+    const btnCadastro = document.getElementById('btnCadastro');
+
+    // ⭐ NOVO: Variável para o botão Mapping
+    const btnMapping = document.getElementById('btnMapping');
 
     // Elemento para mostrar o nome do usuário (do HTML)
     const userNameElement = document.getElementById('userName');
@@ -37,13 +41,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ===============================================
-    // LÓGICA DE REDIRECIONAMENTO E SAÍDA
+    // LÓGICA DE REDIRECIONAMENTO (Módulos)
     // ===============================================
 
     // 1. Ação para o botão INVENTÁRIO
     if (btnInventario) {
         btnInventario.addEventListener('click', () => {
             window.location.href = 'Inventario/Inventario.html';
+        });
+    }
+
+    // ⭐ NOVO: Ação para o botão MAPPING
+    if (btnMapping) {
+        btnMapping.addEventListener('click', () => {
+            // Caminho relativo: Menu -> Mapping -> Mapping.html
+            window.location.href = 'Mapping/Mapping.html';
         });
     }
 
@@ -54,16 +66,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 3. Ação para o botão SAIR (Logout)
-    if (btnSair) {
-        btnSair.addEventListener('click', () => {
-            if (confirm('Tem certeza que deseja sair do sistema?')) {
-                // Limpa os dados da sessão ao sair
-                localStorage.removeItem('user_session_data');
-                localStorage.removeItem('user_session_id');
-
-                window.location.href = '../index.html';
-            }
+    // Ação para o botão CADASTRO
+    if (btnCadastro) {
+        btnCadastro.addEventListener('click', () => {
+            console.log('Botão Cadastro clicado. Módulo ainda não implementado.');
         });
     }
 });

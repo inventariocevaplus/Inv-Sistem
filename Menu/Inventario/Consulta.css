@@ -1,0 +1,281 @@
+/* =======================================================
+   Consulta.css (AJUSTADO PARA VISÃO AMPLA E FONTE MENOR)
+   ======================================================= */
+
+/* ------------------------------------------- */
+/* ESTILOS DO PAINEL DE FILTROS - OTIMIZAÇÃO DE ESPAÇO */
+/* ------------------------------------------- */
+.filter-panel {
+    background-color: var(--box-bg, #ffffff);
+    padding: 15px; /* Reduzido de 20px */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Sombra mais suave */
+}
+
+.filter-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* Padrão de 1 coluna em mobile */
+    gap: 15px; /* Reduzido de 20px */
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    padding: 10px; /* Reduzido de 15px */
+    border: 1px solid var(--light-grey, #e0e0e0);
+    border-radius: 6px;
+    background-color: var(--light-grey, #f7f7f7);
+}
+
+.input-group label {
+    font-size: 1em; /* Levemente reduzido */
+    color: var(--primary-color, #001f3f);
+    border-bottom: 1px solid var(--primary-color, #001f3f); /* Borda mais fina */
+    padding-bottom: 5px;
+    margin-top: 0;
+    margin-bottom: 10px; /* Reduzido de 15px */
+    font-weight: 600;
+}
+
+.input-group select {
+    padding: 6px 10px; /* Reduzido */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    min-height: 34px; /* Reduzido de 40px */
+    font-size: 0.9em;
+}
+
+.contracts-group { grid-column: 1 / 2; }
+.month-year-group { grid-column: 1 / 2; display: flex; flex-direction: column; gap: 10px;} /* Reduzido gap */
+.month-year-group label { border-bottom: none; padding-bottom: 0; margin-bottom: 5px;}
+.search-button-group { grid-column: 1 / 2; }
+.search-button-group button {
+    height: 38px; /* Reduzido de 48px */
+    width: 100%;
+    padding: 0;
+    font-size: 0.9em;
+}
+.select-group { display: flex; gap: 8px; position: relative;} /* Reduzido gap */
+
+/* ------------------------------------------- */
+/* ESTILOS DE COMPONENTES CUSTOMIZADOS (Selects) */
+/* ------------------------------------------- */
+
+.select-styled {
+    background-color: white;
+    padding: 6px 10px; /* Reduzido */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    min-height: 34px; /* Mantém a altura dos selects */
+    font-size: 0.9em;
+    flex-grow: 1;
+}
+
+.select-options {
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background-color: white;
+    border: 1px solid #ccc;
+
+    max-height: 150px; /* Mais compacto */
+    overflow-y: auto;
+
+    display: none;
+    padding: 0;
+    list-style: none;
+}
+
+.select-options.open { display: block; }
+
+.select-option-item {
+    padding: 8px 10px; /* Reduzido */
+    cursor: pointer;
+    transition: background-color 0.1s;
+    font-size: 0.9em;
+    display: block;
+}
+
+.select-option-item:hover { background-color: #e9ecef; }
+
+/* ESTILO DE SELEÇÃO POR COR DE FUNDO */
+.select-option-item.selected {
+    background-color: var(--primary-color, #001f3f); /* Cor corporativa forte */
+    color: white; /* Texto branco para contraste */
+    font-weight: bold;
+}
+
+/* OCULTA o checkbox em TODAS as listas */
+.select-option-item input[type="checkbox"] {
+    display: none !important;
+}
+
+/* Meses e Ano abrem para CIMA */
+.custom-select-month-container, .custom-select-year-container { position: relative; flex-grow: 1; }
+.custom-select-month-container .select-options, .custom-select-year-container .select-options {
+    bottom: 100% !important;
+    top: unset !important;
+    border-bottom: none;
+    box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 4px 4px 0 0;
+}
+
+/* Contratos abrem para BAIXO */
+.custom-select-contract-container { position: relative; width: 100%; margin-bottom: 5px; }
+.custom-select-contract-container .select-options {
+    top: 100%;
+    bottom: unset;
+    border-top: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 0 0 4px 4px;
+}
+
+
+/* ------------------------------------------- */
+/* ESTILOS DA MODAL E TABELA (Diminuir Fonte) */
+/* ------------------------------------------- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background: white;
+    padding: 15px; /* Reduzido */
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    width: 95%; /* Usa mais largura da tela */
+    max-width: 1300px; /* Aumentado o máximo para telas grandes */
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    transform: translateY(-50px);
+    transition: transform 0.3s;
+}
+
+.modal-overlay.active .modal-content {
+    transform: translateY(0);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.3em; /* Levemente reduzido */
+    color: var(--primary-color);
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #666;
+    transition: color 0.2s;
+}
+
+.close-btn:hover {
+    color: var(--secondary-color);
+}
+
+.modal-body {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.modal-footer {
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+    text-align: right;
+}
+
+.table-container {
+    overflow-x: auto;
+    /* Define o tamanho base da fonte para a tabela (Tamanho 10 do Excel) */
+    font-size: 0.75em;
+}
+.data-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+.data-table th, .data-table td {
+    border: 1px solid #ddd;
+    padding: 4px 6px; /* Padding MUITO reduzido para compactar as células */
+    text-align: left;
+    white-space: nowrap;
+}
+.data-table th { background-color: var(--light-grey); color: var(--text-dark); font-weight: 600; position: sticky; top: 0; z-index: 10; }
+
+.loading-message {
+    font-size: 1.1em;
+    padding: 15px;
+    text-align: center;
+}
+.message-info {
+    font-size: 1.1em;
+    padding: 15px;
+    text-align: center;
+    color: #555;
+}
+
+
+/* Ajuste de Responsividade para Desktop */
+@media (min-width: 900px) {
+    /* Layout otimizado para 4 colunas em telas grandes */
+    .filter-grid {
+        grid-template-columns: 200px 1fr 1fr 200px; /* Base, Mês/Ano (expandido), Botão */
+        gap: 15px;
+    }
+
+    /* Base de Dados */
+    .input-group:nth-child(1) {
+        grid-column: 1 / 2;
+        padding-bottom: 0;
+    }
+
+    /* Mês e Ano */
+    .month-year-group {
+        grid-column: 2 / 4;
+        padding-bottom: 0;
+    }
+
+    /* Contratos - Ocupa a linha inteira abaixo */
+    .contracts-group { grid-column: 1 / 5; }
+
+    /* Botão de Busca - Alinha na parte de baixo */
+    .search-button-group {
+        grid-column: 4 / 5;
+        align-self: end;
+        /* Remove o estilo de input-group para este botão */
+        background-color: transparent;
+        border: none;
+        padding: 0 0 5px 0; /* Alinha o botão na parte de baixo dos outros inputs */
+        display: flex;
+        align-items: flex-end;
+    }
+    .search-button-group button {
+        /* Garante que o botão preencha o espaço sem margens */
+        margin: 0;
+    }
+}

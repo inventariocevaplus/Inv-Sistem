@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Consulta de Dados - CEVA Inventário</title>
+
+  <link rel="stylesheet" href="styleCiclico.css">
+  <link rel="stylesheet" href="Consulta.css">
+
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@300;400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+<div class="app-layout">
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h3>CEVA Inventário</h3>
+    </div>
+    <nav class="sidebar-menu">
+      <div class="sidebar-item dropdown-rotinas" id="rotinasDropdown">
+        <a href="#" class="dropdown-toggle">
+          <i class="fas fa-list-ul"></i> Rotinas <i class="fas fa-chevron-down dropdown-icon"></i>
+        </a>
+        <div class="dropdown-content">
+          <a href="Ciclico.html" id="btnCiclico"><i class="fas fa-redo-alt"></i> Cíclico</a>
+          <a href="Inventario.html" id="btnClause"><i class="fas fa-balance-scale"></i> Clause</a>
+          <a href="RN.html" id="btnRN"><i class="fas fa-tags"></i> RN </a>
+        </div>
+      </div>
+      <div class="sidebar-item active"><a href="Dash.html"><i class="fas fa-chart-line"></i> Dashboard</a></div>
+      <div class="sidebar-item active"><a href="Consulta.html"><i class="fas fa-search"></i> CONSULTA</a></div>
+      <div class="sidebar-item"><a href="Relatorio.html"><i class="fas fa-file-alt"></i> Relatório</a></div>
+      <div class="sidebar-item"><a href="../Menu.html"><i class="fas fa-arrow-circle-left"></i> Voltar (Menu)</a></div>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <div class="rotina-container">
+      <header class="content-header">
+        <h1>Consulta de Dados</h1>
+      </header>
+
+      <div class="panel filter-panel">
+        <h2>Filtros de Pesquisa</h2>
+        <form id="consultaForm">
+          <div class="filter-grid">
+
+            <div class="input-group">
+              <label for="baseSelector">1. Base de Dados</label>
+              <select id="baseSelector" required>
+                <option value="">-- Selecione uma Base --</option>
+                <option value="CICLICO">Cíclico</option>
+                <option value="CLAUSE">Clause</option>
+                <option value="RN">RN</option>
+              </select>
+            </div>
+
+            <div class="input-group month-year-group">
+              <label>2. Mês e Ano de Referência</label>
+              <div class="select-group">
+                <div class="custom-select-month-container">
+                  <div class="select-styled" id="monthSelectDisplay">
+                    Selecione Mês(es)
+                  </div>
+                  <div class="select-options" id="monthSelectOptions">
+                  </div>
+                </div>
+
+                <div class="custom-select-year-container">
+                  <div class="select-styled" id="yearSelectDisplay">
+                    Ano
+                  </div>
+                  <div class="select-options" id="yearSelectOptions">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="search-button-group"> <button type="submit" id="searchDataBtn" class="action-btn primary-action">
+              <i class="fas fa-search"></i> Pesquisar Dados
+            </button>
+            </div>
+
+            <div class="input-group contracts-group">
+              <label>3. Contratos (Base Selecionada)</label>
+              <div class="custom-select-contract-container" id="contractSelectContainer">
+                <div class="select-styled" id="contractSelectDisplay">
+                  Selecione uma Base primeiro
+                </div>
+                <div class="select-options" id="contractSelectOptions">
+                </div>
+              </div>
+              <small id="contractHelp" style="color: var(--text-muted); font-size: 0.8em;">Selecione os contratos para inclusão.</small>
+            </div>
+
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<div id="resultsModal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Resultados da Consulta - Base: <span id="baseTitle"></span></h2>
+      <button id="closeModalBtn" class="close-btn"><i class="fas fa-times"></i></button>
+    </div>
+
+    <div class="modal-body">
+      <p id="loadingResults" class="loading-message" style="display:none;"><i class="fas fa-spinner fa-spin"></i> Carregando dados da consulta...</p>
+      <p id="noResults" class="message-info" style="display:none;">Nenhum dado encontrado para os filtros selecionados.</p>
+
+      <div class="table-container">
+        <table id="consultaResultsTable" class="data-table">
+        </table>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button id="downloadCsvBtn" class="action-btn secondary-action" style="margin-top: 15px; display: none;">
+        <i class="fas fa-download"></i> Baixar CSV
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="Consulta.js"></script>
+</body>
+</html>

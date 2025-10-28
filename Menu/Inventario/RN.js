@@ -1,7 +1,5 @@
 // =========================================================================
-// RN.js (Rotina: Reserva Normal) - CÓDIGO FINAL E COMPLETO COM PADRÃO CLAUSE
-// Tabela alvo principal: 'rn_contratos'
-// Tabela alvo mensal: 'rn_details'
+// RN.js (Rotina: Reserva Normal) - CÓDIGO FINAL E COMPLETO
 // =========================================================================
 
 // 🚨 CREDENCIAIS SUPABASE (Mantenha as suas credenciais)
@@ -11,28 +9,46 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const { createClient } = supabase;
 const TARGET_TABLE_NAME = 'rn_contratos';
 
-// --- Lógica de Token de Sessão ---
+// --- Lógica de Token de Sessão CORRIGIDA ---
 const sessionDataJSON = localStorage.getItem('user_session_data');
-let accessToken = SUPABASE_ANON_KEY;
+let jwtToken = null; // Armazenaremos o JWT aqui
+let loggedInUserId = null; // 🚨 NOVO: Armazenaremos o user_id (UUID) aqui
 
 if (sessionDataJSON) {
     try {
         const userData = JSON.parse(sessionDataJSON);
         if (userData.token) {
-            accessToken = userData.token;
+            jwtToken = userData.token; // Pega o JWT da sua sessão
+        }
+        // 🚨 CRÍTICO: Pega o ID do usuário (UUID) salvo no Login.js
+        if (userData.user_id) {
+            loggedInUserId = userData.user_id;
         }
     } catch (e) {
         console.error("Erro ao analisar dados da sessão para obter o token.", e);
     }
 }
-const supabaseClient = createClient(SUPABASE_URL, accessToken);
+
+// 🚨 Inicializa o cliente Supabase com o JWT no cabeçalho
+const supabaseClient = createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY,
+    {
+        global: {
+            headers: {
+                // Se o JWT estiver presente, use-o para autenticar a requisição
+                ...(jwtToken && { Authorization: `Bearer ${jwtToken}` }),
+            }
+        }
+    }
+);
 
 let userPermissions = {};
 let recordToDeleteId = null;
 
 
 // =======================================================
-// REFERÊNCIAS DO DOM - CONTRATOS E GERAL
+// REFERÊNCIAS DO DOM - (MANTIDAS)
 // =======================================================
 const rotinasDropdown = document.getElementById('rotinasDropdown');
 const rnListDiv = document.getElementById('rnList');
@@ -76,7 +92,7 @@ const rnMonthlyFormMessage = document.getElementById('rnMonthlyFormMessage');
 const qtdLinhasInput = document.getElementById('qtdLinhas');
 const repickingInput = document.getElementById('repicking');
 const nilPickingInput = document.getElementById('nilPicking');
-const metaRNInput = document.getElementById('metaRN'); // Padrão 0.15%
+const metaRNInput = document.getElementById('metaRN');
 
 // SAÍDA (CALCULADOS)
 const qtdErrosInput = document.getElementById('qtdErros');
@@ -87,7 +103,7 @@ const acuraciaMesInput = document.getElementById('acuraciaMes');
 
 
 // =======================================================
-// LÓGICA DE PERMISSÕES
+// LÓGICA DE PERMISSÕES (MANTIDA)
 // =======================================================
 
 function loadUserPermissions() {
@@ -100,6 +116,8 @@ function loadUserPermissions() {
 }
 
 function hasPermission(key) {
+    userPermissions = userPermissions || loadUserPermissions();
+
     if (userPermissions.role && userPermissions.role.toUpperCase() === 'MASTER') {
         return true;
     }
@@ -124,7 +142,7 @@ function checkAndDisplayNavigation() {
 
 
 // =======================================================
-// LÓGICA DE EDIÇÃO RÁPIDA DE STATUS
+// LÓGICA DE EDIÇÃO RÁPIDA DE STATUS (MANTIDA)
 // =======================================================
 
 function openEditStatusModalRN(recordId, recordName, currentStatus) {
@@ -161,6 +179,7 @@ async function saveEditStatusRN(e) {
         return;
     }
 
+    // Nota: O RLS em 'rn_contratos' deve permitir UPDATE baseado no can_edit_data OU role = MASTER
     const { error } = await supabaseClient
         .from(TARGET_TABLE_NAME)
         .update({ status: newStatus })
@@ -180,7 +199,7 @@ async function saveEditStatusRN(e) {
 }
 
 // =======================================================
-// FUNÇÕES AUXILIARES DE CÁLCULO E DATA
+// FUNÇÕES AUXILIARES DE CÁLCULO E DATA (MANTIDAS)
 // =======================================================
 
 function formatMonthYearToDate(monthYear) {
@@ -212,7 +231,7 @@ function parseInputInt(inputElement) {
 
 
 // =======================================================
-// LÓGICA DE CÁLCULO AUTOMÁTICO (RN OPERACIONAL)
+// LÓGICA DE CÁLCULO AUTOMÁTICO (RN OPERACIONAL) (MANTIDA)
 // =======================================================
 
 function calculateOperationalMetrics() {
@@ -256,15 +275,16 @@ function calculateOperationalMetrics() {
 }
 
 // =======================================================
-// FUNÇÕES CRUD DE DETALHAMENTO MENSAL RN
+// FUNÇÕES CRUD DE DETALHAMENTO MENSAL RN (CORRIGIDAS)
 // =======================================================
 
 function openRNMonthlyDataModal(contractName, contractId) {
+    // ... (Mantido o código de inicialização do modal) ...
     if (!rnMonthlyDataModal) return;
 
     // Reseta e configura o modal
     rnMonthlyDataForm.reset();
-    rnContractIdInput.value = contractId;
+    rnContractIdInput.value = contractId; // 🚨 contractId é um UUID aqui
     rnDataRecordIdInput.value = '';
 
     if (rnMensalContractNameInput) {
@@ -287,8 +307,16 @@ function openRNMonthlyDataModal(contractName, contractId) {
     rnMonthlyDataModal.style.display = 'block';
 }
 
+// =======================================================
+// FUNÇÃO searchAndLoadRNMonthlyData CORRIGIDA
+// =======================================================
+
 async function searchAndLoadRNMonthlyData() {
+    // 🚨 ATENÇÃO: Verifique se o contractId é UUID ou INTEGER.
+    // Mantido parseInt como no seu código, mas confirme no seu DB.
     const contractId = rnContractIdInput.value;
+    const contractIdValue = parseInt(contractId, 10); // OU apenas 'contractId' se for UUID
+
     const mesReferencia = rnMensReferenciaInput.value.trim();
     const contractName = rnMensalContractNameInput.value;
 
@@ -297,25 +325,47 @@ async function searchAndLoadRNMonthlyData() {
         return;
     }
 
+    if (isNaN(contractIdValue) || contractIdValue <= 0) {
+        displayMessage(rnMonthlyFormMessage, 'Erro: ID de contrato inválido. Recarregue a tela.', false);
+        return;
+    }
+
+    if (!loggedInUserId) {
+        displayMessage(rnMonthlyFormMessage, 'Erro: Usuário não autenticado. Faça login novamente.', false);
+        return;
+    }
+
     const referenceDate = formatMonthYearToDate(mesReferencia);
     if (!referenceDate) return;
 
     rnMonthlyFormMessage.style.display = 'none';
 
-    // 1. Pesquisa na tabela de detalhes
-    const { data: rnMonthlyData, error } = await supabaseClient
-        .from(RN_MONTHLY_DATA_TABLE)
-        .select('*')
-        .eq('contract_id', contractId)
-        .eq('reference_month', referenceDate)
-        .single();
+    // 1. Pesquisa USANDO A FUNÇÃO RPC
+    // *** CORREÇÃO CRÍTICA: REMOÇÃO DO .single() ***
+    const { data: rnMonthlyDataArray, error } = await supabaseClient
+        .rpc('fetch_rn_details', {
+            p_user_id: loggedInUserId,
+            p_contract_id: contractIdValue, // Usando o valor convertido/assumido
+            p_reference_month: referenceDate
+        });
 
-    if (error && error.code !== 'PGRST116') { // PGRST116 = "No rows found"
+    if (error) {
+        // Se der erro aqui, é erro de permissão ou sintaxe na função SQL, não de "0 rows".
         displayMessage(rnMonthlyFormMessage, `Erro ao buscar dados mensais: ${error.message}`, false);
+        console.error('Supabase RPC Error:', error);
+
+        rnMonthlyDataFieldsDiv.style.display = 'none';
+        rnMensReferenciaInput.disabled = false;
+        rnSearchMonthlyDataBtn.style.display = 'inline-block';
         return;
     }
 
-    // 2. Carrega ou Inicializa os campos
+    // 2. Extrai o registro: Verifica se o array tem itens.
+    const rnMonthlyData = (rnMonthlyDataArray && rnMonthlyDataArray.length > 0)
+                          ? rnMonthlyDataArray[0] // Pega o primeiro registro encontrado
+                          : null; // Se 0 linhas, define como null
+
+    // 3. Carrega ou Inicializa os campos
     rnMonthlyDataFieldsDiv.style.display = 'block';
     rnMensReferenciaInput.disabled = true;
     rnSearchMonthlyDataBtn.style.display = 'none';
@@ -325,33 +375,32 @@ async function searchAndLoadRNMonthlyData() {
         document.getElementById('rnMonthlyModalTitle').textContent = `Editar Dados Mensais: ${contractName} (${mesReferencia})`;
         rnDataRecordIdInput.value = rnMonthlyData.id;
 
-        // Preenche os campos de INPUT
+        // Preenche os campos de INPUT (MANTIDO)
         qtdLinhasInput.value = rnMonthlyData.qtd_linhas || 0;
         repickingInput.value = rnMonthlyData.repicking || 0;
         nilPickingInput.value = rnMonthlyData.nil_picking || 0;
-
-        // A meta é armazenada como percentual (ex: 0.15), exibe como string formatada
         metaRNInput.value = formatToTwoDecimals(rnMonthlyData.meta || 0.15);
 
-        calculateOperationalMetrics(); // Recalcula os campos derivados
+        calculateOperationalMetrics();
         displayMessage(rnMonthlyFormMessage, 'Dados mensais existentes carregados. Modo Edição.', true);
     } else {
-        // Dados NÃO encontrados: Modo INSERÇÃO
+        // Dados NÃO encontrados: Modo INSERÇÃO (Nova Linha)
         document.getElementById('rnMonthlyModalTitle').textContent = `Inserir Novos Dados Mensais: ${contractName} (${mesReferencia})`;
         rnDataRecordIdInput.value = '';
 
-        // Garante que os campos de entrada estejam zerados ou com padrão
+        // Garante que os campos de entrada estejam zerados ou com padrão (MANTIDO)
         [qtdLinhasInput, repickingInput, nilPickingInput].forEach(input => input.value = 0);
-        metaRNInput.value = formatToTwoDecimals(0.15); // Padrão
+        metaRNInput.value = formatToTwoDecimals(0.15);
 
         calculateOperationalMetrics();
-        displayMessage(rnMonthlyFormMessage, 'Nenhum dado encontrado. Modo Inserção.', true);
+        displayMessage(rnMonthlyFormMessage, 'Nenhum dado encontrado. Modo Inserção (Nova Linha).', true);
     }
 }
 
 async function saveRNMonthlyData(e) {
     e.preventDefault();
 
+    // ... (Mantida a checagem de permissão no front-end) ...
     if (!hasPermission('can_send_data') && !hasPermission('can_edit_data')) {
         displayMessage(rnMonthlyFormMessage, "Erro: Você não tem permissão para salvar dados.", false);
         return;
@@ -360,42 +409,59 @@ async function saveRNMonthlyData(e) {
     calculateOperationalMetrics();
 
     const recordId = rnDataRecordIdInput.value;
-    const contractId = rnContractIdInput.value;
+    const contractId = rnContractIdInput.value; // UUID
     const mesReferencia = rnMensReferenciaInput.value;
 
-    // Mapeamento dos campos para salvar no Supabase
+    // Mapeamento dos campos para enviar à RPC (deve ser um JSON puro, não um objeto Supabase)
     const dataToSave = {
-        contract_id: contractId,
-        reference_month: formatMonthYearToDate(mesReferencia),
+        contract_id: contractId, // UUID
+        reference_month: formatMonthYearToDate(mesReferencia), // DATE
 
-        // Campos de Entrada
-        qtd_linhas: parseInputInt(qtdLinhasInput),
-        repicking: parseInputInt(repickingInput),
-        nil_picking: parseInputInt(nilPickingInput),
-        meta: parsePercentInput(metaRNInput),
+        // Campos de Entrada (Enviados como string para a RPC fazer o cast)
+        qtd_linhas: String(parseInputInt(qtdLinhasInput)),
+        repicking: String(parseInputInt(repickingInput)),
+        nil_picking: String(parseInputInt(nilPickingInput)),
+        meta: String(parsePercentInput(metaRNInput)),
 
-        // Campos Calculados (todos como percentual 0-100)
-        qtd_erros: parseInputInt(qtdErrosInput),
-        repi_percent: parsePercentInput(repiPercentInput),
-        nilpi_percent: parsePercentInput(nilpiPercentInput),
-        erros_percent: parsePercentInput(errosPercentInput),
-        acuracia_mes: parsePercentInput(acuraciaMesInput),
+        // Campos Calculados
+        qtd_erros: String(parseInputInt(qtdErrosInput)),
+        repi_percent: String(parsePercentInput(repiPercentInput)),
+        nilpi_percent: String(parsePercentInput(nilpiPercentInput)),
+        erros_percent: String(parsePercentInput(errosPercentInput)),
+        acuracia_mes: String(parsePercentInput(acuraciaMesInput)),
     };
 
     let error = null;
 
     if (recordId) {
-        // UPDATE (Editar)
+        // UPDATE (Editar) - Chamando a RPC update_rn_details
+        if (!hasPermission('can_edit_data')) {
+            displayMessage(rnMonthlyFormMessage, "Erro: Você não tem permissão para editar registros existentes.", false);
+            return;
+        }
+
+        // Chamada RPC para UPDATE
         const { error: updateError } = await supabaseClient
-            .from(RN_MONTHLY_DATA_TABLE)
-            .update(dataToSave)
-            .eq('id', recordId);
+            .rpc('update_rn_details', {
+                p_user_id: loggedInUserId, // 🚨 NOVO: Inclui o user_id para a checagem de permissão
+                p_record_id: recordId,
+                p_data: dataToSave
+            });
         error = updateError;
+
     } else {
-        // INSERT (Novo Registro)
+        // INSERT (Novo Registro) - Chamando a RPC insert_rn_details
+        if (!hasPermission('can_send_data')) {
+            displayMessage(rnMonthlyFormMessage, "Erro: Você não tem permissão para inserir novos registros.", false);
+            return;
+        }
+
+        // Chamada RPC para INSERT
         const { error: insertError } = await supabaseClient
-            .from(RN_MONTHLY_DATA_TABLE)
-            .insert([dataToSave]);
+            .rpc('insert_rn_details', {
+                p_user_id: loggedInUserId, // 🚨 NOVO: Inclui o user_id para a checagem de permissão
+                p_data: dataToSave
+            });
         error = insertError;
     }
 
@@ -412,7 +478,7 @@ async function saveRNMonthlyData(e) {
 }
 
 // =======================================================
-// LÓGICA DE CARREGAMENTO E CRIAÇÃO DE CARDS
+// LÓGICA DE CARREGAMENTO E CRIAÇÃO DE CARDS (MANTIDA)
 // =======================================================
 
 function displayMessage(element, message, isSuccess) {
@@ -518,6 +584,7 @@ function createRNCard(record) {
     if (isClickable) {
         card.addEventListener('click', () => {
             const recordName = record.nome_contrato || 'Reserva Desconhecida';
+            // 🚨 CRÍTICO: record.id é o UUID do contrato, usado corretamente como contractId
             openRNMonthlyDataModal(recordName, record.id);
         });
     }
@@ -527,6 +594,7 @@ function createRNCard(record) {
 
 
 async function deleteRNRecord() {
+    // ... (MANTIDA)
     if (!hasPermission('can_delete_data')) {
         alert("Erro: Você não tem permissão para deletar dados.");
         if (deleteConfirmModal) deleteConfirmModal.style.display = 'none';
@@ -535,6 +603,7 @@ async function deleteRNRecord() {
 
     if (!recordToDeleteId) return;
 
+    // Nota: O RLS em 'rn_contratos' deve permitir DELETE baseado no can_delete_data OU role = MASTER
     const { error } = await supabaseClient
         .from(TARGET_TABLE_NAME)
         .delete()
@@ -553,6 +622,7 @@ async function deleteRNRecord() {
 
 
 function setupModalListeners() {
+    // ... (MANTIDA)
     // 1. Modal de Exclusão
     if (confirmDeleteBtn) confirmDeleteBtn.addEventListener('click', deleteRNRecord);
     if (cancelDeleteBtn) cancelDeleteBtn.addEventListener('click', () => {
@@ -570,16 +640,19 @@ function setupModalListeners() {
         editStatusFormRN.addEventListener('submit', saveEditStatusRN);
     }
 
-    // 3. Fechamento de modais com o botão X e clique fora (incluindo o novo modal RN)
+    // 3. Fechamento de modais
     [deleteConfirmModal, addRNModal, editStatusModalRN, rnMonthlyDataModal].forEach(modal => {
         if (modal) {
+            // Fecha com o botão X (mantido)
             modal.querySelectorAll('.close-btn').forEach(btn => btn.addEventListener('click', () => modal.style.display = 'none'));
-            window.addEventListener('click', (event) => { if (event.target === modal) modal.style.display = 'none'; });
+
+            // O código de fechar no overlay foi removido nas correções anteriores.
         }
     });
 }
 
 function setupAddRecordListener() {
+    // ... (MANTIDA)
     if (addRNBtn && addRNModal) {
         addRNBtn.addEventListener('click', () => {
              if (hasPermission('can_send_data')) {
@@ -593,6 +666,7 @@ function setupAddRecordListener() {
 }
 
 function setupFormSubmit() {
+    // ... (MANTIDA)
     if (!addRNForm) return;
 
     addRNForm.addEventListener('submit', async (e) => {
@@ -609,6 +683,7 @@ function setupFormSubmit() {
             analista_responsavel: document.getElementById('analystNameRN').value,
         };
 
+        // Nota: O RLS em 'rn_contratos' deve permitir INSERT baseado no can_send_data OU role = MASTER
         const { error } = await supabaseClient
             .from(TARGET_TABLE_NAME)
             .insert([newRecord]);
@@ -626,6 +701,7 @@ function setupFormSubmit() {
 }
 
 function setupSearchListener() {
+    // ... (MANTIDA)
     const searchInput = document.getElementById('searchInput');
     const searchBtn = document.getElementById('searchBtn');
 
@@ -647,6 +723,7 @@ function setupSearchListener() {
 }
 
 function setupDropdown() {
+    // ... (MANTIDA)
     if (!rotinasDropdown) return;
 
     const dropdownToggle = rotinasDropdown.querySelector('.dropdown-toggle');
@@ -690,6 +767,7 @@ function setupDropdown() {
 
 // Funções de Configuração para o Detalhamento RN (Operacional)
 function setupRNMonthlyListeners() {
+    // ... (MANTIDA)
     // 1. Listeners para Campos de Entrada (disparam o cálculo)
     if (qtdLinhasInput) qtdLinhasInput.addEventListener('input', calculateOperationalMetrics);
     if (repickingInput) repickingInput.addEventListener('input', calculateOperationalMetrics);
@@ -704,9 +782,10 @@ function setupRNMonthlyListeners() {
 document.addEventListener('DOMContentLoaded', async () => {
     setupDropdown();
 
-    userPermissions = loadUserPermissions();
+    userPermissions = loadUserPermissions(); // Carrega as permissões no início
 
-    if (!hasPermission('access_rn') && !hasPermission('access_ciclico') && !hasPermission('access_clause')) {
+    // Verifica se o usuário tem acesso a QUALQUER tela para exibir o conteúdo principal
+    if (!hasPermission('access_rn') && !hasPermission('access_ciclico') && !hasPermission('access_clause') && !hasPermission('access_consulta') && !hasPermission('access_relatorio') && !hasPermission('access_permissions')) {
         const mainContent = document.querySelector('.main-content');
         if (mainContent) mainContent.innerHTML = `<h1 style="color:red; margin-top: 50px; text-align: center;">Acesso Negado.</h1>`;
         const sidebar = document.querySelector('.sidebar');
