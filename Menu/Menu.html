@@ -8,6 +8,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@300;400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="Menu.css">
 
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+
     <link
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
@@ -17,82 +19,94 @@
     />
 
     <style>
-        /* Fundo escurecido */
+        /* Estilos da Modal de Logout (Mantidos do seu HTML) */
         .modal-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.5);
-            display: none; /* Começa escondido */
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            display: none; justify-content: center; align-items: center;
+            z-index: 1000; opacity: 0; transition: opacity 0.3s ease;
         }
-
-        .modal-overlay.show {
-            display: flex;
-            opacity: 1;
-        }
-
-        /* Janela flutuante da modal */
+        .modal-overlay.show { display: flex; opacity: 1; }
         .modal-content {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            text-align: center;
-            width: 350px;
-            transform: translateY(-50px);
-            animation: slideIn 0.3s forwards;
+            background-color: white; padding: 30px; border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); text-align: center;
+            width: 350px; transform: translateY(-50px); animation: slideIn 0.3s forwards;
         }
-
-        .modal-content h3 {
-            color: #051039; /* Azul Marinho (Cor Principal) */
-            margin-top: 0;
-            margin-bottom: 15px;
-            font-size: 1.2em;
-        }
-
-        .modal-content p {
-            color: #555;
-            margin-bottom: 25px;
-        }
-
+        .modal-content h3 { color: #051039; margin-top: 0; margin-bottom: 15px; font-size: 1.2em; }
+        .modal-content p { color: #555; margin-bottom: 25px; }
         .modal-actions button {
-            padding: 10px 20px;
-            margin: 0 10px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background-color 0.2s;
+            padding: 10px 20px; margin: 0 10px; border: none;
+            border-radius: 4px; cursor: pointer; font-weight: 600; transition: background-color 0.2s;
+        }
+        #confirmLogoutBtn { background-color: #FF6600; color: white; }
+        #confirmLogoutBtn:hover { background-color: #cc5200; }
+        #cancelLogoutBtn { background-color: #f0f0f0; color: #333; }
+        #cancelLogoutBtn:hover { background-color: #e0e0e0; }
+        @keyframes slideIn { to { transform: translateY(0); opacity: 1; } }
+
+        /* AJUSTES DE POSICIONAMENTO E CONTAINER (Mantidos do seu HTML) */
+        .content-header { margin-bottom: 20px; }
+        .info-card {
+            margin-top: -15px; padding: 20px; border-left: 5px solid red;
+            background-color: white; border-radius: 5px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            min-height: 75vh;
+        }
+        #mainContainer { padding-top: 5px; width: 100%; }
+
+        /* 💡 ESTILOS CRUCIAIS PARA OS FILTROS E GRID DE GRÁFICOS */
+        .chart-header-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .filter-controls {
+            display: flex;
+            gap: 10px;
+        }
+        .custom-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-toggle {
+            background-color: #f0f0f0; color: #333; padding: 8px 15px; border: 1px solid #ccc;
+            border-radius: 4px; cursor: pointer; display: flex; align-items: center;
+            font-weight: 600; font-size: 0.9em;
+        }
+        .dropdown-toggle i { margin-left: 8px; font-size: 0.7em; transition: transform 0.2s; }
+        .custom-dropdown.open .dropdown-toggle i { transform: rotate(180deg); }
+        .dropdown-menu {
+            /* IMPORTANTE: Mantém as cores e estilos de lista que você pediu para NÃO mudar */
+            position: absolute; top: 100%; left: 0; background-color: white;
+            border: 1px solid #ccc; border-radius: 4px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            z-index: 100; max-height: 200px; overflow-y: auto; display: none;
+            min-width: 120px;
+        }
+        .custom-dropdown.open .dropdown-menu { display: block; }
+        .dropdown-option {
+            padding: 8px 15px; cursor: pointer; font-size: 0.9em;
+            transition: background-color 0.1s;
+        }
+        .dropdown-option:hover, .dropdown-option.selected { background-color: #e0e0e0; }
+        .dropdown-option.selected { font-weight: bold; background-color: #ddd; }
+
+        /* O estilo da grade é controlado primariamente pelo JS, mas definimos o container base aqui */
+        #chartsGrid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px; /* Espaço entre os gráficos, conforme usado no JS */
+            margin-top: 10px;
+        }
+        .chart-container-wrapper {
+             /* Garante que o card ocupe o espaço correto na grade (5 por linha) */
+            flex-basis: calc(100% / 5 - 16px);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-radius: 5px;
+            padding: 5px;
+            background-color: #f9f9f9;
         }
 
-        #confirmLogoutBtn {
-            background-color: #FF6600; /* Laranja CEVA */
-            color: white;
-        }
-
-        #confirmLogoutBtn:hover {
-            background-color: #cc5200;
-        }
-
-        #cancelLogoutBtn {
-            background-color: #f0f0f0;
-            color: #333;
-        }
-
-        #cancelLogoutBtn:hover {
-            background-color: #e0e0e0;
-        }
-
-        @keyframes slideIn {
-            to { transform: translateY(0); opacity: 1; }
-        }
     </style>
 </head>
 <body>
@@ -118,10 +132,10 @@
                     <span>MAPPING</span>
                 </span>
             </button>
-            <button class="nav-button interactive-btn" id="btnCadastro" disabled>
+            <button class="nav-button interactive-btn" id="btnOnePage">
                 <span class="icon-text-wrap">
-                    <i class="fas fa-user-plus"></i>
-                    <span>CADASTRO</span>
+                    <i class="fas fa-table"></i>
+                    <span>ONE PAGE</span>
                 </span>
             </button>
 
@@ -154,28 +168,34 @@
             <p>Use o menu lateral para navegar entre os módulos.</p>
         </header>
 
-        <section class="info-card">
-            <h4>✅ Resumo das Mudanças de Segurança:</h4>
-            <ul>
-                <li>
-                    <strong>Proteção de Senhas Inviolável:</strong> Implementamos o **Hashing Criptográfico (bcrypt)**. As senhas agora são armazenadas em um formato ilegível e irreversível, protegendo os dados de todos os usuários em caso de comprometimento do banco.
-                </li>
-                <li>
-                    <strong>Verificação Segura (RPC):</strong> O processo de login foi movido para uma **Função Secreta no Servidor (RPC)**. O navegador só envia a tentativa de login, mas a verificação real da senha ocorre dentro do Supabase, bloqueando tentativas de invasão via console.
-                </li>
-                <li>
-                    <strong>Controle de Acesso e Auditoria:</strong> O sistema agora registra explicitamente a **Sessão Ativa** de cada usuário no banco, permitindo monitoramento em tempo real e a base para o controle de permissões por função (`MASTER`, `LEITOR`, etc.).
-                </li>
-            </ul>
+        <section class="info-card" id="mainContainer">
 
-            <hr style="margin: 20px 0; border: 0; border-top: 1px dashed #ccc;">
+            <div class="chart-header-controls">
+                <h2>Progresso Cíclico por Contrato</h2>
 
-            <h3>🚀 Próxima Etapa: Desenvolvimento do Módulo INVENTÁRIO e MAPPING</h3>
-            <p>O módulo de **INVENTÁRIO** e o novo módulo **MAPPING** serão o foco do nosso desenvolvimento. Clique nos botões laterais para explorá-los.</p>
-            <ul>
-                <li>**MAPPING (Novo):** Será usado para visualização e gerenciamento de endereços e estrutura de armazém.</li>
-                <li>**INVENTÁRIO:** Será o sistema de consulta e gestão de estoque.</li>
-            </ul>
+                <div class="filter-controls">
+                    <div class="custom-dropdown" id="monthDropdown">
+                        <button class="dropdown-toggle" id="monthToggle">
+                            Mês: <span id="selectedMonth">Carregando...</span> <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu" id="monthMenu">
+                        </div>
+                    </div>
+
+                    <div class="custom-dropdown" id="yearDropdown">
+                        <button class="dropdown-toggle" id="yearToggle">
+                            Ano: <span id="selectedYear">Carregando...</span> <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu" id="yearMenu">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="chartsGrid">
+                <p>Carregando Dashboard Cíclico por Contrato...</p>
+            </div>
+
         </section>
     </main>
 </div>
@@ -190,126 +210,6 @@
         </div>
     </div>
 </div>
-<script>
-    // =========================================================================
-    // CONFIGURAÇÃO SUPABASE (Necessário para o Logout no Banco de Dados)
-    // =========================================================================
-    const SUPABASE_URL = 'https://kidpprfegedkjifbwkju.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtpZHBwcmZlZ2Vka2ppZmJ3a2p1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA1OTE5NjQsImV4cCI6MjA3NjE2Nzk2NH0.OkpgPHJtFIKyicX_qeOSMVHMk58Bppf0SzyZAPgWzLw';
-
-    const { createClient } = supabase;
-    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    // =========================================================================
-
-    /**
-     * Função que executa todo o processo de Logout.
-     */
-    async function performLogout(userProfile) {
-        // 1. Logout no Banco de Dados (Melhoria de Segurança)
-        try {
-            // 1.1. Remove a sessão ativa da tabela 'active_sessions'
-            const { error: deleteError } = await supabaseClient
-                .from('active_sessions')
-                .delete()
-                .eq('user_id', userProfile.user_id)
-                .limit(1)
-                .select();
-
-            if (deleteError) {
-                console.warn("Aviso: Falha ao remover sessão ativa no DB (Verifique RLS de DELETE).", deleteError);
-            }
-
-            // 1.2. Atualizar status do usuário para "User Inativo" na tabela 'cadastros'
-            await supabaseClient
-                .from('cadastros')
-                .update({ status: 'User Inativo' })
-                .eq('id', userProfile.user_id)
-                .limit(1);
-
-        } catch (dbError) {
-            console.error("Erro durante a tentativa de logout no banco:", dbError);
-            // Continua o logout do frontend mesmo se o DB falhar
-        }
-
-        // 2. Logout no Frontend: Limpa os dados de sessão
-        localStorage.removeItem('user_session_data');
-
-        // 3. Redirecionamento Final
-        window.location.href = '../index.html';
-    }
-
-
-    document.addEventListener('DOMContentLoaded', () => {
-        const userNameSpan = document.getElementById('userName');
-        const btnSair = document.getElementById('btnSair');
-
-        // ⭐ Elementos da Modal
-        const logoutModal = document.getElementById('logoutModal');
-        const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
-        const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
-
-
-        // 1. VERIFICAÇÃO DE SESSÃO
-        const sessionData = localStorage.getItem('user_session_data');
-
-        if (!sessionData) {
-            window.location.href = '../index.html';
-            return; // Interrompe a execução do script
-        }
-
-        const userProfile = JSON.parse(sessionData);
-
-        // 2. EXIBIÇÃO DO NOME DO USUÁRIO
-        // Melhora a formatação do nome (Primeira letra maiúscula)
-        let username = userProfile.usuario.toLowerCase();
-        username = username.charAt(0).toUpperCase() + username.slice(1);
-        userNameSpan.textContent = username;
-
-
-        // 3. LÓGICA DE LOGOUT (Chamando a modal)
-        btnSair.addEventListener('click', (e) => {
-            e.preventDefault();
-            // Mostra a modal customizada
-            logoutModal.classList.add('show');
-        });
-
-        // 4. LÓGICA DA MODAL
-
-        // Ação de Cancelar: Oculta a modal
-        cancelLogoutBtn.addEventListener('click', () => {
-            logoutModal.classList.remove('show');
-        });
-
-        // Ação de Confirmar: Executa o logout
-        confirmLogoutBtn.addEventListener('click', () => {
-            logoutModal.classList.remove('show');
-            // Chama a função de logout com a lógica de Supabase/redirecionamento
-            performLogout(userProfile);
-        });
-
-        // 5. LÓGICA DE REDIRECIONAMENTO DE MÓDULOS
-        const btnInventario = document.getElementById('btnInventario');
-        btnInventario.addEventListener('click', () => {
-             window.location.href = './Inventario/Inventario.html';
-        });
-
-        // ⭐ NOVO: Botão Mapping
-        const btnMapping = document.getElementById('btnMapping');
-        btnMapping.addEventListener('click', () => {
-             window.location.href = './Mapping/Mapping.html';
-        });
-
-        const btnPermissoes = document.getElementById('btnPermissoes');
-        btnPermissoes.addEventListener('click', () => {
-             window.location.href = './Permissoes/Permissoes.html';
-        });
-
-        const btnCadastro = document.getElementById('btnCadastro');
-        btnCadastro.addEventListener('click', () => {
-             console.log('Botão Cadastro clicado. Módulo ainda não implementado.');
-        });
-    });
-</script>
 
 <script src="Menu.js"></script>
 </body>

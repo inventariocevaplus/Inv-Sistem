@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CEVA Logistics - Perfil de Usuário</title>
+  <link rel="stylesheet" href="../Menu.css">
+  <link rel="stylesheet" href="Perfil.css">
+
+  <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+          integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+  />
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+</head>
+<body>
+<div class="dashboard-container">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-area">
+        <h1 class="logo-text">CEVA <span class="text-highlight">MAPPING</span></h1>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button class="nav-button active" id="btnInventoryMapping">
+                <span class="icon-text-wrap">
+                    <i class="fas fa-file-contract"></i>
+                    <span>INVENTORY MAPPING</span>
+                </span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-profile" id="userProfileButton" onclick="showUserProfile()">
+        <i class="fas fa-user-circle user-icon"></i>
+        <span id="userName">Carregando...</span>
+      </div>
+      <a href="../Menu.html" class="nav-button logout-btn">
+                <span class="icon-text-wrap">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>VOLTAR AO MENU</span>
+                </span>
+      </a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="custom-nav-header">
+      <div class="header-info">
+        <h1>Perfil de Usuário e Permissões</h1>
+        <p>Visualização das suas credenciais e informações pessoais.</p>
+      </div>
+
+      <nav class="sub-nav-links">
+        <a href="#" class="nav-link active" id="linkPerfil">
+          <i class="fas fa-user-circle"></i> PERFIL
+        </a>
+
+        <a href="Mapping.html" class="nav-link" id="linkGrade">
+          <i class="fas fa-table"></i> GRADE
+        </a>
+        <a href="Dash.html" class="nav-link" id="linkDash">
+          <i class="fas fa-chart-bar"></i> DASH
+        </a>
+        <a href="Analista.html" class="nav-link" id="linkAnalista">
+          <i class="fas fa-user-tie"></i> ANALISTA
+        </a>
+      </nav>
+    </div>
+
+    <div class="toolbar-container">
+      <div class="input-and-search-group">
+
+        <div class="search-input-group">
+          <input type="text" id="searchInput" placeholder="Buscar na tabela...">
+          <button id="searchBtn" class="action-btn icon-btn search-btn">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+
+        <input type="text" id="perfilNameInput" placeholder="Nome do Perfil/Matrícula">
+
+        <button id="addContractBtn" class="action-btn icon-btn add-btn icon-only">
+          <i class="fas fa-plus"></i>
+        </button>
+
+        <button id="saveAllBtn" class="action-btn icon-btn download-btn" disabled>
+          <i class="fas fa-save"></i>
+        </button>
+
+      </div>
+      <div class="action-buttons-group">
+        <button id="downloadBtn" class="action-btn icon-btn download-btn">
+          <i class="fas fa-download"></i> BAIXAR RELATÓRIO
+        </button>
+      </div>
+    </div>
+    <section id="profileArea" class="perfil-page-container">
+      <div class="grid-container">
+        <div class="table-wrapper">
+          <table id="dataTable" class="perfil-table">
+            <thead>
+            <tr id="tableHeaderRow">
+            </tr>
+            </thead>
+            <tbody id="tableBody">
+            <tr><td colspan="5" id="loading-message">Carregando dados do perfil...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toastNotification" class="toast-hidden">
+    <i class="fas fa-check-circle"></i>
+    <span id="toastMessage">Ação Realizada!</span>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="Perfil.js"></script>
+</div>
+</body>
+</html>

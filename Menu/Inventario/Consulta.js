@@ -512,6 +512,9 @@ function formatNumberToCsv(value) {
 /**
  * Lógica para download CSV
  */
+/**
+ * Lógica para download CSV
+ */
 function handleDownloadCsv() {
     if (lastFetchedData.length === 0) {
         alert("Não há dados para baixar.");
@@ -563,6 +566,7 @@ function handleDownloadCsv() {
     const csvRows = lastFetchedData.map(row => {
         return headers.map(h => {
             let value = row[h];
+            const headerLower = h.toLowerCase(); // Usa minúsculas para a verificação
 
             // Trata o campo 'nome_contrato'
             if (h === 'nome_contrato') {
@@ -586,16 +590,21 @@ function handleDownloadCsv() {
                     value = numericValue.toString(); // Garante que seja string
                 }
 
-                // LÓGICA DE PORCENTAGEM (VÁLIDA PARA CLAUSE/RN e se houver colunas com esse nome no CICLICO)
-                else if (h.includes('percent') || h.includes('acuracia') || h.includes('target_net')) {
-                    // 1. Divide por 100 para transformar 70 em 0.7
+                // LÓGICA DE PORCENTAGEM AJUSTADA (DIVISÃO POR 100)
+                else if (
+                    headerLower.includes('percent') ||
+                    headerLower.includes('target_net') ||
+                    headerLower.includes('accuracy') || // Inclui ACCURACY LOCACAO, ITEM, PECAS, MES, etc.
+                    headerLower.includes('meta')
+                ) {
+                    // 1. Divide por 100 para transformar o valor em decimal percentual (ex: 98.5 -> 0.985)
                     value = numericValue / 100;
                     // 2. Formata para o padrão PT-BR (vírgula decimal)
                     value = formatNumberToCsv(value);
                 }
 
                 // OUTROS VALORES NUMÉRICOS (R$)
-                else if (h.includes('value') || h.includes('stock')) {
+                else if (headerLower.includes('value') || headerLower.includes('stock')) {
                     // Outros campos numéricos (R$) devem vir formatados com vírgula decimal
                     value = formatNumberToCsv(value);
                 }
@@ -609,7 +618,7 @@ function handleDownloadCsv() {
             // --- FIM DA CORREÇÃO CRÍTICA ---
 
             // Lógica para tratar Datas
-            if (value && (h.includes('data') || h.includes('date') || h.includes('month'))) {
+            if (value && (headerLower.includes('data') || headerLower.includes('date') || headerLower.includes('month'))) {
                 const dateMatch = String(value).match(/^(\d{4})-(\d{2})-(\d{2})/);
                 if (dateMatch) {
                     const [full, year, month, day] = dateMatch;

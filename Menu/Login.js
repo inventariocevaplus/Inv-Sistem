@@ -226,6 +226,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         user_id: finalProfile.id,
                         role: finalProfile.role,
 
+                        // ⭐ NOVO: REGISTRO O TEMPO ATUAL (em milissegundos)
+                        login_time: Date.now(),
+
                         // ⭐ PERMISSÕES COMPLETAS
                         access_ciclico: finalProfile.access_ciclico,
                         access_permissions: finalProfile.access_permissions,

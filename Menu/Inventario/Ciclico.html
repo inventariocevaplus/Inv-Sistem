@@ -21,7 +21,7 @@
 
       <div class="sidebar-item dropdown-rotinas" id="rotinasDropdown">
         <a href="#" class="dropdown-toggle">
-          <i class="fas fa-list-ul"></i> Rotinas <i class="fas fa-chevron-down dropdown-icon"></i>
+          <i class="fas fa-list-ul"></i> <span>Rotinas</span> <i class="fas fa-chevron-down dropdown-icon"></i>
         </a>
         <div class="dropdown-content">
           <a href="Ciclico.html" id="btnCiclico"><i class="fas fa-redo-alt"></i> Cíclico</a>
@@ -72,6 +72,8 @@
         </button>
       </div>
 
+      <p id="mainPageAlert" class="form-message"></p>
+
       <div id="ciclicoList" class="contracts-grid">
         <p id="loadingMessage" style="color:var(--text-muted);">Carregando contratos...</p>
       </div>
@@ -92,7 +94,7 @@
 
       <div class="input-group">
         <label for="contractStatusCiclico">Status</label>
-        <select id="contractStatusCiclico" required>
+        <select type="text" id="contractStatusCiclico" required>
           <option value="ATIVO">ATIVO</option>
           <option value="INATIVO">INATIVO</option>
         </select>
@@ -115,52 +117,60 @@
 <div id="editStatusModalCiclico" class="modal">
   <div class="modal-content small-modal">
     <span class="close-btn edit-status-close-btn">&times;</span>
-    <h2 id="editStatusTitleCiclico">Editar Status do Contrato</h2>
+    <h2 id="editStatusTitleCiclico">Editar Contrato Cíclico</h2>
 
     <form id="editStatusFormCiclico">
       <input type="hidden" id="editContractIdInputCiclico">
       <input type="hidden" id="editContractNameInputCiclico">
 
-      <p>Contrato: <strong id="currentContractNameCiclico"></strong></p>
-      <p>Status Atual: <strong id="currentStatusDisplayCiclico"></strong></p>
+      <div class="header-info-edit">
+        <p>Contrato: <strong id="currentContractNameCiclico"></strong></p>
+        <p>Analista Atual: <strong id="currentAnalystDisplayCiclico"></strong></p>
+        <p>Status Atual: <strong id="currentStatusDisplayCiclico"></strong></p>
+      </div>
 
-      <div class="input-group" style="margin-top: 20px;">
+      <div class="input-group">
+        <label for="newAnalystNameCiclico">Novo Analista Responsável</label>
+        <input type="text" id="newAnalystNameCiclico" required>
+      </div>
+
+      <div class="input-group">
         <label for="newContractStatusCiclico">Novo Status</label>
         <select id="newContractStatusCiclico" required>
           <option value="ATIVO">ATIVO</option>
           <option value="INATIVO">INATIVO</option>
+          <option value="CONCLUIDO">CONCLUÍDO</option>
         </select>
       </div>
 
+      <p id="editStatusFormMessageCiclico" class="form-message"></p>
+
       <div class="modal-actions-edit">
-        <button type="button" id="cancelEditBtnCiclico" class="action-btn">
+        <button type="button" id="cancelEditBtnCiclico" class="action-btn secondary-action">
           <i class="fas fa-times"></i> Cancelar
         </button>
         <button type="submit" class="action-btn primary-action">
-          <i class="fas fa-check"></i> Salvar Status
+          <i class="fas fa-check"></i> Salvar Alterações
         </button>
       </div>
-      <p id="editStatusFormMessageCiclico" class="form-message"></p>
     </form>
   </div>
 </div>
+<div id="deleteConfirmModal" class="modal top-layer"> <div class="modal-content small-modal">
+  <span class="close-btn delete-close-btn">&times;</span>
+  <h2>Confirmar Exclusão</h2>
 
-<div id="deleteConfirmModal" class="modal">
-  <div class="modal-content small-modal">
-    <span class="close-btn delete-close-btn">&times;</span>
-    <h2>Confirmar Exclusão</h2>
+  <p id="deleteMessage">Você tem certeza que deseja excluir este item? Esta ação não pode ser desfeita.</p>
 
-    <p id="deleteMessage">Você tem certeza que deseja excluir este item? Esta ação não pode ser desfeita.</p>
-
-    <div class="modal-actions">
-      <button id="cancelDeleteBtn" class="action-btn">
-        <i class="fas fa-times"></i> Não
-      </button>
-      <button id="confirmDeleteBtn" class="action-btn primary-action">
-        <i class="fas fa-trash-alt"></i> Sim, Excluir
-      </button>
-    </div>
+  <div class="modal-actions">
+    <button id="cancelDeleteBtn" class="action-btn">
+      <i class="fas fa-times"></i> Não
+    </button>
+    <button id="confirmDeleteBtn" class="action-btn primary-action">
+      <i class="fas fa-trash-alt"></i> Sim, Excluir
+    </button>
   </div>
+</div>
 </div>
 
 <div id="ciclicoConfigModal" class="modal">
@@ -182,7 +192,7 @@
           <input type="number" id="totalLocacoes" min="1" required>
         </div>
         <div class="input-group">
-          <label for="cicloValue">Ciclo:</label>
+          <label for="cicloValue">Dias uteis:</label>
           <input type="number" id="cicloValue" min="1" required>
         </div>
       </div>
@@ -198,12 +208,22 @@
 
       <div class="input-group" id="existingGradeGroup">
         <label for="existingGradeSelector">Grade de Referência (Opcional):</label>
-        <select id="existingGradeSelector" name="existingGradeSelector" class="custom-select">
-          <option value="">-- Selecione uma Grade Existente --</option>
-        </select>
+
+        <div class="grade-selector-container-flex">
+          <select id="gradeYearSelector" name="gradeYearSelector" class="custom-select">
+            <option value="">-- Selecione o Ano --</option>
+          </select>
+
+          <select id="existingGradeSelector" name="existingGradeSelector" class="custom-select" disabled>
+            <option value="">-- Selecione o Mês (Selecione o Ano Primeiro) --</option>
+          </select>
+
+          <button type="button" id="deleteGradeBtn" class="action-btn delete-grade-btn" title="Excluir Grade Selecionada" style="display: none;">
+            <i class="fas fa-trash-can"></i>
+          </button>
+        </div>
         <small style="color: var(--text-muted); font-size: 0.8em;">Se selecionado, ignora Locações/Ciclo e carrega a grade salva.</small>
       </div>
-
       <div id="monthYearSelectionGroup" class="input-group-flex" style="margin-bottom: 20px;">
         <div class="input-group" style="flex: 1;">
           <label for="monthSelector">Mês de Referência:</label>
@@ -237,43 +257,42 @@
 </div>
 
 
-<div id="manualDaysModal" class="modal">
-  <div class="modal-content calendar-modal-size">
-    <span class="close-btn manual-close-btn">&times;</span>
-    <h2>Seleção Manual de Dias de Inventário</h2>
+<div id="manualDaysModal" class="modal top-layer"> <div class="modal-content calendar-modal-size">
+  <span class="close-btn manual-close-btn">&times;</span>
+  <h2>Seleção Manual de Dias de Inventário</h2>
 
-    <p class="calendar-instruction">Clique nos dias que farão parte da contagem cíclica. Dias selecionados ficarão verdes.</p>
+  <p class="calendar-instruction">Clique nos dias que farão parte da contagem cíclica. Dias selecionados ficarão verdes.</p>
 
-    <div id="calendarContainer">
-      <div class="calendar-navigation">
-        <button type="button" id="prevMonth" class="nav-btn"><i class="fas fa-chevron-left"></i></button>
-        <h3 id="currentMonthTitle">Mês Atual</h3>
-        <button type="button" id="nextMonth" class="nav-btn"><i class="fas fa-chevron-right"></i></button>
-      </div>
-
-      <div class="calendar-header-days">
-        <div class="day-of-week">DOM</div>
-        <div class="day-of-week">SEG</div>
-        <div class="day-of-week">TER</div>
-        <div class="day-of-week">QUA</div>
-        <div class="day-of-week">QUI</div>
-        <div class="day-of-week">SEX</div>
-        <div class="day-of-week">SAB</div>
-      </div>
-
-      <div id="calendarGrid" class="calendar-grid">
-      </div>
+  <div id="calendarContainer">
+    <div class="calendar-navigation">
+      <button type="button" id="prevMonth" class="nav-btn"><i class="fas fa-chevron-left"></i></button>
+      <h3 id="currentMonthTitle">Mês Atual</h3>
+      <button type="button" id="nextMonth" class="nav-btn"><i class="fas fa-chevron-right"></i></button>
     </div>
 
-    <div class="modal-actions-manual">
-      <button type="button" id="manualVoltarBtn" class="action-btn secondary-action">
-        <i class="fas fa-arrow-left"></i> Cancelar e Voltar
-      </button>
-      <button type="button" id="manualSaveBtn" class="action-btn primary-action">
-        <i class="fas fa-check"></i> Salvar Seleção
-      </button>
+    <div class="calendar-header-days">
+      <div class="day-of-week">DOM</div>
+      <div class="day-of-week">SEG</div>
+      <div class="day-of-week">TER</div>
+      <div class="day-of-week">QUA</div>
+      <div class="day-of-week">QUI</div>
+      <div class="day-of-week">SEX</div>
+      <div class="day-of-week">SAB</div>
+    </div>
+
+    <div id="calendarGrid" class="calendar-grid">
     </div>
   </div>
+
+  <div class="modal-actions-manual">
+    <button type="button" id="manualVoltarBtn" class="action-btn secondary-action">
+      <i class="fas fa-arrow-left"></i> Cancelar e Voltar
+    </button>
+    <button type="button" id="manualSaveBtn" class="action-btn primary-action">
+      <i class="fas fa-check"></i> Salvar Seleção
+    </button>
+  </div>
+</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

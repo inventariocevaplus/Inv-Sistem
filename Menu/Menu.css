@@ -9,17 +9,17 @@
     --sidebar-width: 250px;
 }
 
-/* 🚨 CORREÇÃO 1: Remover as barras de rolagem */
+/* 🚨 AJUSTE CRÍTICO 1: Box-Sizing Universal para cálculo de largura correto */
+* {
+    box-sizing: border-box; /* Garante que padding/border sejam incluídos na largura/altura */
+}
+
+/* AJUSTE CRÍTICO 2: Eliminar o roll scroll horizontal */
 html, body {
     margin: 0;
     padding: 0;
-    /* Remove a barra horizontal (rolagem lateral) */
-    overflow-x: hidden;
-    /* Remove a barra vertical (rolagem para cima/baixo) */
-    /* ATENÇÃO: Se o conteúdo da página não couber na tela, ele será cortado! */
-    overflow-y: hidden;
+    overflow-x: hidden; /* Esconde a barra que ocasionalmente aparece */
 }
-
 
 /* ---------------------------------- */
 /* Layout Geral do Dashboard */
@@ -36,29 +36,25 @@ html, body {
 /* ---------------------------------- */
 /* Sidebar (Menu Esquerdo) */
 /* ---------------------------------- */
-
+/* ... (Seu código da sidebar inalterado) ... */
 .sidebar {
     width: var(--sidebar-width);
     background-color: var(--primary-color);
     color: white;
-    /* 🚨 AJUSTE AQUI: Adicionado padding-bottom para dar espaço no final */
     padding: 20px 0 20px 0;
     display: flex;
     flex-direction: column;
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
     position: fixed;
     height: 100%;
-    /* 🚨 NOVO: Para o conteúdo não vazar se a tela for pequena demais */
     overflow-y: auto;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
-/* Esconde a barra de rolagem para navegadores Webkit */
 .sidebar::-webkit-scrollbar {
     display: none;
 }
-
 
 .sidebar-header {
     padding: 0 20px 20px;
@@ -82,7 +78,6 @@ html, body {
     flex-grow: 1;
 }
 
-/* Estilo para todos os botões de navegação */
 .nav-button {
     width: 100%;
     padding: 15px 20px;
@@ -102,7 +97,6 @@ html, body {
     text-decoration: none;
 }
 
-/* Estilo para ícones e texto */
 .icon-text-wrap {
     display: flex;
     align-items: center;
@@ -125,7 +119,6 @@ html, body {
     cursor: not-allowed;
 }
 
-/* Botão de Destaque (Fundo Vermelho) */
 .interactive-btn {
     background-color: var(--secondary-color);
     color: white;
@@ -137,25 +130,19 @@ html, body {
     box-shadow: 0 0 8px rgba(255, 0, 0, 0.5);
 }
 
-/* ---------------------------------- */
 /* Rodapé da Sidebar (Perfil + Sair) */
-/* ---------------------------------- */
-
 .sidebar-footer {
     margin-top: auto;
     padding-top: 10px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
-    /* 🚨 NOVO: Padding-bottom para dar espaço real do final da tela */
     padding-bottom: 10px;
 }
 
-/* Estilos do Perfil do Usuário (Mais limpo e profissional) */
 .user-profile {
     display: flex;
     align-items: center;
     justify-content: flex-start;
     padding: 10px 20px;
-    /* 🚨 AJUSTE AQUI: Mais espaço em baixo para separar do botão Sair */
     margin: 0 10px 15px 10px;
     font-size: 0.95em;
     font-weight: 600;
@@ -170,11 +157,9 @@ html, body {
     margin-right: 8px;
 }
 
-/* Botão SAIR (Ajustado para o novo rodapé) */
 .logout-btn {
     width: 100%;
     margin-top: 0;
-    /* 🚨 AJUSTE AQUI: Reduzido o padding para não sair da tela */
     padding: 12px 20px;
     color: rgba(255, 255, 255, 0.7);
     margin-bottom: 0;
@@ -186,6 +171,7 @@ html, body {
     background-color: var(--secondary-color);
 }
 
+
 /* ---------------------------------- */
 /* Conteúdo Principal (Direita) */
 /* ---------------------------------- */
@@ -193,6 +179,7 @@ html, body {
 .main-content {
     margin-left: var(--sidebar-width);
     flex-grow: 1;
+    /* 🚨 Ajuste de largura: o overflow-x: hidden no body deve ser suficiente, mas o box-sizing ajuda */
     padding: 30px;
     overflow-y: auto;
 }
@@ -216,7 +203,7 @@ html, body {
     margin-top: 5px;
 }
 
-/* Cartão de Informações (Mantido) */
+/* Cartão de Informações (Contêiner Pai) */
 .info-card {
     background-color: var(--box-bg);
     padding: 25px;
@@ -225,15 +212,118 @@ html, body {
     border-left: 5px solid var(--secondary-color);
 }
 
-.info-card h3 {
-    color: var(--primary-color);
-    margin-bottom: 15px;
-    font-weight: 600;
+/* --- ALINHAMENTO DO TÍTULO E FILTROS --- */
+
+.chart-header-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
 }
 
-.info-card ul {
-    margin-top: 10px;
-    margin-left: 20px;
-    line-height: 2;
+.chart-header-controls h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.5em;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 0;
+}
+
+.filter-controls {
+    display: flex;
+    gap: 15px;
+}
+
+/* --- ESTILO DO FILTRO CUSTOMIZADO --- */
+
+.custom-dropdown {
+    position: relative;
+    display: inline-block;
+    z-index: 50;
+}
+
+.dropdown-toggle {
+    background: var(--box-bg);
     color: var(--text-dark);
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 600;
+    transition: box-shadow 0.3s ease-out;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.dropdown-toggle:hover {
+    background-color: var(--box-bg);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-toggle span {
+    font-weight: 700;
+    margin-left: 5px;
+    color: var(--primary-color);
+}
+
+.dropdown-toggle i {
+    font-size: 0.7em;
+    margin-left: 8px;
+    transition: transform 0.3s;
+}
+
+.custom-dropdown.open .dropdown-toggle i {
+    transform: rotate(180deg);
+}
+
+/* Menu de Opções (Dropdown) */
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: var(--box-bg);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    min-width: 150px;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+    padding: 5px 0;
+    z-index: 100;
+}
+
+.custom-dropdown.open .dropdown-menu {
+    display: block;
+}
+
+.dropdown-option {
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 0.9em;
+    color: var(--text-dark);
+    transition: background-color 0.1s;
+}
+
+.dropdown-option:hover {
+    background-color: var(--background-light);
+    color: var(--primary-color);
+}
+
+.dropdown-option.selected {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 700;
+}
+
+/* --- ESTILOS ADICIONAIS PARA OS GRÁFICOS (MANTIDOS) --- */
+#chartsGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: flex-start;
+    padding-top: 10px;
 }

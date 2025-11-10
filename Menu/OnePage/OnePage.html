@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CEVA Logistics - One Page</title>
+    <link rel="stylesheet" href="../Menu.css">
+    <link rel="stylesheet" href="OnePage.css">
+
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+            integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+    />
+
+</head>
+<body>
+<div class="dashboard-container">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-area">
+                <h1 class="logo-text">CEVA <span class="text-highlight">ONE PAGE</span></h1>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <button class="nav-button active" id="btnOnePage">
+                <span class="icon-text-wrap">
+                    <i class="fas fa-table"></i>
+                    <span>ONE PAGE</span>
+                </span>
+            </button>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-profile" id="userProfileButton">
+                <i class="fas fa-user-circle user-icon"></i>
+                <span id="userName">Carregando...</span>
+            </div>
+
+            <a href="../Menu.html" class="nav-button logout-btn">
+                <span class="icon-text-wrap">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>VOLTAR AO MENU</span>
+                </span>
+            </a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="custom-nav-header">
+            <div class="header-info">
+                <h1>One Page - CEVA Plus</h1>
+            </div>
+        </div>
+
+        <div class="filter-container">
+            <div class="filter-group">
+                <label for="selectContrato">Contrato:</label>
+                <select id="selectContrato" name="selectContrato">
+                    <option value="">Todos os Contratos</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="mesMultiSelectContainer">Mês:</label>
+                <div id="mesMultiSelectContainer" class="custom-multi-select">
+                    <div id="mesDisplay" class="select-display">
+                        Selecionar o mês
+                    </div>
+                    <div id="mesDropdown" class="select-dropdown">
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label for="selectAno">Ano:</label>
+                <div class="ano-filter-wrap">
+                    <select id="selectAno" name="selectAno"></select>
+
+                    <a href="DashOne.html" id="btnGoToDashboard" title="Ver Dashboard">
+                        <i class="fas fa-chart-bar dashboard-icon"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <section id="resultsArea">
+            <div class="table-wrapper">
+                <table id="dataTable" class="contract-grade">
+                    <thead>
+                    <tr id="tableHeaderRow">
+                        <th style="width: 100px; min-width: 100px;">Contrato</th>
+                        <th style="width: 150px; min-width: 150px;">Indicador</th>
+                        <th style="width: 60px; min-width: 60px;">UN</th>
+                        <th style="width: 70px; min-width: 70px;">Target</th>
+
+                    </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="text-align: center; padding: 20px; color: #666; font-style: italic;" id="infoMessage">
+                <p>Nenhum dado carregado. Utilize os filtros para exibir a grade.</p>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="OnePage.js"></script>
+
+</div>
+</body>
+</html>

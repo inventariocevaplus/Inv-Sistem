@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CEVA Logistics - Dashboard One</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+  />
+  <link rel="stylesheet" href="../Menu.css">
+  <link rel="stylesheet" href="DashOne.css">
+
+  <style>
+    /* Container pai para posicionamento da engrenagem e modal */
+    .chart-relative-container {
+        position: relative;
+    }
+
+    /* Estilo para a engrenagem */
+    .settings-gear-icon {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        color: #555;
+        cursor: pointer;
+        z-index: 10;
+        /* Adiciona transição para o hover */
+        transition: color 0.2s;
+    }
+
+    .settings-gear-icon:hover {
+        color: #000;
+    }
+
+    /* ESTILO DO MODAL - AJUSTADO PARA EFEITO "SLIDE" */
+    .settings-modal {
+        /* Mantém como 'block' para aplicar a animação (display: none no JS é substituído por opacidade 0) */
+        display: block;
+        position: absolute;
+        top: 30px; /* Posição para iniciar o slide abaixo da engrenagem */
+        right: 5px;
+        width: 250px;
+        background-color: white;
+        border: 1px solid #ccc;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        z-index: 20;
+        border-radius: 8px;
+        overflow: hidden;
+
+        /* Configuração da Animação Inicial: invisível e pequena */
+        opacity: 0;
+        transform: scale(0.95) translateY(-5px);
+        /* Não interage quando fechado */
+        pointer-events: none;
+        transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+    }
+
+    /* Estado Aberto (Abre para baixo e para o lado) */
+    .settings-modal.open {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        /* Permite interação quando aberto */
+        pointer-events: auto;
+    }
+
+    /* Ajuste de cabeçalho com apenas o botão de fechar */
+    .settings-header {
+        background-color: #f0f0f0;
+        padding: 5px 10px; /* Padding reduzido para economizar espaço */
+        display: flex;
+        justify-content: flex-end; /* Alinha o botão de fechar à direita */
+        align-items: center;
+        border-bottom: 1px solid #eee;
+    }
+
+    .close-button {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #777;
+        cursor: pointer;
+        line-height: 1;
+    }
+
+    .settings-content {
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    /* Estilo para os itens da legenda customizada */
+    .custom-legend-item {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        user-select: none;
+    }
+
+    .custom-legend-marker {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+        border: 1px solid #ccc;
+    }
+
+    .custom-legend-marker.square {
+        border-radius: 2px;
+    }
+
+    .hidden-filters-container {
+      display: none;
+    }
+  </style>
+
+</head>
+<body>
+<div class="dashboard-container">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-area">
+        <h1 class="logo-text">CEVA <span class="text-highlight">ONE DASH</span></h1>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button class="nav-button active" id="btnOnePage">
+                <span class="icon-text-wrap">
+                    <i class="fas fa-table"></i>
+                    <span>ONE PAGE</span>
+                </span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-profile" id="userProfileButton">
+        <i class="fas fa-user-circle user-icon"></i>
+        <span id="userName">Carregando...</span>
+      </div>
+
+      <a href="../Menu.html" class="nav-button logout-btn">
+                <span class="icon-text-wrap">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>VOLTAR AO MENU</span>
+                </span>
+      </a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="custom-nav-header">
+      <div class="header-info">
+        <h1>Dashboard Operacional (Dash One)</h1>
+      </div>
+    </div>
+
+    <div class="filter-container">
+      <a href="OnePage.html" id="btnReturnToGrid" title="Voltar para Grade (One Page)">
+        <i class="fas fa-table dashboard-icon"></i>
+      </a>
+
+      <div class="filter-group">
+        <div id="mesMultiSelectContainer" class="custom-multi-select">
+          <div id="mesDisplay" class="select-display">Selecionar o mês</div>
+          <div id="mesDropdown" class="select-dropdown"></div>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <div id="anoMultiSelectContainer" class="custom-multi-select">
+          <div id="anoDisplay" class="select-display">Carregando...</div>
+          <div id="anoDropdown" class="select-dropdown"></div>
+        </div>
+      </div>
+    </div>
+
+    <section id="dashboardArea">
+      <div class="dashboard-panels-container">
+        <div class="dashboard-panel panel-full-width">
+          <div class="card chart-card">
+            <div class="card-header">
+              <h3>Acuracidade GROSS</h3>
+            </div>
+            <div class="card-body chart-relative-container">
+              <button id="settingsGear" class="settings-gear-icon" title="Configurações de Exibição">
+                <i class="fas fa-cog"></i>
+              </button>
+
+              <div id="settingsModal" class="settings-modal">
+                <div class="settings-header">
+                  <button id="closeSettingsModal" class="close-button" title="Fechar">&times;</button>
+                </div>
+                <div class="settings-content">
+                  <div id="customLegendContainer">
+                    <p>Carregando opções...</p>
+                  </div>
+                </div>
+              </div>
+
+              <div id="chartPanel2" class="chart-panel chart-placeholder"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-panel panel-full-width">
+          <div class="card chart-card">
+            <div class="card-header">
+              <h3>Acuracidade SUSPENSE</h3>
+            </div>
+            <div class="card-body">
+              <div id="chartPanel3" class="chart-panel chart-placeholder"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-panel panel-full-width">
+          <div class="card chart-card">
+            <div class="card-header">
+              <h3>Cíclico Projetado vs Realizado</h3>
+            </div>
+            <div class="card-body">
+              <div id="chartPanel4" class="chart-panel chart-placeholder"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="DashOne.js"></script>
+
+</body>
+</html>

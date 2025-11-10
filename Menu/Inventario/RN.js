@@ -1,5 +1,5 @@
 // =========================================================================
-// RN.js (Rotina: Reserva Normal) - CÓDIGO FINAL E COMPLETO
+// RN.js (Rotina: Reserva Normal) - CÓDIGO FINAL E COMPLETO E CORRIGIDO
 // =========================================================================
 
 // 🚨 CREDENCIAIS SUPABASE (Mantenha as suas credenciais)
@@ -11,14 +11,14 @@ const TARGET_TABLE_NAME = 'rn_contratos';
 
 // --- Lógica de Token de Sessão CORRIGIDA ---
 const sessionDataJSON = localStorage.getItem('user_session_data');
-let jwtToken = null; // Armazenaremos o JWT aqui
-let loggedInUserId = null; // 🚨 NOVO: Armazenaremos o user_id (UUID) aqui
+let jwtToken = null;
+let loggedInUserId = null; // 🚨 Armazenaremos o user_id (UUID) aqui
 
 if (sessionDataJSON) {
     try {
         const userData = JSON.parse(sessionDataJSON);
         if (userData.token) {
-            jwtToken = userData.token; // Pega o JWT da sua sessão
+            jwtToken = userData.token;
         }
         // 🚨 CRÍTICO: Pega o ID do usuário (UUID) salvo no Login.js
         if (userData.user_id) {
@@ -29,26 +29,41 @@ if (sessionDataJSON) {
     }
 }
 
-// 🚨 Inicializa o cliente Supabase com o JWT no cabeçalho
+// 🚨 CRÍTICO: Inicializa o cliente Supabase sem cabeçalhos de autenticação manual.
+// A autenticação será forçada via setSession() abaixo.
 const supabaseClient = createClient(
     SUPABASE_URL,
-    SUPABASE_ANON_KEY,
-    {
-        global: {
-            headers: {
-                // Se o JWT estiver presente, use-o para autenticar a requisição
-                ...(jwtToken && { Authorization: `Bearer ${jwtToken}` }),
-            }
-        }
-    }
+    SUPABASE_ANON_KEY
 );
+// Mantém a inicialização original
+
+// 🛠️ CORREÇÃO DE AUTENTICAÇÃO (RESOLVE O ERRO 401)
+// Se o token existir, forçamos o Supabase a usá-lo para todas as requisições.
+if (jwtToken && loggedInUserId) {
+    // Nota: O Supabase SDK espera um objeto de sessão.
+    // Como você armazena o token separadamente, criamos um objeto mínimo.
+    // Isso garante que o cliente Supabase use o token em todas as chamadas RPC.
+    supabaseClient.auth.setSession({
+        access_token: jwtToken,
+        refresh_token: 'placeholder_refresh_token', // Obrigatório para a função
+        token_type: 'bearer',
+        user: {
+            id: loggedInUserId,
+            aud: 'authenticated',
+            role: 'authenticated',
+            email: 'placeholder@user.com', // Placeholder para satisfazer o objeto
+
+            user_metadata: {},
+            app_metadata: {}
+        }
+    }).catch(e => console.error("Falha ao setar a sessão Supabase:", e));
+}
+// FIM CORREÇÃO DE AUTENTICAÇÃO
 
 let userPermissions = {};
 let recordToDeleteId = null;
-
-
 // =======================================================
-// REFERÊNCIAS DO DOM - (MANTIDAS)
+// REFERÊNCIAS DO DOM (Sem alterações)
 // =======================================================
 const rotinasDropdown = document.getElementById('rotinasDropdown');
 const rnListDiv = document.getElementById('rnList');
@@ -60,7 +75,6 @@ const addRNBtn = document.getElementById('addRNBtn');
 const addRNModal = document.getElementById('addRNModal');
 const addRNForm = document.getElementById('addRNForm');
 const formMessage = document.getElementById('formMessageRN');
-
 // Referências do Modal de Edição Rápida de Status
 const editStatusModalRN = document.getElementById('editStatusModalRN');
 const editStatusFormRN = document.getElementById('editStatusFormRN');
@@ -71,12 +85,15 @@ const currentStatusDisplayRN = document.getElementById('currentStatusDisplayRN')
 const newContractStatusRN = document.getElementById('newContractStatusRN');
 const cancelEditBtnRN = document.getElementById('cancelEditBtnRN');
 const editStatusFormMessageRN = document.getElementById('editStatusFormMessageRN');
+// ⭐ NOVO: Referências do Analista no Modal de Edição
+const currentAnalystDisplayRN = document.getElementById('currentAnalystDisplayRN');
+const newAnalystNameRN = document.getElementById('newAnalystNameRN');
+// FIM NOVO
 
 // =======================================================
 // REFERÊNCIAS DO MÓDULO DE DETALHAMENTO RN (OPERACIONAL)
 // =======================================================
 const RN_MONTHLY_DATA_TABLE = 'rn_details';
-
 const rnMonthlyDataModal = document.getElementById('rnMonthlyDataModal');
 const rnMonthlyDataForm = document.getElementById('rnMonthlyDataForm');
 const rnMensalContractNameInput = document.getElementById('rnMonthlyContractName');
@@ -86,7 +103,6 @@ const rnDataRecordIdInput = document.getElementById('rnDataRecordId');
 const rnContractIdInput = document.getElementById('rnContractIdInput');
 const rnMonthlyDataFieldsDiv = document.getElementById('rnMonthlyDataFields');
 const rnMonthlyFormMessage = document.getElementById('rnMonthlyFormMessage');
-
 // CAMPOS DE DADOS RN OPERACIONAL
 // ENTRADA
 const qtdLinhasInput = document.getElementById('qtdLinhas');
@@ -103,20 +119,23 @@ const acuraciaMesInput = document.getElementById('acuraciaMes');
 
 
 // =======================================================
-// LÓGICA DE PERMISSÕES (MANTIDA)
+// LÓGICA DE PERMISSÕES (Sem alterações)
 // =======================================================
 
 function loadUserPermissions() {
     const userDataJSON = localStorage.getItem('user_session_data');
     let permissions = { role: 'GUEST', can_consult: false, access_rn: false, access_ciclico: false, access_clause: false, can_send_data: false, can_delete_data: false, can_edit_data: false };
     if (userDataJSON) {
-        try { permissions = JSON.parse(userDataJSON); } catch (e) { console.error("Erro ao analisar dados da sessão JSON.", e); }
+        try { permissions = JSON.parse(userDataJSON);
+        } catch (e) { console.error("Erro ao analisar dados da sessão JSON.", e);
+        }
     }
     return permissions;
 }
 
 function hasPermission(key) {
-    userPermissions = userPermissions || loadUserPermissions();
+    userPermissions = userPermissions ||
+    loadUserPermissions();
 
     if (userPermissions.role && userPermissions.role.toUpperCase() === 'MASTER') {
         return true;
@@ -142,10 +161,10 @@ function checkAndDisplayNavigation() {
 
 
 // =======================================================
-// LÓGICA DE EDIÇÃO RÁPIDA DE STATUS (MANTIDA)
+// LÓGICA DE EDIÇÃO RÁPIDA DE STATUS (Sem alterações)
 // =======================================================
 
-function openEditStatusModalRN(recordId, recordName, currentStatus) {
+function openEditStatusModalRN(recordId, recordName, currentStatus, currentAnalyst) { // 🚨 NOVO ARGUMENTO: currentAnalyst
     if (!hasPermission('can_edit_data')) {
         alert("Erro: Você não tem permissão para editar dados.");
         return;
@@ -155,6 +174,9 @@ function openEditStatusModalRN(recordId, recordName, currentStatus) {
     editContractNameInputRN.value = recordName;
     currentContractNameRN.textContent = recordName;
     currentStatusDisplayRN.textContent = currentStatus;
+    // ⭐ NOVO: Popula o display e o campo de input do analista
+    currentAnalystDisplayRN.textContent = currentAnalyst;
+    newAnalystNameRN.value = currentAnalyst || '';
 
     const statusUpper = currentStatus.toUpperCase();
     if (statusUpper === 'ATIVA' || statusUpper === 'ATIVO') {
@@ -173,24 +195,29 @@ async function saveEditStatusRN(e) {
     const recordId = editContractIdInputRN.value;
     const recordName = editContractNameInputRN.value;
     const newStatus = newContractStatusRN.value;
-
-    if (!recordId || !newStatus) {
-        displayMessage(editStatusFormMessageRN, "Erro: Reserva ou status inválido.", false);
+    // ⭐ NOVO: Pega o novo analista
+    const newAnalyst = newAnalystNameRN.value.trim();
+    if (!recordId || !newStatus || !newAnalyst) { // 🚨 Validação atualizada
+        displayMessage(editStatusFormMessageRN, "Erro: Reserva, status ou analista inválido.", false);
         return;
     }
 
+    // Objeto de atualização
+    const updatePayload = {
+        status: newStatus,
+        // ⭐ NOVO: Inclui o novo analista no payload
+        analista_responsavel: newAnalyst
+    };
     // Nota: O RLS em 'rn_contratos' deve permitir UPDATE baseado no can_edit_data OU role = MASTER
     const { error } = await supabaseClient
         .from(TARGET_TABLE_NAME)
-        .update({ status: newStatus })
+        .update(updatePayload) // Usa o payload completo
         .eq('id', recordId);
-
     if (error) {
-        displayMessage(editStatusFormMessageRN, `Falha ao atualizar o status: ${error.message}`, false);
+        displayMessage(editStatusFormMessageRN, `Falha ao atualizar dados: ${error.message}`, false);
         console.error('Supabase Update Error:', error);
     } else {
-        displayMessage(editStatusFormMessageRN, `Status de "${recordName}" atualizado para ${newStatus}!`, true);
-
+        displayMessage(editStatusFormMessageRN, `Dados de "${recordName}" atualizados!`, true);
         loadRNRecords();
         setTimeout(() => {
             editStatusModalRN.style.display = 'none';
@@ -199,7 +226,7 @@ async function saveEditStatusRN(e) {
 }
 
 // =======================================================
-// FUNÇÕES AUXILIARES DE CÁLCULO E DATA (MANTIDAS)
+// FUNÇÕES AUXILIARES DE CÁLCULO E DATA (Sem alterações)
 // =======================================================
 
 function formatMonthYearToDate(monthYear) {
@@ -226,12 +253,13 @@ function parsePercentInput(inputElement) {
 
 // Converte um input number (ex: qtdLinhas) para inteiro
 function parseInputInt(inputElement) {
-    return parseInt(inputElement.value) || 0;
+    return parseInt(inputElement.value) ||
+    0;
 }
 
 
 // =======================================================
-// LÓGICA DE CÁLCULO AUTOMÁTICO (RN OPERACIONAL) (MANTIDA)
+// LÓGICA DE CÁLCULO AUTOMÁTICO (RN OPERACIONAL) (Sem alterações)
 // =======================================================
 
 function calculateOperationalMetrics() {
@@ -242,22 +270,17 @@ function calculateOperationalMetrics() {
 
     // 1. QTD Erros
     const qtdErros = repicking + nilPicking;
-
     let repiPercent = 0.00;
     let nilpiPercent = 0.00;
     let errosPercent = 0.00;
     let acuraciaMes = 0.00;
-
     if (qtdLinhas > 0) {
         // 2. Repi %
         repiPercent = (repicking / qtdLinhas) * 100;
-
         // 3. NilPi %
         nilpiPercent = (nilPicking / qtdLinhas) * 100;
-
         // 4. Erros %
         errosPercent = repiPercent + nilpiPercent;
-
         // 5. Acuracia Mês
         acuraciaMes = 100 - errosPercent;
     } else {
@@ -275,25 +298,22 @@ function calculateOperationalMetrics() {
 }
 
 // =======================================================
-// FUNÇÕES CRUD DE DETALHAMENTO MENSAL RN (CORRIGIDAS)
+// FUNÇÕES CRUD DE DETALHAMENTO MENSAL RN (Sem alterações)
 // =======================================================
 
 function openRNMonthlyDataModal(contractName, contractId) {
-    // ... (Mantido o código de inicialização do modal) ...
     if (!rnMonthlyDataModal) return;
-
     // Reseta e configura o modal
     rnMonthlyDataForm.reset();
-    rnContractIdInput.value = contractId; // 🚨 contractId é um UUID aqui
+    rnContractIdInput.value = contractId;
+    // 🚨 contractId é um número inteiro (ex: 11) vindo do record.id do rn_contratos.
     rnDataRecordIdInput.value = '';
-
     if (rnMensalContractNameInput) {
         rnMensalContractNameInput.value = contractName;
     }
 
     // Configura o valor padrão da Meta
     metaRNInput.value = formatToTwoDecimals(0.15);
-
     // Oculta campos de dados e mostra a busca
     rnMonthlyDataFieldsDiv.style.display = 'none';
     rnMonthlyFormMessage.style.display = 'none';
@@ -303,19 +323,16 @@ function openRNMonthlyDataModal(contractName, contractId) {
 
     // Inicializa cálculo para zeros
     calculateOperationalMetrics();
-
     rnMonthlyDataModal.style.display = 'block';
 }
 
 // =======================================================
-// FUNÇÃO searchAndLoadRNMonthlyData CORRIGIDA
+// FUNÇÃO searchAndLoadRNMonthlyData (Mantido o parse/uso de INT)
 // =======================================================
 
 async function searchAndLoadRNMonthlyData() {
-    // 🚨 ATENÇÃO: Verifique se o contractId é UUID ou INTEGER.
-    // Mantido parseInt como no seu código, mas confirme no seu DB.
     const contractId = rnContractIdInput.value;
-    const contractIdValue = parseInt(contractId, 10); // OU apenas 'contractId' se for UUID
+    const contractIdValue = parseInt(contractId, 10); // Mantido o parseInt para buscar com INT
 
     const mesReferencia = rnMensReferenciaInput.value.trim();
     const contractName = rnMensalContractNameInput.value;
@@ -339,16 +356,13 @@ async function searchAndLoadRNMonthlyData() {
     if (!referenceDate) return;
 
     rnMonthlyFormMessage.style.display = 'none';
-
     // 1. Pesquisa USANDO A FUNÇÃO RPC
-    // *** CORREÇÃO CRÍTICA: REMOÇÃO DO .single() ***
     const { data: rnMonthlyDataArray, error } = await supabaseClient
         .rpc('fetch_rn_details', {
             p_user_id: loggedInUserId,
-            p_contract_id: contractIdValue, // Usando o valor convertido/assumido
+            p_contract_id: contractIdValue, // Usando o valor convertido/assumido (INTEGER)
             p_reference_month: referenceDate
         });
-
     if (error) {
         // Se der erro aqui, é erro de permissão ou sintaxe na função SQL, não de "0 rows".
         displayMessage(rnMonthlyFormMessage, `Erro ao buscar dados mensais: ${error.message}`, false);
@@ -362,8 +376,10 @@ async function searchAndLoadRNMonthlyData() {
 
     // 2. Extrai o registro: Verifica se o array tem itens.
     const rnMonthlyData = (rnMonthlyDataArray && rnMonthlyDataArray.length > 0)
-                          ? rnMonthlyDataArray[0] // Pega o primeiro registro encontrado
-                          : null; // Se 0 linhas, define como null
+                          ?
+    rnMonthlyDataArray[0] // Pega o primeiro registro encontrado
+                          : null;
+    // Se 0 linhas, define como null
 
     // 3. Carrega ou Inicializa os campos
     rnMonthlyDataFieldsDiv.style.display = 'block';
@@ -376,7 +392,8 @@ async function searchAndLoadRNMonthlyData() {
         rnDataRecordIdInput.value = rnMonthlyData.id;
 
         // Preenche os campos de INPUT (MANTIDO)
-        qtdLinhasInput.value = rnMonthlyData.qtd_linhas || 0;
+        qtdLinhasInput.value = rnMonthlyData.qtd_linhas ||
+        0;
         repickingInput.value = rnMonthlyData.repicking || 0;
         nilPickingInput.value = rnMonthlyData.nil_picking || 0;
         metaRNInput.value = formatToTwoDecimals(rnMonthlyData.meta || 0.15);
@@ -397,10 +414,12 @@ async function searchAndLoadRNMonthlyData() {
     }
 }
 
+// =======================================================
+// FUNÇÃO saveRNMonthlyData (CORRIGIDA PARA INTEGER)
+// =======================================================
 async function saveRNMonthlyData(e) {
     e.preventDefault();
 
-    // ... (Mantida a checagem de permissão no front-end) ...
     if (!hasPermission('can_send_data') && !hasPermission('can_edit_data')) {
         displayMessage(rnMonthlyFormMessage, "Erro: Você não tem permissão para salvar dados.", false);
         return;
@@ -409,12 +428,24 @@ async function saveRNMonthlyData(e) {
     calculateOperationalMetrics();
 
     const recordId = rnDataRecordIdInput.value;
-    const contractId = rnContractIdInput.value; // UUID
+    const contractId = rnContractIdInput.value;
     const mesReferencia = rnMensReferenciaInput.value;
 
-    // Mapeamento dos campos para enviar à RPC (deve ser um JSON puro, não um objeto Supabase)
+    // ⭐ CORREÇÃO CRÍTICA APLICADA AQUI:
+    // Converte o ID para o tipo numérico INTEGER, que corresponde ao int4 do Supabase.
+    // Isso faz com que o JSON seja serializado como "contract_id": 11 (sem aspas).
+    const contractIdInt = parseInt(contractId, 10);
+
+    // Validação de segurança
+    if (isNaN(contractIdInt) || contractIdInt <= 0) {
+        displayMessage(rnMonthlyFormMessage, 'Erro: ID de contrato (INT) inválido para salvar.', false);
+        return;
+    }
+
+    // Mapeamento dos campos para enviar à RPC
     const dataToSave = {
-        contract_id: contractId, // UUID
+        // ✅ CORREÇÃO FINAL JS: Envia o valor como o tipo nativo Number.
+        contract_id: contractIdInt,
         reference_month: formatMonthYearToDate(mesReferencia), // DATE
 
         // Campos de Entrada (Enviados como string para a RPC fazer o cast)
@@ -430,7 +461,6 @@ async function saveRNMonthlyData(e) {
         erros_percent: String(parsePercentInput(errosPercentInput)),
         acuracia_mes: String(parsePercentInput(acuraciaMesInput)),
     };
-
     let error = null;
 
     if (recordId) {
@@ -445,10 +475,11 @@ async function saveRNMonthlyData(e) {
             .rpc('update_rn_details', {
                 p_user_id: loggedInUserId, // 🚨 NOVO: Inclui o user_id para a checagem de permissão
                 p_record_id: recordId,
+
+
                 p_data: dataToSave
             });
         error = updateError;
-
     } else {
         // INSERT (Novo Registro) - Chamando a RPC insert_rn_details
         if (!hasPermission('can_send_data')) {
@@ -470,7 +501,6 @@ async function saveRNMonthlyData(e) {
         console.error('Supabase RN Save Error:', error);
     } else {
         displayMessage(rnMonthlyFormMessage, 'Dados mensais salvos com sucesso!', true);
-
         setTimeout(() => {
             rnMonthlyDataModal.style.display = 'none';
         }, 1000);
@@ -478,7 +508,7 @@ async function saveRNMonthlyData(e) {
 }
 
 // =======================================================
-// LÓGICA DE CARREGAMENTO E CRIAÇÃO DE CARDS (MANTIDA)
+// LÓGICA DE CARREGAMENTO E CRIAÇÃO DE CARDS (Sem alterações)
 // =======================================================
 
 function displayMessage(element, message, isSuccess) {
@@ -497,7 +527,6 @@ async function loadRNRecords(searchTerm = '') {
     if (loadingMessage) loadingMessage.textContent = 'Carregando reservas normais...';
 
     let query = supabaseClient.from(TARGET_TABLE_NAME).select('id, nome_contrato, status, analista_responsavel');
-
     if (searchTerm) {
         query = query.or(`nome_contrato.ilike.%${searchTerm}%,analista_responsavel.ilike.%${searchTerm}%`);
     }
@@ -505,7 +534,6 @@ async function loadRNRecords(searchTerm = '') {
     let { data: records, error } = await query;
 
     if (loadingMessage) loadingMessage.textContent = '';
-
     if (error) {
         if (rnListDiv) rnListDiv.innerHTML = `<p style="color:red;">Erro ao carregar reservas: ${error.message}</p>`;
         console.error("Supabase Error (SELECT):", error);
@@ -524,7 +552,8 @@ async function loadRNRecords(searchTerm = '') {
     }
 
     if (addRNBtn) {
-        addRNBtn.style.display = hasPermission('can_send_data') ? 'block' : 'none';
+        addRNBtn.style.display = hasPermission('can_send_data') ?
+        'block' : 'none';
     }
 }
 
@@ -533,29 +562,29 @@ function createRNCard(record) {
     const card = document.createElement('div');
     card.className = 'contract-card';
     card.setAttribute('data-id', record.id);
-
     const statusText = record.status ? record.status.toUpperCase() : 'INATIVO';
-    const statusClass = (statusText === 'ATIVA' || statusText === 'ATIVO') ? 'ATIVO' : 'INATIVO';
+    const statusClass = (statusText === 'ATIVA' || statusText === 'ATIVO') ?
+    'ATIVO' : 'INATIVO';
 
     const editButtonHTML = hasPermission('can_edit_data') ?
         `<button class="edit-status-btn" title="Editar Status Rápido"><i class="fas fa-cog"></i></button>` : '';
-
     const deleteButtonHTML = hasPermission('can_delete_data')
-        ? `<button class="delete-btn" title="Excluir Reserva"><i class="fas fa-times"></i></button>`
+        ?
+    `<button class="delete-btn" title="Excluir Reserva"><i class="fas fa-times"></i></button>`
         : '';
 
     const actionsHTML = `<div class="card-actions">${editButtonHTML}${deleteButtonHTML}</div>`;
-
     const isClickable = hasPermission('can_edit_data') || hasPermission('can_consult');
     card.classList.toggle('clickable', isClickable);
 
     card.innerHTML = `
         <div class="status-bar ${statusClass}"></div>
-        <div class="contract-name">${record.nome_contrato || 'N/A'}</div>
-        <div class="contract-analyst">Analista: ${record.analista_responsavel || 'N/A'}</div>
+        <div class="contract-name">${record.nome_contrato ||
+    'N/A'}</div>
+        <div class="contract-analyst">Analista: ${record.analista_responsavel ||
+    'N/A'}</div>
         ${actionsHTML}
     `;
-
     // 1. Listener para o botão de exclusão
     if (hasPermission('can_delete_data')) {
         const deleteBtn = card.querySelector('.delete-btn');
@@ -574,7 +603,8 @@ function createRNCard(record) {
         if (editBtn) {
             editBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                openEditStatusModalRN(record.id, record.nome_contrato, statusText);
+                // ⭐ AJUSTADO: Passa o nome do analista
+                openEditStatusModalRN(record.id, record.nome_contrato, statusText, record.analista_responsavel);
             });
         }
     }
@@ -584,8 +614,10 @@ function createRNCard(record) {
     if (isClickable) {
         card.addEventListener('click', () => {
             const recordName = record.nome_contrato || 'Reserva Desconhecida';
-            // 🚨 CRÍTICO: record.id é o UUID do contrato, usado corretamente como contractId
+            // 🚨 CRÍTICO: record.id é o ID do contrato (que é usado como contractId no input)
             openRNMonthlyDataModal(recordName, record.id);
+
+
         });
     }
 
@@ -594,7 +626,6 @@ function createRNCard(record) {
 
 
 async function deleteRNRecord() {
-    // ... (MANTIDA)
     if (!hasPermission('can_delete_data')) {
         alert("Erro: Você não tem permissão para deletar dados.");
         if (deleteConfirmModal) deleteConfirmModal.style.display = 'none';
@@ -602,13 +633,11 @@ async function deleteRNRecord() {
     }
 
     if (!recordToDeleteId) return;
-
     // Nota: O RLS em 'rn_contratos' deve permitir DELETE baseado no can_delete_data OU role = MASTER
     const { error } = await supabaseClient
         .from(TARGET_TABLE_NAME)
         .delete()
         .eq('id', recordToDeleteId);
-
     if (error) {
         alert(`Falha ao excluir reserva: ${error.message}`);
     } else {
@@ -622,14 +651,12 @@ async function deleteRNRecord() {
 
 
 function setupModalListeners() {
-    // ... (MANTIDA)
     // 1. Modal de Exclusão
     if (confirmDeleteBtn) confirmDeleteBtn.addEventListener('click', deleteRNRecord);
     if (cancelDeleteBtn) cancelDeleteBtn.addEventListener('click', () => {
         recordToDeleteId = null;
         if (deleteConfirmModal) deleteConfirmModal.style.display = 'none';
     });
-
     // 2. Modal de Edição Rápida
     if (cancelEditBtnRN) {
         cancelEditBtnRN.addEventListener('click', () => {
@@ -652,13 +679,14 @@ function setupModalListeners() {
 }
 
 function setupAddRecordListener() {
-    // ... (MANTIDA)
     if (addRNBtn && addRNModal) {
         addRNBtn.addEventListener('click', () => {
              if (hasPermission('can_send_data')) {
                 if (addRNForm) addRNForm.reset();
                 addRNModal.style.display = 'block';
             } else {
+
+
                 alert("Você não tem permissão para adicionar novos contratos.");
             }
         });
@@ -666,9 +694,7 @@ function setupAddRecordListener() {
 }
 
 function setupFormSubmit() {
-    // ... (MANTIDA)
     if (!addRNForm) return;
-
     addRNForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -679,6 +705,8 @@ function setupFormSubmit() {
 
         const newRecord = {
             nome_contrato: document.getElementById('contractNameRN').value,
+
+
             status: document.getElementById('contractStatusRN').value,
             analista_responsavel: document.getElementById('analystNameRN').value,
         };
@@ -689,6 +717,8 @@ function setupFormSubmit() {
             .insert([newRecord]);
 
         if (error) {
+
+
             displayMessage(formMessage, `Erro ao salvar: ${error.message}`, false);
             console.error("Supabase Error (INSERT):", error);
         } else {
@@ -701,12 +731,12 @@ function setupFormSubmit() {
 }
 
 function setupSearchListener() {
-    // ... (MANTIDA)
     const searchInput = document.getElementById('searchInput');
     const searchBtn = document.getElementById('searchBtn');
 
     const executeSearch = () => {
-        const searchTerm = searchInput ? searchInput.value.trim() : '';
+        const searchTerm = searchInput ?
+        searchInput.value.trim() : '';
         loadRNRecords(searchTerm);
     };
 
@@ -723,7 +753,6 @@ function setupSearchListener() {
 }
 
 function setupDropdown() {
-    // ... (MANTIDA)
     if (!rotinasDropdown) return;
 
     const dropdownToggle = rotinasDropdown.querySelector('.dropdown-toggle');
@@ -746,6 +775,8 @@ function setupDropdown() {
             const icon = rotinasDropdown.querySelector('.dropdown-icon');
             if (icon) {
                 icon.classList.toggle('fa-chevron-down');
+
+
                 icon.classList.toggle('fa-chevron-up');
             }
         });
@@ -760,6 +791,8 @@ function setupDropdown() {
                 e.preventDefault();
             }
 
+
+
             closeDropdown();
         });
     });
@@ -767,7 +800,6 @@ function setupDropdown() {
 
 // Funções de Configuração para o Detalhamento RN (Operacional)
 function setupRNMonthlyListeners() {
-    // ... (MANTIDA)
     // 1. Listeners para Campos de Entrada (disparam o cálculo)
     if (qtdLinhasInput) qtdLinhasInput.addEventListener('input', calculateOperationalMetrics);
     if (repickingInput) repickingInput.addEventListener('input', calculateOperationalMetrics);
@@ -789,6 +821,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const mainContent = document.querySelector('.main-content');
         if (mainContent) mainContent.innerHTML = `<h1 style="color:red; margin-top: 50px; text-align: center;">Acesso Negado.</h1>`;
         const sidebar = document.querySelector('.sidebar');
+
         if (sidebar) sidebar.style.display = 'none';
         return;
     }

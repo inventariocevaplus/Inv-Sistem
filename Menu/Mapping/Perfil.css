@@ -1,0 +1,274 @@
+/* Importa o estilo principal do menu para reutilização de variáveis */
+@import url('../Menu.css');
+
+/* ================================================================= */
+/* ESTILOS GERAIS DA PÁGINA PERFIL (Reutilizados do Mapping) */
+/* ================================================================= */
+
+.main-content {
+    padding: 25px;
+    margin-top: 0;
+}
+
+.custom-nav-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 20px;
+}
+
+.header-info h1 {
+    margin: 0;
+    color: var(--text-color-dark);
+    font-size: 1.8em;
+}
+
+.header-info p {
+    margin-top: 5px;
+    color: var(--text-color-medium);
+    font-size: 0.9em;
+}
+
+.sub-nav-links {
+    display: flex;
+    gap: 15px;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: var(--text-color-medium);
+    font-weight: 600;
+    padding: 8px 15px;
+    border-radius: 4px;
+    transition: color 0.2s, background-color 0.2s;
+    border-bottom: 3px solid transparent;
+}
+
+.nav-link:hover {
+    color: var(--primary-color);
+}
+
+.nav-link.active {
+    color: var(--primary-color);
+    border-bottom: 3px solid var(--primary-color);
+}
+
+.nav-link i {
+    margin-right: 5px;
+}
+
+/* ================================================================= */
+/* NOVO: ESTILOS PARA A BARRA DE PESQUISA/AÇÃO (data-tools pattern) */
+/* ================================================================= */
+
+.toolbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: var(--box-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-subtle);
+}
+
+/* GRUPO ESQUERDO: Agora contém Pesquisa, Perfil, Adicionar e Salvar */
+.input-and-search-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.search-input-group {
+    display: flex;
+    gap: 10px;
+}
+
+/* GRUPO DIREITO: Agora contém apenas o botão Baixar Relatório */
+.action-buttons-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+/* Regra para uniformizar o estilo de TODOS os inputs na barra de ferramentas */
+#searchInput, #perfilNameInput {
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    transition: border-color 0.2s;
+}
+
+#searchInput:focus, #perfilNameInput:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+/* Larguras específicas */
+#searchInput {
+    width: 180px;
+}
+#perfilNameInput {
+    width: 250px;
+}
+
+/* Estilo dos Botões de Ação (Adaptando classes/IDs do Mapping) */
+
+/* Botão de Pesquisa */
+#searchBtn {
+    background-color: var(--secondary-color);
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#searchBtn:hover {
+    background-color: #040e2b;
+}
+
+/* Ícone de Adicionar (+) */
+#addContractBtn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s;
+    width: 40px;
+    padding: 10px 0;
+}
+
+#addContractBtn i {
+    margin: 0;
+}
+
+#addContractBtn:hover {
+    background-color: #218838;
+}
+
+/* Botão Salvar E Botão Baixar Relatório (usam a classe download-btn) */
+.download-btn {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: opacity 0.2s, background-color 0.2s;
+}
+
+.download-btn:hover:not(:disabled) {
+    opacity: 0.9;
+}
+
+#saveAllBtn {
+    background-color: var(--secondary-color); /* Sobrescreve para cor de Salvar (Azul Escuro) */
+}
+
+#saveAllBtn:hover:not(:disabled) {
+    background-color: #040e2b;
+}
+
+#saveAllBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ================================================================= */
+/* ESTILOS ESPECÍFICOS DA TELA DE PERFIL */
+/* ================================================================= */
+
+/* Ajuste do layout para corrigir o encurtamento */
+.perfil-page-container {
+    padding: 0 0px 20px 0px;
+}
+
+/* Contêiner da Grade/Tabela */
+.grid-container {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    overflow-x: auto;
+}
+
+/* Estilo da Tabela (Grade) */
+.perfil-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.perfil-table th, .perfil-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    font-size: 0.9em;
+}
+
+.perfil-table th {
+    background-color: var(--primary-color, #007bff);
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+/* Estilo para linhas pares e ímpares (zebra striping) */
+.perfil-table tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.perfil-table tr:hover {
+    background-color: #e9ecef;
+}
+
+#loading-message {
+    text-align: center;
+    padding: 50px;
+    font-size: 1.1em;
+    color: #6c757d;
+}
+
+/* ================================================================= */
+/* ESTILOS DO TOAST DE AVISO (Para garantir que comece escondido) */
+/* ================================================================= */
+
+#toastNotification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    /* Cor de sucesso padrão, alterada por JS */
+    background-color: #28a745;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 5px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+}
+
+.toast-hidden {
+    opacity: 0;
+    pointer-events: none; /* Garante que não interfira nos cliques */
+    transform: translateY(100%); /* Esconde inicialmente */
+}
+
+.toast-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+#toastNotification i {
+    font-size: 1.2em;
+}

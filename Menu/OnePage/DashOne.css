@@ -1,0 +1,337 @@
+/* Cor base do CEVA (mantendo o Menu.css padrão) */
+:root {
+    /* Estas variáveis usam fallbacks, mas dependem do Menu.css para a cor primária */
+    --text-color-dark: #333;
+    --border-color: #ddd;
+    --panel-bg: #fff;
+    --shadow-subtle: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --border-radius: 8px;
+    --box-bg: #fff;
+}
+
+/* ---------------------------------- */
+/* Layout Base do Dashboard (Para corrigir o Scroll) */
+/* ---------------------------------- */
+
+/* 🔑 NOVO AJUSTE CRUCIAL: Garante que o container principal ocupe a altura total da viewport */
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+.dashboard-container {
+    display: flex;
+    min-height: 100vh; /* Garante que o dashboard ocupe a altura total */
+    /* Se o seu Menu.css já define o layout com sidebar/main, mantenha o display: flex aqui. */
+}
+
+
+/* ---------------------------------- */
+/* Layout do Main Content e Filtros */
+/* ---------------------------------- */
+
+.main-content {
+    flex-grow: 1;
+    padding: 20px;
+    background-color: #f4f7f9;
+    /* 🔑 ESSENCIAL: Permite que o conteúdo principal role se for maior que o espaço disponível. */
+    overflow-y: auto;
+    /* Garante que o main content ocupe o espaço restante do dashboard-container */
+    height: 100vh;
+    box-sizing: border-box; /* Inclui padding e border na altura */
+}
+
+/* O restante da seção .custom-nav-header e .filter-container permanece o mesmo */
+.custom-nav-header h1 {
+    /* Usando fallback para garantir a cor */
+    color: var(--primary-color, #004b87);
+    font-size: 1.8em;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--primary-color, #004b87);
+    padding-bottom: 5px;
+}
+
+/* ESTILOS DO FILTER CONTAINER (ONE PAGE) */
+.filter-container {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: var(--box-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-subtle);
+    margin-bottom: 20px;
+}
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-group label {
+    font-weight: 600;
+    color: var(--text-color-dark);
+    font-size: 0.95em;
+}
+
+/* --- ESTILOS PARA OS SELECTS CUSTOMIZADOS (MÊS e ANO) --- */
+
+.custom-multi-select {
+    position: relative;
+    min-width: 180px;
+    font-size: 0.9em;
+    cursor: pointer;
+}
+
+.select-display {
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: white;
+    transition: border-color 0.2s;
+    user-select: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.custom-multi-select.open .select-display {
+    border-color: var(--primary-color, #004b87);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.select-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    border: 1px solid var(--border-color);
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    background-color: white;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: var(--shadow-subtle);
+    display: none;
+}
+
+.custom-multi-select.open .select-dropdown {
+    display: block;
+    border-top: 1px solid var(--primary-color, #004b87);
+}
+
+.select-dropdown label {
+    display: block;
+    padding: 8px 10px;
+    cursor: pointer;
+    font-weight: normal;
+    font-size: 1em;
+    white-space: nowrap;
+}
+
+.select-dropdown input[type="checkbox"],
+.select-dropdown input[type="radio"] {
+    display: none;
+}
+
+.select-dropdown label:hover {
+    background-color: #f0f4f8;
+    color: var(--text-color-dark);
+}
+
+.select-dropdown label:has(input:checked) {
+    background-color: var(--primary-color, #004b87);
+    color: white;
+}
+
+.select-dropdown label:has(input:checked):hover {
+    background-color: var(--primary-color, #004b87);
+    color: white;
+}
+
+
+/* --- ESTILOS DO BOTÃO VOLTAR --- */
+
+#btnReturnToGrid {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 38px;
+    width: 38px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+    text-decoration: none;
+}
+
+#btnReturnToGrid:hover {
+    background-color: #f0f4f8;
+}
+
+.dashboard-icon {
+    color: var(--primary-color, #004b87);
+    font-size: 1.5em;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.dashboard-icon:hover {
+    color: var(--secondary-color, #003366);
+}
+
+/* ---------------------------------- */
+/* Layout dos Painéis do Dashboard */
+/* ---------------------------------- */
+
+.dashboard-panels-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: stretch;
+}
+
+.dashboard-panel {
+    background-color: var(--panel-bg);
+    border-radius: 8px;
+    box-shadow: var(--shadow-subtle);
+    padding: 20px;
+    padding-top: 15px;
+}
+
+/* CLASSE PARA LARGURA TOTAL E ALTURA PADRÃO */
+.panel-full-width {
+    flex-basis: 100%;
+    height: 400px; /* Altura padrão para todos os gráficos */
+}
+
+
+.chart-container {
+    width: 100%;
+    /* Altura ajustada para o cabeçalho do card */
+    height: calc(100% - 25px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+}
+
+.dashboard-panel .chart-placeholder {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* -------------------------------------------------------- */
+/* ⚙️ Estilos da Engrenagem e Modal de Configurações 🔑 (Mantidos) */
+/* -------------------------------------------------------- */
+
+.chart-relative-container {
+    position: relative;
+}
+
+/* 1. Estilo para o Ícone da Engrenagem */
+.settings-gear-icon {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: #555;
+    cursor: pointer;
+    z-index: 10;
+    transition: color 0.2s;
+}
+
+.settings-gear-icon:hover {
+    /* Usando var(--primary-color) para manter o destaque com a cor do menu */
+    color: var(--primary-color, #004b87);
+}
+
+/* 2. Estilo para o Modal de Configurações (Janela) - Efeito SLIDE */
+.settings-modal {
+    display: block;
+    position: absolute;
+    top: 30px;
+    right: 5px;
+    width: 250px;
+    background-color: var(--panel-bg);
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    z-index: 200;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+
+    opacity: 0;
+    transform: scale(0.95) translateY(-5px);
+    pointer-events: none;
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+.settings-modal.open {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    pointer-events: auto;
+}
+
+/* 3. Estilo para o Cabeçalho do Modal (Apenas botão de fechar) */
+.settings-header {
+    background-color: #f0f0f0;
+    padding: 5px 10px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #777;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.close-button:hover {
+    color: var(--secondary-color, #003366);
+}
+
+.settings-content {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Estilo para os itens da legenda customizada */
+.custom-legend-item {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    user-select: none;
+}
+
+.custom-legend-marker {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    border: 1px solid #ccc;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.custom-legend-marker.square {
+    border-radius: 2px;
+}
+
+/* Estilo para o container dos filtros originais (mantido) */
+.hidden-filters-container {
+    display: none;
+}

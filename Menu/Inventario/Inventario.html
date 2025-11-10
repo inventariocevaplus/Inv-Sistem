@@ -203,6 +203,26 @@
           </div>
 
           <div class="input-group">
+            <label for="suspenseValue">SUSPENSE (R$)</label>
+            <input type="text" id="suspenseValue" step="0.01" value="0,00" class="money-input">
+          </div>
+
+          <div class="input-group">
+            <label for="epmValue">EPM</label>
+            <input type="number" id="epmValue" value="0" min="0">
+          </div>
+
+          <div class="input-group">
+            <label for="assesmentInventario">Assesment de Inventario (%)</label>
+            <input type="text" id="assesmentInventario" step="0.01" value="0,00" class="percent-input">
+          </div>
+
+          <div class="input-group">
+            <label for="snapshotPercent">SNAPSHOT (%)</label>
+            <input type="text" id="snapshotPercent" step="0.01" value="0,00" class="percent-input">
+          </div>
+
+          <div class="input-group">
             <label for="targetNet">Target NET (%)</label>
             <input type="text" id="targetNet" step="0.01" value="0,00" class="money-input">
           </div>
@@ -234,7 +254,6 @@
     </form>
   </div>
 </div>
-
 <div id="deleteConfirmModal" class="modal">
   <div class="modal-content small-modal">
     <span class="close-btn delete-close-btn">&times;</span>
@@ -252,19 +271,28 @@
     </div>
   </div>
 </div>
+
 <div id="editStatusModal" class="modal">
   <div class="modal-content small-modal">
     <span class="close-btn edit-status-close-btn">&times;</span>
-    <h2 id="editStatusTitle">Editar Status do Contrato</h2>
+    <h2 id="editStatusTitle">Editar Contrato Clause</h2>
 
     <form id="editStatusForm">
       <input type="hidden" id="editContractIdInput">
       <input type="hidden" id="editContractNameInput">
 
       <p>Contrato: <strong id="currentContractName"></strong></p>
-      <p>Status Atual: <strong id="currentStatusDisplay"></strong></p>
 
-      <div class="input-group" style="margin-top: 20px;">
+      <p>Analista Atual: <strong id="currentAnalystDisplay"></strong></p>
+
+      <div class="input-group" style="margin-top: 15px;">
+        <label for="newAnalystName">Novo Analista Responsável</label>
+        <input type="text" id="newAnalystName" required>
+      </div>
+
+      <p style="margin-top: 15px;">Status Atual: <strong id="currentStatusDisplay"></strong></p>
+
+      <div class="input-group">
         <label for="newContractStatus">Novo Status</label>
         <select id="newContractStatus" required>
           <option value="ATIVO">ATIVO</option>
@@ -278,7 +306,7 @@
           <i class="fas fa-times"></i> Cancelar
         </button>
         <button type="submit" class="action-btn primary-action">
-          <i class="fas fa-check"></i> Salvar Status
+          <i class="fas fa-check"></i> Salvar Alterações
         </button>
       </div>
       <p id="editStatusFormMessage" class="form-message"></p>

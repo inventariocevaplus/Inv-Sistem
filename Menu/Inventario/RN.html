@@ -117,16 +117,24 @@
 <div id="editStatusModalRN" class="modal">
   <div class="modal-content small-modal">
     <span class="close-btn edit-status-close-btn">&times;</span>
-    <h2 id="editStatusTitleRN">Editar Status da RN</h2>
+    <h2 id="editStatusTitleRN">Editar Contrato RN</h2>
 
     <form id="editStatusFormRN">
       <input type="hidden" id="editContractIdInputRN">
       <input type="hidden" id="editContractNameInputRN">
 
       <p>RN: <strong id="currentContractNameRN"></strong></p>
-      <p>Status Atual: <strong id="currentStatusDisplayRN"></strong></p>
 
-      <div class="input-group" style="margin-top: 20px;">
+      <p>Analista Atual: <strong id="currentAnalystDisplayRN"></strong></p>
+
+      <div class="input-group" style="margin-top: 15px;">
+        <label for="newAnalystNameRN">Novo Analista Responsável</label>
+        <input type="text" id="newAnalystNameRN" required>
+      </div>
+
+      <p style="margin-top: 15px;">Status Atual: <strong id="currentStatusDisplayRN"></strong></p>
+
+      <div class="input-group">
         <label for="newContractStatusRN">Novo Status</label>
         <select id="newContractStatusRN" required>
           <option value="ATIVO">ATIVO</option>
@@ -139,7 +147,7 @@
           <i class="fas fa-times"></i> Cancelar
         </button>
         <button type="submit" class="action-btn primary-action">
-          <i class="fas fa-check"></i> Salvar Status
+          <i class="fas fa-check"></i> Salvar Alterações
         </button>
       </div>
       <p id="editStatusFormMessageRN" class="form-message"></p>

@@ -99,6 +99,13 @@ function formatDropdownToSupabaseMonth(mesNome, ano) {
     return null;
 }
 
+/**
+ * Retorna o número do mês (ex: '11' para 'Novembro').
+ */
+function getMonthNumberByName(mesNome) {
+    return Object.keys(MONTHS_MAP).find(key => MONTHS_MAP[key] === mesNome);
+}
+
 function displayLoading(message) {
     loadingDashMessage.innerHTML = `<p>${message}</p>`;
     loadingDashMessage.style.display = 'block';
@@ -117,7 +124,7 @@ function getDiaSemanaAbreviado(dateStr) {
 // ⭐ Função captureDashboard() REMOVIDA ⭐
 
 // =======================================================
-// LÓGICA DE CARREGAMENTO DE DADOS
+// LÓGICA DE CARREGAMENTO DE DATOS
 // =======================================================
 
 /**
@@ -155,7 +162,74 @@ async function loadContracts() {
 }
 
 /**
- * Carrega os meses (nomes completos) e anos disponíveis para o contrato selecionado.
+ * Carrega apenas os meses disponíveis para um contrato e ano específicos.
+ * 🔄 NOVO: Função para filtrar Meses pelo Ano selecionado.
+ */
+async function loadMonthsByYear(contractId, selectedYear) {
+    monthSelect.innerHTML = '<option value="">Carregando...</option>';
+
+    if (!contractId || !selectedYear) {
+        monthSelect.innerHTML = '<option value="">Selecione o Contrato/Ano</option>';
+        return;
+    }
+
+    // Busca apenas os registros do ano selecionado
+    const { data: records, error } = await supabaseClient
+        .from(GRADE_DATA_TABLE)
+        .select('mes_referencia')
+        .eq('contract_id', contractId)
+        .like('mes_referencia', `${selectedYear}-%`) // Filtra por 'YYYY-%'
+        .order('mes_referencia', { ascending: false });
+
+    if (error) {
+        console.error("Erro ao carregar meses por ano:", error);
+        monthSelect.innerHTML = `<option value="">Erro</option>`;
+        return;
+    }
+
+    let uniqueMonths = new Set();
+    let latestMonthYear = null;
+
+    if (records.length > 0) {
+        records
+            .map(item => item.mes_referencia)
+            .filter((value, index, self) => self.indexOf(value) === index)
+            .forEach(monthYear => {
+                const [, monthNum] = monthYear.split('-');
+                if (MONTHS_MAP[monthNum]) {
+                    uniqueMonths.add(MONTHS_MAP[monthNum]);
+                }
+                if (!latestMonthYear || monthYear > latestMonthYear) {
+                    latestMonthYear = monthYear;
+                }
+            });
+    }
+
+    // Popula o Dropdown de Mês (Ordenado do mais recente para o mais antigo)
+    monthSelect.innerHTML = '<option value="">-- Mês --</option>';
+    Array.from(uniqueMonths).sort((a, b) => {
+        const monthNumA = Object.keys(MONTHS_MAP).find(key => MONTHS_MAP[key] === a);
+        const monthNumB = Object.keys(MONTHS_MAP).find(key => MONTHS_MAP[key] === b);
+        return parseInt(monthNumB) - parseInt(monthNumA);
+    }).forEach(month => {
+        const option = document.createElement('option');
+        option.value = month;
+        option.textContent = month;
+        monthSelect.appendChild(option);
+    });
+
+    // Seleciona o mês mais recente do ano selecionado
+    if (latestMonthYear) {
+        const [, latestMonthNum] = latestMonthYear.split('-');
+        monthSelect.value = MONTHS_MAP[latestMonthNum];
+    } else {
+        monthSelect.innerHTML = `<option value="">Nenhum dado mensal</option>`;
+    }
+}
+
+/**
+ * Carrega os anos disponíveis para o contrato selecionado e inicializa a carga dos meses.
+ * 🔄 AJUSTADO: Foca em carregar Anos e chama loadMonthsByYear para carregar os meses.
  */
 async function loadMonthsAndYearsByContract(contractId) {
     monthSelect.innerHTML = '<option value="">Carregando...</option>';
@@ -181,7 +255,6 @@ async function loadMonthsAndYearsByContract(contractId) {
         return;
     }
 
-    let uniqueMonths = new Set();
     let uniqueYears = new Set();
     let latestMonthYear = null;
 
@@ -190,11 +263,7 @@ async function loadMonthsAndYearsByContract(contractId) {
             .map(item => item.mes_referencia)
             .filter((value, index, self) => self.indexOf(value) === index)
             .forEach(monthYear => {
-                const [year, monthNum] = monthYear.split('-');
-
-                if (MONTHS_MAP[monthNum]) {
-                    uniqueMonths.add(MONTHS_MAP[monthNum]);
-                }
+                const [year, ] = monthYear.split('-');
                 uniqueYears.add(year);
 
                 if (!latestMonthYear || monthYear > latestMonthYear) {
@@ -203,34 +272,22 @@ async function loadMonthsAndYearsByContract(contractId) {
             });
     }
 
-    // Popula o Dropdown de Mês (Ordenado do mais recente para o mais antigo)
-    monthSelect.innerHTML = '<option value="">-- Mês --</option>';
-    Array.from(uniqueMonths).sort((a, b) => {
-        const monthNumA = Object.keys(MONTHS_MAP).find(key => MONTHS_MAP[key] === a);
-        const monthNumB = Object.keys(MONTHS_MAP).find(key => MONTHS_MAP[key] === b);
-        return parseInt(monthNumB) - parseInt(monthNumA);
-    }).forEach(month => {
-        const option = document.createElement('option');
-        option.value = month;
-        option.textContent = month;
-        monthSelect.appendChild(option);
-    });
-
     // Popula o Dropdown de Ano
     yearSelect.innerHTML = '<option value="">-- Ano --</option>';
+    let latestYear = null;
     Array.from(uniqueYears).sort((a, b) => parseInt(b) - parseInt(a))
     .forEach(year => {
         const option = document.createElement('option');
         option.value = year;
         option.textContent = year;
         yearSelect.appendChild(option);
+        if (!latestYear) latestYear = year; // Pega o ano mais recente para setar o valor
     });
 
-    // Seleciona o Mês e Ano mais recente por padrão
-    if (latestMonthYear) {
-        const [latestYear, latestMonthNum] = latestMonthYear.split('-');
-        monthSelect.value = MONTHS_MAP[latestMonthNum];
+    if (latestYear) {
         yearSelect.value = latestYear;
+        // 🚨 Chama a nova função para carregar os meses do ano mais recente
+        loadMonthsByYear(contractId, latestYear);
     } else {
         monthSelect.innerHTML = `<option value="">Nenhum dado mensal</option>`;
         yearSelect.innerHTML = `<option value="">Nenhum dado anual</option>`;
@@ -306,38 +363,77 @@ async function updateDashboard() {
 
     const dataGeracao = gradeData.data_geracao ? new Date(gradeData.data_geracao).toLocaleString('pt-BR') : 'N/A';
 
-    // LÓGICA DO KPI PRAZO (MANTIDO)
-    let lastStatusPositivoIndex = -1;
-    for (let i = currentStatusPlano.length - 1; i >= 0; i--) {
-        if (currentStatusPlano[i] > 0) {
-            lastStatusPositivoIndex = i;
-            break;
-        }
-    }
-
+    // 🌟 LÓGICA CORRIGIDA DO KPI PRAZO 🌟
     let prazoDiff = 0;
     let prazoText = 'N/A';
     let arrowIcon = '';
 
-    if (currentDiasInventario.length > 0 && lastStatusPositivoIndex !== -1) {
-        const lastStatusDateStr = currentDiasInventario[lastStatusPositivoIndex];
-        const lastStatusDate = new Date(lastStatusDateStr + 'T00:00:00');
-
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        const diffTime = lastStatusDate.getTime() - today.getTime();
-        const MS_PER_DAY = 1000 * 60 * 60 * 24;
-        prazoDiff = Math.ceil(diffTime / MS_PER_DAY);
-
-        const isPositive = prazoDiff >= 0;
-        const sign = prazoDiff > 0 ? '+' : '';
-        const arrowClass = isPositive ? 'fa-arrow-up text-success' : 'fa-arrow-down text-danger';
-        arrowIcon = `<i class="fas ${arrowClass} ml-1" style="font-size: 0.8em;"></i>`;
-        prazoText = `${sign}${prazoDiff} dias`;
+    // 3. Condição de Finalizado (100% Realizado)
+    if (kpiRealizadoValue >= 100) {
+        prazoText = 'FINALIZADO';
+        arrowIcon = `<i class="fas fa-check-circle text-success ml-1" style="font-size: 0.8em;"></i>`;
     } else {
-        arrowIcon = '';
-        prazoText = 'N/A';
+
+        // 1. Busca o último dia com Status Positivo (no mês selecionado)
+        let lastStatusDate = null;
+
+        // Percorre *somente* os dias do mês selecionado, de trás para frente.
+        for (let i = currentStatusPlano.length - 1; i >= 0; i--) {
+            // Status positivo (Status > 0)
+            if (currentStatusPlano[i] > 0) {
+                const dateStr = currentDiasInventario[i];
+                if (dateStr) {
+                    // Define a hora para meia-noite para evitar problemas de fuso horário no cálculo
+                    lastStatusDate = new Date(dateStr + 'T00:00:00');
+                    break; // Encontrado o último dia positivo, pare o loop.
+                }
+            }
+        }
+
+        if (lastStatusDate) {
+            // 2. Determina a data de referência (Hoje ou Último Dia do Gráfico)
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Data de hoje, meia-noite
+
+            const currentMonthNum = getMonthNumberByName(mesSelecionado);
+            const currentYear = parseInt(anoSelecionado);
+
+            // Ref. do mês selecionado (Ex: Nov 1, 2025)
+            const currentMonthRef = new Date(currentYear, currentMonthNum - 1, 1);
+
+            // Ref. do mês atual (Ex: Nov 1, 2025 - se for hoje)
+            const todayMonthRef = new Date(today.getFullYear(), today.getMonth(), 1);
+
+            let referenceDate;
+
+            // Verifica se o mês selecionado é o mês atual
+            if (currentMonthRef.getTime() === todayMonthRef.getTime()) {
+                // Mês atual: Usa o dia de hoje
+                referenceDate = today;
+            } else {
+                // Mês passado ou futuro: Usa o último dia com dados do inventário/gráfico
+                // (O último dia disponível no filtro, que é o último dia do ciclo se estiver fechado)
+                const lastDataDateStr = currentDiasInventario[currentDiasInventario.length - 1];
+                referenceDate = new Date(lastDataDateStr + 'T00:00:00');
+            }
+
+            // Calcula a diferença de dias
+            const MS_PER_DAY = 1000 * 60 * 60 * 24;
+            const diffTime = lastStatusDate.getTime() - referenceDate.getTime();
+
+            // Usa Math.round para garantir dias inteiros e precisos
+            prazoDiff = Math.round(diffTime / MS_PER_DAY);
+
+            const isPositive = prazoDiff >= 0;
+            const sign = prazoDiff > 0 ? '+' : '';
+            const arrowClass = isPositive ? 'fa-arrow-up text-success' : 'fa-arrow-down text-danger';
+            arrowIcon = `<i class="fas ${arrowClass} ml-1" style="font-size: 0.8em;"></i>`;
+            prazoText = `${sign}${prazoDiff} dias`;
+        } else {
+            // Caso não haja dados de status positivo no mês
+            arrowIcon = '';
+            prazoText = 'N/A';
+        }
     }
 
     kpiPrazo.innerHTML = `${prazoText} ${arrowIcon}`;
@@ -747,6 +843,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. Adiciona Listener para o filtro de contrato
     contractSelect.addEventListener('change', (e) => {
         loadMonthsAndYearsByContract(e.target.value);
+    });
+
+    // 🌟 NOVO: Adiciona Listener para o filtro de ano. Recarrega os meses do ano selecionado.
+    yearSelect.addEventListener('change', (e) => {
+        const contractId = contractSelect.value;
+        const selectedYear = e.target.value;
+        if (contractId && selectedYear) {
+            loadMonthsByYear(contractId, selectedYear);
+        } else {
+            monthSelect.innerHTML = '<option value="">Selecione o Contrato/Ano</option>';
+        }
     });
 
     // 3. Adiciona Listener para o botão de Atualizar Dashboard

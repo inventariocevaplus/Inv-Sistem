@@ -5,42 +5,31 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7d79809c-8bab-4b33-a110-025983aa6406" name="Changes" comment="Deploy Netlify pronto. Estrutura final e limpeza de código Flask">
-      <change afterPath="$PROJECT_DIR$/Menu/Inventario/Consulta.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/Inventario/Consulta.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/Inventario/Consulta.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/Inventario/Dash.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/Inventario/Dash.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/Inventario/Dash.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/Mapping/Analista.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/Mapping/Analista.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/Mapping/Analista.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/Mapping/Mapping.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/Mapping/Mapping.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/Mapping/Mapping.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/Menu.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Menu/Mapping/Perfil.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Menu/Mapping/Perfil.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Menu/Mapping/Perfil.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Menu/OnePage/DashOne.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Menu/OnePage/DashOne.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Menu/OnePage/DashOne.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Menu/OnePage/OnePage.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Menu/OnePage/OnePage.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Menu/OnePage/OnePage.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LoginInicial.js" beforeDir="false" afterPath="$PROJECT_DIR$/LoginInicial.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Menu/Inventario/Ciclico.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Ciclico.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Menu/Inventario/Ciclico.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Ciclico.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Inventario/Grade.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Grade.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Inventario/Grade.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Grade.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Inventario/Consulta.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Consulta.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Inventario/Dash.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Dash.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Menu/Inventario/Inventario.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Inventario.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Menu/Inventario/Inventario.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Inventario.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Menu/Inventario/RN.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/RN.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Menu/Inventario/RN.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/RN.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Inventario/Relatorio.css" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Relatorio.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Inventario/Relatorio.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Relatorio.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Inventario/Relatorio.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Relatorio.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Inventario/styleInv.css" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/styleInv.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Inventario/styleRN.css" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/styleRN.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Inventario/styleCiclico.css" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/styleCiclico.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Menu/Login.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Login.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Mapping/Analista.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Mapping/Analista.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Mapping/Mapping.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Mapping/Mapping.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Menu.css" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Menu.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Menu.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Menu.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Menu/Menu.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Menu.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Permissoes/Permissoes.css" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Permissoes/Permissoes.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Permissoes/Permissoes.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Permissoes/Permissoes.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Permissoes/Permissoes.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Permissoes/Permissoes.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/dashboard.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/style.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -81,33 +70,33 @@
     <option name="sortByType" value="true" />
     <option name="sortKey" value="BY_TYPE" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultHtmlFileTemplate": "HTML File",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/Silvagabrieln/OneDrive - CEVA Logistics/Inventario APP/Inv Sistem 1.0",
-    "onboarding.tips.debug.path": "C:/Users/Silvagabrieln/OneDrive - CEVA Logistics/Desktop/Inv Sistem/Inv Sistem 1.0/src/main/java/com/ceva/Main.java",
-    "project.structure.last.edited": "Project",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "preferences.keymap"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Silvagabrieln/OneDrive - CEVA Logistics/Inventario APP/Inv Sistem 1.0&quot;,
+    &quot;onboarding.tips.debug.path&quot;: &quot;C:/Users/Silvagabrieln/OneDrive - CEVA Logistics/Desktop/Inv Sistem/Inv Sistem 1.0/src/main/java/com/ceva/Main.java&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;
   },
-  "keyToStringList": {
-    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
-      "PLAIN_TEXT"
+  &quot;keyToStringList&quot;: {
+    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
+      &quot;PLAIN_TEXT&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Silvagabrieln\OneDrive - CEVA Logistics\Inventario APP\Inv Sistem 1.0\Menu\JS" />
       <recent name="C:\Users\Silvagabrieln\OneDrive - CEVA Logistics\Desktop\Inv Sistem\Inv Sistem 1.0\Menu" />
       <recent name="C:\Users\Silvagabrieln\OneDrive - CEVA Logistics\Desktop\Inv Sistem\Inv Sistem 1.0\Login\Menu" />
       <recent name="C:\Users\Silvagabrieln\OneDrive - CEVA Logistics\Desktop\Inv Sistem\Inv Sistem 1.0\Login" />
       <recent name="C:\Users\Silvagabrieln\OneDrive - CEVA Logistics\Desktop\Inv Sistem\Inv Sistem 1.0" />
-      <recent name="C:\Users\Silvagabrieln\OneDrive - CEVA Logistics\Desktop\Inv Sistem\Inv Sistem 1.0\proxy" />
     </key>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />

@@ -1,18 +1,3 @@
-// =========================================================================
-// Inventario.js (Rotina: Clause) - CÓDIGO FINAL E COMPLETO
-// 🚀 AJUSTES:
-// 1. CORREÇÃO DE REFERÊNCIAS DE DOM (Usando getElement) para resolver erros de 'null'.
-// 2. CORREÇÃO DA LÓGICA DE CÁLCULO e I/O (Input/Output) para lidar corretamente
-//    com VÍRGULA (,) na interface (leitura) e PONTO (.) para cálculos e Supabase (escrita).
-// 3. Funções de cálculo de acurácia (Net/Gross) mantidas.
-// 4. CORREÇÃO DO ERRO 406: Uso de .filter() na busca por reference_month.
-// 5. CORREÇÃO PREVENTIVA DE SINTAXE: O HTML do card foi colocado em uma única linha para
-//    evitar o erro 'Invalid or unexpected token' em ambientes hostis.
-// 6. NOVO AJUSTE: O campo Accuracy Locação (%) agora é EDITÁVEL (INPUT). Sua fórmula foi movida para Accuracy Item (%) (OUTPUT).
-// 7. CORREÇÃO DE SYNTAX ERROR: Garantia de sintaxe perfeita nas declarações de constantes.
-// 8. REFORÇO: Accuracy Peças (%) e Target NET (%) também adicionados aos listeners como campos editáveis (INPUT).
-// =========================================================================
-
 // 🚨 CREDENCIAIS SUPABASE (MANTIDAS)
 const SUPABASE_URL = 'https://kidpprfegedkjifbwkju.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtpZHBwcmZlZ2Vka2ppZmJ3a2p1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA1OTE5NjQsImV4cCI6MjA3NjE2Nzk2NH0.OkpgPHJtFIKyicX_qeOSMVHMk58Bppf0SzyZAPgWzLw';
@@ -42,7 +27,7 @@ const MONTHLY_DATA_TABLE = 'inventory_details';
 let userPermissions = {};
 let contractToDeleteId = null;
 // =======================================================
-// REFERÊNCIAS DO DOM (REFORÇADAS E CORRIGIDAS)
+// REFERÊNCIAS DO DOM
 // =======================================================
 
 // FUNÇÃO AUXILIAR PARA LIDAR COM ERROS DE REFERÊNCIA NULA NO DOM
@@ -77,13 +62,14 @@ const contractIdInput = getElement('contractIdInput');
 const monthlyDataFieldsDiv = getElement('monthlyDataFields');
 const monthlyFormMessage = getElement('monthlyFormMessage');
 const cancelMonthlyBtn = getElement('cancelMonthlyBtn');
-
 // REFERÊNCIAS DO NOVO MODAL DE EDIÇÃO RÁPIDA
 const editStatusModal = getElement('editStatusModal');
 const editStatusForm = getElement('editStatusForm');
 const editContractIdInput = getElement('editContractIdInput');
 const editContractNameInput = getElement('editContractNameInput');
 const currentContractName = getElement('currentContractName');
+const currentAnalystDisplay = getElement('currentAnalystDisplay');
+const newAnalystNameInput = getElement('newAnalystName');
 const currentStatusDisplay = getElement('currentStatusDisplay');
 const newContractStatus = getElement('newContractStatus');
 const cancelEditBtn = getElement('cancelEditBtn');
@@ -109,6 +95,13 @@ const accuracyItemInput = getElement('accuracyItem');
 const accuracyPecasInput = getElement('accuracyPecas');
 const accuracyLocacaoInput = getElement('accuracyLocacao');
 
+// 🌟 NOVAS REFERÊNCIAS ADICIONADAS
+const suspenseValueInput = getElement('suspenseValue');
+const epmValueInput = getElement('epmValue');
+const assesmentInventarioInput = getElement('assesmentInventario');
+const snapshotPercentInput = getElement('snapshotPercent');
+// 🌟 FIM NOVAS REFERÊNCIAS
+
 
 // =======================================================
 // FUNÇÕES AUXILIARES DE CÁLCULO E FORMATAÇÃO
@@ -126,7 +119,7 @@ const parseInputFloat = (inputElement) => {
     if (!inputElement) return 0.00;
     // Tenta trocar a vírgula por ponto (o que é o padrão de input no Brasil)
     const value = inputElement.value ?
-    inputElement.value.replace(',', '.') : '0';
+        inputElement.value.replace(',', '.') : '0';
     return parseFloat(value) || 0.00;
 };
 
@@ -136,38 +129,31 @@ const parseInputInt = (inputElement) => {
     return parseInt(inputElement.value) || 0;
 };
 
-
-// =======================================================
-// LÓGICA DE CÁLCULO AUTOMÁTICO (FUNÇÃO AJUSTADA)
-// =======================================================
-
+// LÓGICA DE CÁLCULO AUTOMÁTICO
 function calculateInventoryMetrics() {
     // Variáveis de entrada (R$)
     const positiveValue = parseInputFloat(positiveValueInput);
     const negativeValue = parseInputFloat(negativeValueInput);
     const countedValue = parseInputFloat(countedValueInput);
 
-    // Variáveis de ENTRADA (Lidos como INPUT para salvamento, mas não usados para calcular os campos abaixo)
-    const accuracyLocacao = parseInputFloat(accuracyLocacaoInput);
-    const accuracyPecas = parseInputFloat(accuracyPecasInput);
-    const targetNet = parseInputFloat(targetNetInput);
-
-    // Variáveis de entrada (inteiros)
+    // Variáveis de ENTRADA (Lidos como INPUT para salvamento)
     const partNumbersCorrect = parseInputInt(partNumbersCorrectInput);
     const partNumbersCounted = parseInputInt(partNumbersCountedInput);
-    const cycleCount = parseInputInt(cycleCountInput);
 
+    // Novas variáveis lidas (não usadas em cálculos derivados aqui)
+    const epmValue = parseInputInt(epmValueInput);
 
     let grossVariationValue = 0;
     let netVariationValue = 0;
     let netPercent = 0;
     let grossPercent = 0;
-    let accuracyItem = 0; // MODIFICADO: Campo CALCULADO
+    let accuracyItem = 0;
 
     // 1. Gross Variation Value
     grossVariationValue = positiveValue + negativeValue;
     // 2. Net Variation Value
     netVariationValue = positiveValue - negativeValue;
+
     // 3. NET (%) (ACURÁCIA)
     if (countedValue > 0) {
         const absoluteNetVariation = Math.abs(netVariationValue);
@@ -205,10 +191,7 @@ function calculateInventoryMetrics() {
     if (accuracyItemInput) accuracyItemInput.value = formatValue(accuracyItem);
 }
 
-
-// =======================================================
 // LÓGICA DE PERMISSÕES
-// =======================================================
 
 function loadUserPermissions() {
     const userDataJSON = localStorage.getItem('user_session_data');
@@ -248,15 +231,12 @@ function displayMessage(element, message, isSuccess) {
     if (!element) return;
     element.textContent = message;
     element.className = `form-message ${isSuccess ?
-    'success' : 'error'}`;
+        'success' : 'error'}`;
     element.style.display = 'block';
     setTimeout(() => element.style.display = 'none', 3000);
 }
 
-
-// =======================================================
 // LÓGICA DE DADOS MENSAIS (Abrir/Buscar/Salvar)
-// =======================================================
 
 // Função auxiliar para converter MM/AAAA para YYYY-MM-01 (formato DATE)
 function formatMonthYearToDate(mesAno) {
@@ -287,14 +267,16 @@ function openMonthlyDataModal(contractName, contractId) {
     // Define os valores padrão (0 ou 0,00)
     [
         partNumbersInStockInput, piecesInStockInput, cycleCountInput,
-        partNumbersCorrectInput, accuracyItemInput, partNumbersCountedInput
+        partNumbersCorrectInput, accuracyItemInput, partNumbersCountedInput,
+        epmValueInput // 🌟 NOVO: EPM (INT)
     ].forEach(input => { if (input) input.value = 0; });
     // Campos R$ e % usam "0,00" para exibição inicial
     [
         stockValueInput, countedValueInput, positiveValueInput,
         negativeValueInput, grossVariationValueInput, netVariationValueInput,
         netPercentInput, grossPercentInput, accuracyLocacaoInput,
-        accuracyPecasInput, targetNetInput
+        accuracyPecasInput, targetNetInput,
+        suspenseValueInput, assesmentInventarioInput, snapshotPercentInput // 🌟 NOVOS: R$ e %
     ].forEach(input => { if (input) input.value = '0,00'; });
     calculateInventoryMetrics(); // Inicializa os campos calculados
 
@@ -304,7 +286,7 @@ function openMonthlyDataModal(contractName, contractId) {
 async function searchAndLoadMonthlyData() {
     const contractId = contractIdInput ? contractIdInput.value : null;
     const contractName = monthlyContractNameInput ?
-    monthlyContractNameInput.value : '';
+        monthlyContractNameInput.value : '';
     const mesReferencia = mesReferenciaInput ? mesReferenciaInput.value.trim() : '';
     if (!mesReferencia || !/^\d{2}\/\d{4}$/.test(mesReferencia)) {
         displayMessage(monthlyFormMessage, 'Formato do Mês/Ano inválido (MM/AAAA).', false);
@@ -321,7 +303,7 @@ async function searchAndLoadMonthlyData() {
         .from(MONTHLY_DATA_TABLE)
         .select('*')
         .eq('contract_id', contractId)
-        .filter('reference_month', 'eq', referenceDate) // 💥 CORREÇÃO PARA O ERRO 406
+        .filter('reference_month', 'eq', referenceDate)
         .single();
     if (error && error.code !== 'PGRST116') { // PGRST116 é "No rows found"
         displayMessage(monthlyFormMessage, `Erro ao buscar dados mensais: ${error.message}. Verifique as políticas de RLS (Row Level Security) de SELECT na tabela 'inventory_details'.`, false);
@@ -341,32 +323,37 @@ async function searchAndLoadMonthlyData() {
 
         // Preenche os campos de INPUT (Conversão de PONTO para VÍRGULA para exibição)
         if (partNumbersInStockInput) partNumbersInStockInput.value = monthlyData.part_numbers_in_stock ||
-        0;
+            0;
         if (piecesInStockInput) piecesInStockInput.value = monthlyData.pieces_in_stock || 0;
         if (cycleCountInput) cycleCountInput.value = monthlyData.cycle_count || 0;
         if (partNumbersCorrectInput) partNumbersCorrectInput.value = monthlyData.part_numbers_correct || 0;
         if (partNumbersCountedInput) partNumbersCountedInput.value = monthlyData.part_numbers_counted || 0;
+        if (epmValueInput) epmValueInput.value = monthlyData.epm_value || 0; // 🌟 NOVO: EPM (INT)
+
         // Campos R$ e % (Float)
         const formatFloatForDisplay = (val) => formatToTwoDecimals(val).replace('.', ',');
         if (stockValueInput) stockValueInput.value = formatFloatForDisplay(monthlyData.stock_value);
         if (countedValueInput) countedValueInput.value = formatFloatForDisplay(monthlyData.counted_value);
         if (positiveValueInput) positiveValueInput.value = formatFloatForDisplay(monthlyData.positive_value);
         if (negativeValueInput) negativeValueInput.value = formatFloatForDisplay(monthlyData.negative_value);
+
+        // 🌟 NOVOS CAMPOS R$ e %
+        if (suspenseValueInput) suspenseValueInput.value = formatFloatForDisplay(monthlyData.suspense_value);
+        if (assesmentInventarioInput) assesmentInventarioInput.value = formatFloatForDisplay(monthlyData.assesment_inventario);
+        if (snapshotPercentInput) snapshotPercentInput.value = formatFloatForDisplay(monthlyData.snapshot_percent);
+        // 🌟 FIM NOVOS CAMPOS
+
         // Campos calculados (R$ e %)
         if (grossVariationValueInput) grossVariationValueInput.value = formatFloatForDisplay(monthlyData.gross_variation_value);
         if (netVariationValueInput) netVariationValueInput.value = formatFloatForDisplay(monthlyData.net_variation_value);
         if (netPercentInput) netPercentInput.value = formatFloatForDisplay(monthlyData.net_percent);
         if (grossPercentInput) grossPercentInput.value = formatFloatForDisplay(monthlyData.gross_percent);
-
         // CAMPOS EDITÁVEIS (INPUTS)
         if (accuracyLocacaoInput) accuracyLocacaoInput.value = formatFloatForDisplay(monthlyData.accuracy_locacao);
         if (accuracyPecasInput) accuracyPecasInput.value = formatFloatForDisplay(monthlyData.accuracy_pecas);
         if (targetNetInput) targetNetInput.value = formatFloatForDisplay(monthlyData.target_net);
-
         // Campo CALCULADO (OUTPUT)
         if (accuracyItemInput) accuracyItemInput.value = formatFloatForDisplay(monthlyData.accuracy_item);
-
-
         // Dispara o cálculo para garantir a precisão dos campos derivados (e sobrescrever accuracyItemInput)
         calculateInventoryMetrics();
         displayMessage(monthlyFormMessage, 'Dados existentes carregados. Modo Edição.', true);
@@ -410,10 +397,17 @@ async function saveMonthlyData(e) {
 
 
         part_numbers_correct: parseInputInt(partNumbersCorrectInput),
-        part_numbers_counted: parseInputInt(partNumbersCountedInput), // Novo campo
+        part_numbers_counted: parseInputInt(partNumbersCountedInput),
         counted_value: parseInputFloat(countedValueInput),
         positive_value: parseInputFloat(positiveValueInput),
         negative_value: parseInputFloat(negativeValueInput),
+
+        // 🌟 NOVOS CAMPOS ADICIONADOS (Seu Pedido Principal)
+        suspense_value: parseInputFloat(suspenseValueInput),
+        epm_value: parseInputInt(epmValueInput),
+        assesment_inventario: parseInputFloat(assesmentInventarioInput),
+        snapshot_percent: parseInputFloat(snapshotPercentInput),
+        // 🌟 FIM NOVOS CAMPOS
 
         // Campos Calculados (R$ e %) - Já lidos como PONTO decimal pela função parseInputFloat
         gross_variation_value: parseInputFloat(grossVariationValueInput),
@@ -459,12 +453,8 @@ async function saveMonthlyData(e) {
     }
 }
 
-
-// =======================================================
-// LÓGICA DE EDIÇÃO RÁPIDA DE STATUS (AGORA COM MODAL)
-// =======================================================
-
-function openEditStatusModal(contractId, contractName, currentStatus) {
+// LÓGICA DE EDIÇÃO RÁPIDA DE STATUS (AGORA COM ANALISTA)
+function openEditStatusModal(contractId, contractName, currentStatus, currentAnalyst) {
     if (!hasPermission('can_edit_data')) {
         alert("Erro: Você não tem permissão para editar dados.");
         return;
@@ -474,6 +464,10 @@ function openEditStatusModal(contractId, contractName, currentStatus) {
     if (editContractIdInput) editContractIdInput.value = contractId;
     if (editContractNameInput) editContractNameInput.value = contractName;
     if (currentContractName) currentContractName.textContent = contractName;
+    // Preenche Analista Atual e Novo Analista
+    if (currentAnalystDisplay) currentAnalystDisplay.textContent = currentAnalyst;
+    if (newAnalystNameInput) newAnalystNameInput.value = currentAnalyst;
+
     if (currentStatusDisplay) currentStatusDisplay.textContent = currentStatus;
     if (newContractStatus) newContractStatus.value = currentStatus;
     if (editStatusFormMessage) editStatusFormMessage.style.display = 'none';
@@ -482,25 +476,33 @@ function openEditStatusModal(contractId, contractName, currentStatus) {
 
 async function saveEditStatus(e) {
     e.preventDefault();
-    const contractId = editContractIdInput ? editContractIdInput.value : null;
+    const contractId = editContractIdInput ?
+        editContractIdInput.value : null;
     const contractName = editContractNameInput ? editContractNameInput.value : '';
     const newStatus = newContractStatus ? newContractStatus.value : '';
-
-    if (!contractId || !newStatus) {
-        displayMessage(editStatusFormMessage, "Erro: Contrato ou status inválido.", false);
+    // Ler o novo analista
+    const newAnalyst = newAnalystNameInput ? newAnalystNameInput.value.trim() : '';
+    if (!contractId || !newStatus || !newAnalyst) {
+        // Checagem para o novo analista
+        displayMessage(editStatusFormMessage, "Erro: Contrato, status, ou analista inválido.", false);
         return;
     }
 
+    // Objeto de update com Status e Analista
+    const updateData = {
+        status: newStatus,
+        analista_responsavel: newAnalyst
+    };
     // Tenta atualizar no Supabase
     const { error } = await supabaseClient
         .from(TARGET_TABLE_NAME)
-        .update({ status: newStatus })
+        .update(updateData)
         .eq('id', contractId);
     if (error) {
-        displayMessage(editStatusFormMessage, `Falha ao atualizar o status: ${error.message}`, false);
+        displayMessage(editStatusFormMessage, `Falha ao atualizar o contrato: ${error.message}`, false);
         console.error('Supabase Update Error:', error);
     } else {
-        displayMessage(editStatusFormMessage, `Status de "${contractName}" atualizado para ${newStatus}!`, true);
+        displayMessage(editStatusFormMessage, `Contrato "${contractName}" atualizado com sucesso!`, true);
         // Recarrega a lista e fecha o modal
         loadClauseContracts();
         setTimeout(() => {
@@ -509,10 +511,7 @@ async function saveEditStatus(e) {
     }
 }
 
-
-// =======================================================
 // LÓGICA DA LISTA PRINCIPAL (LOAD/CREATE/DELETE)
-// =======================================================
 
 async function loadClauseContracts(searchTerm = '') {
     if (!hasPermission('can_consult')) {
@@ -541,7 +540,7 @@ async function loadClauseContracts(searchTerm = '') {
 
     if (loadingMessage) loadingMessage.textContent = '';
     if (addContractBtn) addContractBtn.style.display = hasPermission('can_send_data') ?
-    'block' : 'none';
+        'block' : 'none';
 }
 
 function createContractCard(contract) {
@@ -553,20 +552,20 @@ function createContractCard(contract) {
 
     // Botão de Edição Rápida (Engrenagem)
     const editButtonHTML = hasPermission('can_edit_data') ?
-    `<button class="edit-status-btn" title="Editar Status Rápido"><i class="fas fa-cog"></i></button>` : '';
+        `<button class="edit-status-btn" title="Editar Status Rápido"><i class="fas fa-cog"></i></button>` : '';
 
     // Botão de Exclusão
     const deleteButtonHTML = hasPermission('can_delete_data') ?
-    `<button class="delete-btn" title="Excluir Contrato"><i class="fas fa-times"></i></button>` : '';
+        `<button class="delete-btn" title="Excluir Contrato"><i class="fas fa-times"></i></button>` : '';
 
     // Container para os botões no canto superior direito
     const actionsHTML = `<div class="card-actions">${editButtonHTML}${deleteButtonHTML}</div>`;
     const isClickable = hasPermission('can_edit_data') || hasPermission('can_consult');
     card.classList.toggle('clickable', isClickable);
 
-    // Estrutura HTML do Card (AGORA EM UMA ÚNICA LINHA DE TEMPLATE LITERAL)
+    // Estrutura HTML do Card
     card.innerHTML = `<div class="status-bar ${statusClass}"></div><div class="contract-name">${contract.nome_contrato ||
-    'Sem Nome'}</div><div class="contract-analyst">Analista: ${contract.analista_responsavel || 'N/A'}</div>${actionsHTML}`;
+        'Sem Nome'}</div><div class="contract-analyst">Analista: ${contract.analista_responsavel || 'N/A'}</div>${actionsHTML}`;
 
     // Lógica para o botão de exclusão
     if (hasPermission('can_delete_data')) {
@@ -588,7 +587,11 @@ function createContractCard(contract) {
 
             // Pega o status do elemento DOM criado
             const currentStatus = card.querySelector('.status-bar').classList[1] || 'INATIVO';
-            openEditStatusModal(contract.id, contract.nome_contrato, currentStatus);
+            // Pega o nome do analista
+            const currentAnalyst = contract.analista_responsavel || '';
+
+            // Passa o analista para a função
+            openEditStatusModal(contract.id, contract.nome_contrato, currentStatus, currentAnalyst);
         });
     }
 
@@ -647,6 +650,7 @@ function setupFormSubmit() {
         const contractNameInput = document.getElementById('contractName');
         const contractStatusInput = document.getElementById('contractStatus');
 
+
         const analystNameInput = document.getElementById('analystName');
 
         const newContract = {
@@ -659,6 +663,7 @@ function setupFormSubmit() {
         const { error } = await supabaseClient.from(TARGET_TABLE_NAME).insert([newContract]);
 
         if (error)
+
         {
             displayMessage(formMessage, `Erro ao salvar: ${error.message}`, false);
         } else {
@@ -703,10 +708,7 @@ function setupSearchListener() {
     }
 }
 
-
-// =======================================================
 // LISTENERS (No fim, para garantir que todas as funções sejam definidas)
-// =======================================================
 
 function setupModalListeners() {
     const addContractModal = document.getElementById('addContractModal');
@@ -723,7 +725,7 @@ function setupModalListeners() {
             // Adiciona listener para fechar ao clicar fora, mas somente nestes modais
             window.addEventListener('click', (event) => {
                 if (event.target === modal) modal.style.display
-        = 'none';
+                    = 'none';
             });
         }
     });
@@ -759,7 +761,8 @@ function setupMonthlyFormListeners() {
                     searchAndLoadMonthlyData();
                 }
 
-             });
+
+            });
         }
     }
 
@@ -768,9 +771,7 @@ function setupMonthlyFormListeners() {
         editStatusForm.addEventListener('submit', saveEditStatus);
     }
 
-    // =======================================================
     // 🚨 LÓGICA DE CÁLCULO AUTOMÁTICO (Event Listeners)
-    // =======================================================
 
     // Campos que disparam o cálculo (Counted Value, Valor Positivo, Valor Negativo, etc.)
     const calculationFields = [
@@ -781,6 +782,7 @@ function setupMonthlyFormListeners() {
         cycleCountInput,
         // Adicionando outros campos de valor que podem
         stockValueInput,
+
         partNumbersInStockInput,
         piecesInStockInput,
         partNumbersCountedInput,
@@ -789,6 +791,12 @@ function setupMonthlyFormListeners() {
         accuracyLocacaoInput,
         accuracyPecasInput,
         targetNetInput,
+        // 🌟 NOVOS CAMPOS ADICIONADOS AQUI
+        suspenseValueInput,
+        epmValueInput,
+        assesmentInventarioInput,
+        snapshotPercentInput,
+        // 🌟 FIM NOVOS CAMPOS
     ];
     calculationFields.forEach(input => {
         if (input) {
@@ -798,16 +806,11 @@ function setupMonthlyFormListeners() {
     });
 }
 
-
-// =======================================================
 // INICIALIZAÇÃO (PONTO DE ENTRADA)
-// =======================================================
 
 document.addEventListener('DOMContentLoaded', async () => {
 
-    // =======================================================
     // LÓGICA DO DROP-DOWN ROTINAS
-    // =======================================================
     const rotinasDropdown = document.getElementById('rotinasDropdown');
 
     if (rotinasDropdown) {
@@ -823,6 +826,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     icon.classList.toggle('fa-chevron-down');
                     icon.classList.toggle('fa-chevron-up');
                 }
+
             });
         }
     }
@@ -831,7 +835,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     userPermissions = loadUserPermissions();
     // Acesso completo ao Supabase já é feito no topo via 'accessToken'
     const hasAnyAccess = userPermissions.access_clause ||
-    userPermissions.access_ciclico || userPermissions.access_rn || userPermissions.access_permissions;
+        userPermissions.access_ciclico || userPermissions.access_rn || userPermissions.access_permissions;
 
     if (!hasAnyAccess) {
         const mainContent = document.querySelector('.main-content');
@@ -860,3 +864,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupSearchListener();
     setupMonthlyFormListeners();
 });
+// FIM DO ARQUIVO (Corrigido para não ter a chave '}' extra)
