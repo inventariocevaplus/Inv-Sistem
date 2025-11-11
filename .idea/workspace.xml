@@ -5,31 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7d79809c-8bab-4b33-a110-025983aa6406" name="Changes" comment="Deploy Netlify pronto. Estrutura final e limpeza de código Flask">
-      <change afterPath="$PROJECT_DIR$/Menu/Mapping/Perfil.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/Mapping/Perfil.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/Mapping/Perfil.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/OnePage/DashOne.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/OnePage/DashOne.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/OnePage/DashOne.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/OnePage/OnePage.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/OnePage/OnePage.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/OnePage/OnePage.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Inventario/Ciclico.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Ciclico.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Inventario/Ciclico.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Ciclico.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Inventario/Consulta.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Consulta.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Inventario/Dash.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Dash.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Inventario/Inventario.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Inventario.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Inventario/Inventario.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Inventario.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Inventario/RN.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/RN.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Inventario/RN.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/RN.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Inventario/styleCiclico.css" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/styleCiclico.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Login.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Login.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Mapping/Analista.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Mapping/Analista.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Mapping/Mapping.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Mapping/Mapping.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Menu.css" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Menu.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Menu.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Menu.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Menu.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Menu.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
