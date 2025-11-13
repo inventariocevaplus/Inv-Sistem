@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Cíclico - CEVA Logistics</title>
-
     <link rel="stylesheet" href="styleInv.css">
     <link rel="stylesheet" href="Dash.css">
 
@@ -67,7 +66,6 @@
         </header>
 
         <div class="dashboard-controls">
-
             <div class="input-group-filter">
                 <label for="contractSelect">Contrato:</label>
                 <select id="contractSelect">
@@ -118,7 +116,6 @@
                     <span class="kpi-value" id="kpiRealizado">N/A</span>
                 </div>
 
-                <!-- ✅ KPI AJUSTADO: Agora mostra o Total Realizado (Contagem) -->
                 <div class="kpi-card">
                     <span class="kpi-label">TOTAL REALIZADO (Contagem)</span>
                     <span class="kpi-value" id="kpiLocInc">N/A</span>
@@ -158,6 +155,12 @@
                                     Status
                                 </label>
 
+                                <label class="setting-item">
+                                    <input type="checkbox" id="chkStatusLabels">
+                                    <span class="legend-line line-purple"></span>
+                                    Números da Linha Status
+                                </label>
+
                                 <hr>
 
                                 <h6>Visualização (Colunas/Linhas):</h6>
@@ -165,7 +168,13 @@
                                 <label class="setting-item">
                                     <input type="checkbox" id="chkDataLabels">
                                     <i class="fas fa-hashtag" style="color: var(--color-secondary);"></i>
-                                    Mostrar Números
+                                    Mostrar Números (> 0)
+                                </label>
+
+                                <label class="setting-item">
+                                    <input type="checkbox" id="chkZeroLabels">
+                                    <i class="fas fa-hashtag" style="color: var(--text-color-muted);"></i>
+                                    Mostrar '0' nas Colunas Vazias
                                 </label>
 
                                 <label class="setting-item">

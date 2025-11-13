@@ -51,16 +51,17 @@ const chkEixoY = document.getElementById('chkEixoY');
 const chkDataLabels = document.getElementById('chkDataLabels');
 const chkDiaSemana = document.getElementById('chkDiaSemana');
 
-// Rosca (Vazio no meio)
-const chkDonutPizza = document.getElementById('chkDonutPizza');
+// NOVOS IDS ADICIONADOS
+const chkStatusLabels = document.getElementById('chkStatusLabels');
+const chkZeroLabels = document.getElementById('chkZeroLabels');
+const chkLogScale = document.getElementById('chkLogScale');
 
-// ELEMENTOS DE CONFIGURAÇÃO (Gráfico de Pizza)
+// Checkboxes de Configuração (Gráfico de Pizza/Rosca)
+const chkDonutPizza = document.getElementById('chkDonutPizza');
 const chkDataLabelsPizza = document.getElementById('chkDataLabelsPizza');
 const toggleCorLabelsPizza = document.getElementById('toggleCorLabelsPizza');
 const radioCorLabelBranco = document.getElementById('radioCorLabelBranco');
 const radioCorLabelPreto = document.getElementById('radioCorLabelPreto');
-const chkLogScale = document.getElementById('chkLogScale');
-
 
 // Variáveis para Armazenar Dados Atuais do Gráfico
 let currentDiasInventario = [];
@@ -135,7 +136,6 @@ async function loadContracts() {
         .from(CONTRATOS_TABLE)
         .select('id, nome_contrato')
         .order('nome_contrato', { ascending: true });
-
     if (error) {
         console.error("Erro ao carregar contratos:", error);
         contractSelect.innerHTML = `<option value="">Erro ao carregar</option>`;
@@ -164,7 +164,6 @@ async function loadContracts() {
  */
 async function loadMonthsByYear(contractId, selectedYear) {
     monthSelect.innerHTML = '<option value="">Carregando...</option>';
-
     if (!contractId || !selectedYear) {
         monthSelect.innerHTML = '<option value="">Selecione o Contrato/Ano</option>';
         return;
@@ -177,7 +176,6 @@ async function loadMonthsByYear(contractId, selectedYear) {
         .eq('contract_id', contractId)
         .like('mes_referencia', `${selectedYear}-%`) // Filtra por 'YYYY-%'
         .order('mes_referencia', { ascending: false });
-
     if (error) {
         console.error("Erro ao carregar meses por ano:", error);
         monthSelect.innerHTML = `<option value="">Erro</option>`;
@@ -186,7 +184,6 @@ async function loadMonthsByYear(contractId, selectedYear) {
 
     let uniqueMonths = new Set();
     let latestMonthYear = null;
-
     if (records.length > 0) {
         records
             .map(item => item.mes_referencia)
@@ -230,7 +227,6 @@ async function loadMonthsByYear(contractId, selectedYear) {
 async function loadMonthsAndYearsByContract(contractId) {
     monthSelect.innerHTML = '<option value="">Carregando...</option>';
     yearSelect.innerHTML = '<option value="">Carregando...</option>';
-
     if (!contractId) {
         monthSelect.innerHTML = '<option value="">Selecione o Contrato</option>';
         yearSelect.innerHTML = '<option value="">Selecione o Contrato</option>';
@@ -243,7 +239,6 @@ async function loadMonthsAndYearsByContract(contractId) {
         .eq('contract_id', contractId)
         .order('mes_referencia', { ascending: false })
         .limit(24);
-
     if (error) {
         console.error("Erro ao carregar meses/anos:", error);
         monthSelect.innerHTML = `<option value="">Erro</option>`;
@@ -253,7 +248,6 @@ async function loadMonthsAndYearsByContract(contractId) {
 
     let uniqueYears = new Set();
     let latestMonthYear = null;
-
     if (records.length > 0) {
         records
             .map(item => item.mes_referencia)
@@ -279,7 +273,6 @@ async function loadMonthsAndYearsByContract(contractId) {
         yearSelect.appendChild(option);
         if (!latestYear) latestYear = year; // Pega o ano mais recente para setar o valor
     });
-
     if (latestYear) {
         yearSelect.value = latestYear;
         // Chama a função para carregar os meses do ano mais recente
@@ -297,7 +290,6 @@ async function updateDashboard() {
     const contractId = contractSelect.value;
     const mesSelecionado = monthSelect.value;
     const anoSelecionado = yearSelect.value;
-
     if (!contractId || !mesSelecionado || !anoSelecionado ||
         mesSelecionado === 'Nenhum dado mensal' || anoSelecionado === 'Nenhum dado anual') {
         alert("Por favor, selecione o Contrato, Mês e Ano de Referência.");
@@ -324,7 +316,6 @@ async function updateDashboard() {
         .eq('contract_id', contractId)
         .eq('mes_referencia', mesReferenciaSupabase)
         .single();
-
     if (error && error.code !== 'PGRST116') {
         console.error("Erro ao buscar dados do GRADE:", error);
         displayLoading("Erro ao carregar dados. Verifique a busca ou RLS.");
@@ -345,10 +336,8 @@ async function updateDashboard() {
     currentStatusPlano = gradeData.status_plano ?
         gradeData.status_plano.map(Number) : [];
     currentDiasInventario = Array.isArray(gradeData.dias_inventario)
-        ?
-        gradeData.dias_inventario
+        ? gradeData.dias_inventario
         : (typeof gradeData.dias_inventario === 'string' ? JSON.parse(gradeData.dias_inventario) : []);
-
     const locacoesIncorretas = gradeData.locacoes_incorretas ? gradeData.locacoes_incorretas.map(Number) : [];
 
     // Variável que contém a soma das locações realizadas, ex: 4000
@@ -358,14 +347,13 @@ async function updateDashboard() {
 
     // KPI Realizado (Percentual)
     const kpiRealizadoValue = gradeData.total_locacoes > 0
-        ?
-        (totalRealizado / gradeData.total_locacoes) * 100
+        ? (totalRealizado / gradeData.total_locacoes) * 100
         : 0;
 
     const dataGeracao = gradeData.data_geracao ?
         new Date(gradeData.data_geracao).toLocaleString('pt-BR') : 'N/A';
 
-    // 🌟 LÓGICA CORRIGIDA DO KPI PRAZO 🌟
+    // LÓGICA CORRIGIDA DO KPI PRAZO
     let prazoDiff = 0;
     let prazoText = 'N/A';
     let arrowIcon = '';
@@ -378,7 +366,6 @@ async function updateDashboard() {
 
         // 1. Busca o último dia com Status Positivo (no mês selecionado)
         let lastStatusDate = null;
-
         // Percorre *somente* os dias do mês selecionado, de trás para frente.
         for (let i = currentStatusPlano.length - 1; i >= 0; i--) {
             // Status positivo (Status > 0)
@@ -402,10 +389,8 @@ async function updateDashboard() {
 
             // Ref. do mês selecionado (Ex: Nov 1, 2025)
             const currentMonthRef = new Date(currentYear, currentMonthNum - 1, 1);
-
             // Ref. do mês atual (Ex: Nov 1, 2025 - se for hoje)
             const todayMonthRef = new Date(today.getFullYear(), today.getMonth(), 1);
-
             let referenceDate;
 
             // Verifica se o mês selecionado é o mês atual
@@ -425,7 +410,6 @@ async function updateDashboard() {
 
             // Usa Math.round para garantir dias inteiros e precisos
             prazoDiff = Math.round(diffTime / MS_PER_DAY);
-
             const isPositive = prazoDiff >= 0;
             const sign = prazoDiff > 0 ? '+' : '';
             const arrowClass = isPositive ? 'fa-arrow-up text-success' : 'fa-arrow-down text-danger';
@@ -453,7 +437,7 @@ async function updateDashboard() {
 }
 
 // =======================================================
-// FUNÇÕES DE GRÁFICOS (MANTIDAS)
+// FUNÇÕES DE GRÁFICOS
 // =======================================================
 
 function drawRealizadoPendenteChart(realizado, pendente) {
@@ -462,12 +446,9 @@ function drawRealizadoPendenteChart(realizado, pendente) {
         realizadoPendenteChart.destroy();
     }
 
-    const showLabels = chkDataLabelsPizza ?
-        chkDataLabelsPizza.checked : false;
+    const showLabels = chkDataLabelsPizza ? chkDataLabelsPizza.checked : false;
     const isDonut = chkDonutPizza ? chkDonutPizza.checked : false;
-    const labelColor = (radioCorLabelBranco && radioCorLabelBranco.checked) ?
-        '#FFFFFF' : '#333333';
-
+    const labelColor = (radioCorLabelBranco && radioCorLabelBranco.checked) ? '#FFFFFF' : '#333333';
 
     const corRealizado = '#051039';
     const corPendente = '#FF0000';
@@ -476,8 +457,7 @@ function drawRealizadoPendenteChart(realizado, pendente) {
     const labels = ['Realizado', 'Pendente'];
 
     const chartType = isDonut ? 'doughnut' : 'pie';
-    const cutoutPercentage = isDonut ?
-        '50%' : '0%';
+    const cutoutPercentage = isDonut ? '50%' : '0%';
 
     realizadoPendenteChart = new Chart(ctx, {
         type: chartType,
@@ -493,8 +473,7 @@ function drawRealizadoPendenteChart(realizado, pendente) {
             }]
         },
         options: {
-            responsive:
-                true,
+            responsive: true,
             maintainAspectRatio: false,
             cutout: cutoutPercentage,
 
@@ -588,8 +567,12 @@ function applyChartSettings() {
     const formatDiaSemana = chkDiaSemana.checked;
     const selectedChartType = 'bar_line';
     const useLogScale = chkLogScale ? chkLogScale.checked : false;
-    if (currentDiasInventario.length === 0) return;
 
+    // NOVOS CONTROLES
+    const showStatusLabels = chkStatusLabels ? chkStatusLabels.checked : false;
+    const showZeroLabels = chkZeroLabels ? chkZeroLabels.checked : false;
+
+    if (currentDiasInventario.length === 0) return;
     const labels = currentDiasInventario.map(dateStr => {
         const day = String(new Date(dateStr + 'T00:00:00').getDate()).padStart(2, '0');
         if (formatDiaSemana) {
@@ -598,6 +581,7 @@ function applyChartSettings() {
         }
         return day;
     });
+
     drawContagemDiariaChart(
         labels,
         currentRealizadoLocacoes,
@@ -612,6 +596,9 @@ function applyChartSettings() {
             showDataLabels,
             chartType: selectedChartType,
             useLogScale: useLogScale,
+            // PASSANDO OS NOVOS CONTROLES
+            showStatusLabels: showStatusLabels,
+            showZeroLabels: showZeroLabels,
         }
     );
 }
@@ -626,7 +613,24 @@ function drawContagemDiariaChart(labels, contagens, planoLocacoes, statusPlano, 
     const corPlano = '#FF6600';
     const corStatusPlano = '#8A2BE2';
 
+    // LÓGICA DO FORMATADOR DE RÓTULOS (Para Colunas - Trata o "0")
+    const columnLabelFormatter = (value) => {
+        // Se 'Mostrar Números' (chkDataLabels) estiver desligado, não mostra nada
+        if (!settings.showDataLabels) return '';
+
+        // Se 'Mostrar '0' nas Colunas Vazias' (chkZeroLabels) estiver ligado,
+        // mostra '0' se o valor for 0, senão mostra o valor formatado
+        if (settings.showZeroLabels) {
+            return value.toLocaleString('pt-BR');
+        }
+
+        // Se 'Mostrar '0' nas Colunas Vazias' estiver desligado,
+        // mostra o valor formatado APENAS se for > 0
+        return value > 0 ? value.toLocaleString('pt-BR') : '';
+    };
+
     const datasets = [];
+
     if (settings.showContagem) {
         datasets.push({
             label: 'Contagem',
@@ -637,18 +641,32 @@ function drawContagemDiariaChart(labels, contagens, planoLocacoes, statusPlano, 
             type: 'bar',
             order: 3,
             datalabels: {
-                display: settings.showDataLabels,
+                // Ativa se qqr um dos dois controles de rótulos da coluna estiver ligado
+                display: settings.showDataLabels || settings.showZeroLabels,
                 anchor: 'end',
                 align: 'end',
                 offset: 2,
-                font: { size: 9, weight: 'bold' },
+                font: {
+                    size: 9,
+                    weight: 'bold'
+                },
                 color: '#333333',
-                formatter: (value) => value > 0 ? value.toLocaleString('pt-BR') : '',
+                // USA O NOVO FORMATTER
+                formatter: columnLabelFormatter,
             }
         });
     }
 
+    // ⭐️ NOVO DATASET PARA O RÓTULO ÚNICO DO PLANO ⭐️
+    // Cria um array com o valor do 1º dia na última posição
+    const labelPlanoData = new Array(planoLocacoes.length).fill(null);
+    if (planoLocacoes.length > 0) {
+        // Coloca o valor do 1º dia na última posição do array
+        labelPlanoData[labelPlanoData.length - 1] = planoLocacoes[0];
+    }
+
     if (settings.showPlanejado) {
+        // 1. DATASET DA LINHA (Sem rótulos, apenas a linha)
         datasets.push({
             label: 'Planejado',
             data: planoLocacoes,
@@ -658,10 +676,39 @@ function drawContagemDiariaChart(labels, contagens, planoLocacoes, statusPlano, 
             borderWidth: 2,
             borderDash: [5, 5],
             pointRadius: 0,
+            pointHoverRadius: 0,
             fill: false,
             order: 2,
             datalabels: {
                 display: false
+            }
+        });
+
+        // 2. DATASET DO RÓTULO ÚNICO (Um ponto invisível com rótulo)
+        datasets.push({
+            label: 'Planejado (Valor Base)',
+            data: labelPlanoData, // Usa o array auxiliar com um único ponto
+            type: 'line',
+            borderColor: 'transparent',
+            backgroundColor: 'transparent',
+            pointRadius: 0, // Ponto invisível
+            pointHoverRadius: 0,
+            fill: false,
+            order: 2,
+            datalabels: {
+                // Ativa se a linha Planejado estiver marcada
+                display: settings.showPlanejado,
+                anchor: 'end',
+                align: 'end',
+                // Offset maior para ficar fora da área do gráfico (último dia)
+                offset: 15,
+                font: {
+                    size: 9,
+                    weight: 'bold'
+                },
+                color: corPlano,
+                // Formata apenas o valor que não é null (o valor do 1º dia)
+                formatter: (value) => value !== null ? value.toLocaleString('pt-BR') : '',
             }
         });
     }
@@ -675,20 +722,36 @@ function drawContagemDiariaChart(labels, contagens, planoLocacoes, statusPlano, 
             backgroundColor: 'transparent',
             borderWidth: 2,
             borderDash: [10, 5],
+            // Pontos removidos na linha Status
             pointRadius: 0,
+            pointHoverRadius: 0,
             fill: false,
             order: 1,
             datalabels: {
-                display: false
+                // Rótulos de dados ATIVADOS E CONTROLADOS pela checkbox
+                display: settings.showStatusLabels,
+                // CORREÇÃO: Alinhamento para garantir que fique acima
+                anchor: 'end',
+                align: 'end',
+                // Offset para separar da linha
+                offset: 5,
+                font: {
+                    size: 9,
+                    weight: 'bold'
+                },
+                color: corStatusPlano,
+                // ⭐️ CORREÇÃO: Exibe o número APENAS se for maior que zero ⭐️
+                formatter: (value) => value > 0 ? value.toLocaleString('pt-BR') : '',
             }
         });
     }
 
-    const visiveis = datasets.flatMap(d => d.data);
+    const visiveis = datasets.flatMap(d => d.data).filter(v => v !== null); // Filtra nulos/invisíveis
     const maxDataValue = visiveis.length > 0 ? Math.max(...visiveis) : 0;
     const maxYAxisValue = maxDataValue > 0 ? Math.ceil(maxDataValue * 1.3) : 10;
 
     const minYAxisValue = settings.useLogScale ? 1 : 0;
+
     contagemDiariaChart = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -706,8 +769,7 @@ function drawContagemDiariaChart(labels, contagens, planoLocacoes, statusPlano, 
 
             plugins: {
                 title: { display: false },
-                legend:
-                {
+                legend: {
                     display: false,
                 },
                 tooltip: {
@@ -715,6 +777,8 @@ function drawContagemDiariaChart(labels, contagens, planoLocacoes, statusPlano, 
                         label:
                             function(context) {
                                 const label = context.dataset.label || '';
+                                // Garante que rótulos de dados invisíveis (nulls) não apareçam no tooltip
+                                if (context.parsed.y === null || context.parsed.y === undefined) return null;
                                 const value = context.parsed.y.toLocaleString('pt-BR');
                                 return ` ${label}: ${value}`;
                             }
@@ -724,8 +788,7 @@ function drawContagemDiariaChart(labels, contagens, planoLocacoes, statusPlano, 
             scales: {
                 y: {
                     display: settings.showEixoY,
-                    type: settings.useLogScale ?
-                        'logarithmic' : 'linear',
+                    type: settings.useLogScale ? 'logarithmic' : 'linear',
 
                     min: minYAxisValue,
                     max: maxYAxisValue,
@@ -755,8 +818,7 @@ function drawContagemDiariaChart(labels, contagens, planoLocacoes, statusPlano, 
                 },
                 x: {
                     grid: { display: false, drawBorder: false },
-                    title:
-                    {
+                    title: {
                         display: true,
                         text: settings.showEixoY ? 'Dia do Mês' : '',
                         font: { size: 10 }
@@ -822,14 +884,18 @@ function setupChartControls() {
     // 3. Adiciona Listener para todos os controles do GRÁFICO DE COLUNAS/LINHAS
     const controlsColuna = [
         chkContagem, chkPlanejado, chkStatus, chkGrid, chkEixoY,
-        chkDataLabels, chkDiaSemana, chkLogScale
+        chkDataLabels, chkDiaSemana, chkLogScale,
+        // NOVOS CONTROLES ADICIONADOS AQUI
+        chkStatusLabels,
+        chkZeroLabels
     ];
     controlsColuna.forEach(control => {
         if (control) {
             control.addEventListener('change', applyChartSettings);
         }
     });
-    // Adiciona Listener para os controles do GRÁFICO DE PIZZA
+
+    // 4. Adiciona Listener para os controles do GRÁFICO DE PIZZA
     const controlsPizza = [
         chkDataLabelsPizza, radioCorLabelBranco, radioCorLabelPreto,
         chkDonutPizza
@@ -851,7 +917,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loadMonthsAndYearsByContract(e.target.value);
     });
 
-    // 🌟 NOVO: Adiciona Listener para o filtro de ano. Recarrega os meses do ano selecionado.
+    // NOVO: Adiciona Listener para o filtro de ano. Recarrega os meses do ano selecionado.
     yearSelect.addEventListener('change', (e) => {
         const contractId = contractSelect.value;
         const selectedYear = e.target.value;
@@ -882,9 +948,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (chkDiaSemana) chkDiaSemana.checked = false;
     if (chkLogScale) chkLogScale.checked = false;
 
-    // ⭐️ AJUSTE PARA OS CONTROLES DO GRÁFICO DE PIZZA (Conforme a solicitação) ⭐️
-    if (chkDonutPizza) chkDonutPizza.checked = true; // Vazio no Meio (Rosca)
-    if (chkDataLabelsPizza) chkDataLabelsPizza.checked = true; // Mostrar Números (KPI)
-    if (radioCorLabelBranco) radioCorLabelBranco.checked = true; // Cor do Número: Branco
-    if (radioCorLabelPreto) radioCorLabelPreto.checked = false; // Cor do Número: Preto (desselecionado)
+    // ESTADOS INICIAIS PARA OS NOVOS CONTROLES
+    if (chkStatusLabels) chkStatusLabels.checked = true;
+    if (chkZeroLabels) chkZeroLabels.checked = false;
+
+    // AJUSTE PARA OS CONTROLES DO GRÁFICO DE PIZZA
+    if (chkDonutPizza) chkDonutPizza.checked = true;
+    if (chkDataLabelsPizza) chkDataLabelsPizza.checked = true;
+    if (radioCorLabelBranco) radioCorLabelBranco.checked = true;
+    if (radioCorLabelPreto) radioCorLabelPreto.checked = false;
 });
