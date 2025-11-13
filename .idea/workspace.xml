@@ -6,6 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="7d79809c-8bab-4b33-a110-025983aa6406" name="Changes" comment="Deploy Netlify pronto. Estrutura final e limpeza de código Flask">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Inventario/Dash.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Dash.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Inventario/Dash.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Dash.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
