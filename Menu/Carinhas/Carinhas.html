@@ -15,15 +15,13 @@
           referrerpolicy="no-referrer"
   />
 
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas-pro@latest/dist/html2canvas.min.js"></script>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     /* ------------------------------------------------ */
     /* ESTILOS CSS GERAIS (Mantidos/Ajustados) */
     /* ------------------------------------------------ */
 
-    /* AJUSTE CRUCIAL: CABEÇALHO COM FLEX (Filtro + Câmera + Impressão) */
+    /* AJUSTE CRUCIAL: CABEÇALHO COM FLEX (Filtro + Impressão) */
     .custom-nav-header {
         margin-bottom: 10px;
         display: flex;
@@ -34,38 +32,72 @@
         margin: 0;
     }
 
-    /* Contêiner para o filtro e câmera (alinha à direita) */
+    /* Contêiner para o filtro e ações (alinha à direita) */
     .header-actions {
         display: flex;
         align-items: center;
-        gap: 15px; /* Espaço entre o filtro, seleção e os ícones */
+        gap: 15px;
     }
 
-    /* ESTILO PARA OS ÍCONES DE AÇÃO (Câmera e Impressão) */
-    #exportIcon, #printIcon {
+    /* ESTILO PARA O ÍCONE DE AÇÃO (Impressão) */
+    #printIcon {
         font-size: 1.5em;
         color: #0F243E;
         cursor: pointer;
         transition: color 0.2s;
         padding: 5px;
     }
-    #exportIcon:hover, #printIcon:hover {
+    #printIcon:hover {
         color: #FF6600;
     }
 
     /* ------------------------------------------------ */
-    /* ESTILOS DE IMPRESSÃO (Oculta o Menu e os Botões) */
+    /* ESTILOS DE IMPRESSÃO (Oculta Menu e Botões, Adiciona Borda de Contorno) */
     /* ------------------------------------------------ */
     @media print {
+        /* Esconder elementos de interface */
         .custom-nav-header {
-            display: none; /* Esconde o filtro e os botões de ação ao imprimir */
+            display: none;
         }
         .sidebar {
             display: none; /* Esconde o menu lateral na impressão */
         }
         .main-content {
-            padding: 0;
+            flex-grow: 1; /* Permite que o conteúdo principal ocupe todo o espaço */
+            padding: 20px;
+            /* Remove a largura forçada para que se adapte melhor à folha A4 */
+            width: auto;
+            max-width: 100%;
         }
+
+        /* 🔑 Borda de contorno para a FOLHA INTEIRA (mainCarinhasContainer) */
+        #mainCarinhasContainer {
+            border: 2px solid black;
+            padding: 10px;
+            box-shadow: none; /* Remover sombras para impressão */
+        }
+
+        /* 🔑 Borda de contorno para cada GRID (Resultado de Inventário) */
+        .data-grid-container {
+            border: 1px solid black !important; /* Força borda preta sólida */
+            page-break-inside: avoid; /* Evita quebrar a grade entre páginas */
+            margin-bottom: 30px;
+        }
+
+        /* Remover bordas pontilhadas internas para impressão mais limpa */
+        .month-block {
+            border-right: 1px solid black !important;
+        }
+        .month-block:last-child {
+            border-right: none !important;
+        }
+        .data-row.meta-row {
+            border-bottom: 1px solid black !important;
+        }
+        .data-separator {
+            border-left: 1px solid black !important;
+        }
+
     }
 
 
@@ -286,8 +318,6 @@
           </div>
         </div>
 
-        <i class="fas fa-camera" id="exportIcon" title="Exportar como Imagem (Tudo)"></i>
-
         <i class="fas fa-print" id="printIcon" title="Imprimir/Gerar PDF"></i>
       </div>
     </div>
@@ -334,8 +364,6 @@
       </div>
     </section>
 
-    <div id="cameraFeedContainer" style="display: none;">
-    </div>
   </main>
 
   <script src="Carinhas.js"></script>

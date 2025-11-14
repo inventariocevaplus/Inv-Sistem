@@ -4,6 +4,7 @@
 // 1. IMAGE_BASE_PATH ajustado para "" (vazio).
 // 2. Lógica de esconder o elemento da Câmera (cameraFeedContainer) no html2canvas
 //    para evitar o erro "Tainted Canvas".
+// 3. ADIÇÃO do parâmetro ignoreElements no html2canvas (Correção crítica).
 // =========================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -426,7 +427,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 useCORS: true,
                 scrollX: 0,
                 scrollY: 0,
-                allowTaint: false
+                allowTaint: false,
+                // 🚨 CORREÇÃO CRÍTICA: Ignorar o elemento da câmera explicitamente (FIX para Tainted Canvas)
+                ignoreElements: (element) => {
+                    // Retorna TRUE se o elemento atual (ou qualquer um dentro dele)
+                    // for o container da câmera.
+                    return element === cameraElementContainer || (cameraElementContainer && cameraElementContainer.contains(element));
+                }
             });
 
             const imageURL = canvas.toDataURL('image/png');
