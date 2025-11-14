@@ -88,6 +88,7 @@ async function createActiveSession(userProfile) {
         // ⭐ NOVAS TELAS
         access_consulta: userProfile.access_consulta,
         access_relatorio: userProfile.access_relatorio,
+        access_carinhas: userProfile.access_carinhas, // ✅ CORREÇÃO 1: ADICIONADO AQUI
 
         // Permissões de Ação
         can_delete_data: userProfile.can_delete_data,
@@ -135,6 +136,7 @@ function sanitizeProfilePermissions(profile) {
         // ⭐ NOVAS TELAS
         'access_consulta',
         'access_relatorio',
+        'access_carinhas', // ✅ CORREÇÃO 2: ADICIONADO AQUI
 
         'can_delete_data',
         'can_edit_data',
@@ -236,6 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         access_rn: finalProfile.access_rn,
                         access_consulta: finalProfile.access_consulta,
                         access_relatorio: finalProfile.access_relatorio,
+                        access_carinhas: finalProfile.access_carinhas, // ✅ CORREÇÃO 3: ADICIONADO AQUI
                         can_delete_data: finalProfile.can_delete_data,
                         can_edit_data: finalProfile.can_edit_data,
                         can_consult: finalProfile.can_consult,

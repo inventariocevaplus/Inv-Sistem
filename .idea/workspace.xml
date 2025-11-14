@@ -5,9 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7d79809c-8bab-4b33-a110-025983aa6406" name="Changes" comment="Deploy Netlify pronto. Estrutura final e limpeza de código Flask">
+      <change afterPath="$PROJECT_DIR$/Menu/Carinhas/Carinhas.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Menu/Carinhas/Carinhas.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Menu/Carinhas/Carinhas.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Menu/Carinhas/CarinhasEmoji/ATENCAO.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Menu/Carinhas/CarinhasEmoji/PARABENS.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Menu/Carinhas/CarinhasEmoji/QUASE.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Menu/Carinhas/CarinhasEmoji/VAZIO.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Menu/Carinhas/INVENTARIO.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Inventario/Dash.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Dash.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Inventario/Dash.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Dash.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Login.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Login.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Menu.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Menu.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Menu.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Menu.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,7 +64,7 @@
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Silvagabrieln/OneDrive - CEVA Logistics/Inventario APP/Inv Sistem 1.0&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Silvagabrieln/OneDrive - CEVA Logistics/Inventario APP/Inv Sistem 1.0/css&quot;,
     &quot;onboarding.tips.debug.path&quot;: &quot;C:/Users/Silvagabrieln/OneDrive - CEVA Logistics/Desktop/Inv Sistem/Inv Sistem 1.0/src/main/java/com/ceva/Main.java&quot;,
     &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
@@ -69,12 +78,16 @@
   }
 }</component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Silvagabrieln\OneDrive - CEVA Logistics\Inventario APP\Inv Sistem 1.0\css" />
+      <recent name="C:\Users\Silvagabrieln\OneDrive - CEVA Logistics\Inventario APP\Inv Sistem 1.0\js" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Silvagabrieln\OneDrive - CEVA Logistics\Inventario APP\Inv Sistem 1.0\Menu\Carinhas\CarinhasEmoji" />
+      <recent name="C:\Users\Silvagabrieln\OneDrive - CEVA Logistics\Inventario APP\Inv Sistem 1.0\Menu\Carinhas" />
       <recent name="C:\Users\Silvagabrieln\OneDrive - CEVA Logistics\Inventario APP\Inv Sistem 1.0\Menu\JS" />
       <recent name="C:\Users\Silvagabrieln\OneDrive - CEVA Logistics\Desktop\Inv Sistem\Inv Sistem 1.0\Menu" />
       <recent name="C:\Users\Silvagabrieln\OneDrive - CEVA Logistics\Desktop\Inv Sistem\Inv Sistem 1.0\Login\Menu" />
-      <recent name="C:\Users\Silvagabrieln\OneDrive - CEVA Logistics\Desktop\Inv Sistem\Inv Sistem 1.0\Login" />
-      <recent name="C:\Users\Silvagabrieln\OneDrive - CEVA Logistics\Desktop\Inv Sistem\Inv Sistem 1.0" />
     </key>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />

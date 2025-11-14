@@ -1,0 +1,369 @@
+/* =================================================================
+   ESTILOS GLOBAIS E DE LAYOUT
+   =================================================================
+*/
+/* 1. Importa o estilo principal do menu (variáveis de cor, fonte, etc.) */
+@import url('../Menu.css');
+
+/* 2. Importa os estilos de layout (sidebar, custom-nav-header, data-tools, etc.) */
+@import url('../Mapping/Mapping.css');
+
+
+/* ================================================================= */
+/* AJUSTES DE COMPACTAÇÃO DE LAYOUT */
+/* ================================================================= */
+
+.main-content .custom-nav-header {
+    padding-bottom: 5px;
+    margin-bottom: 5px;
+}
+
+.filter-container {
+    margin-bottom: 10px;
+}
+
+#resultsArea {
+    margin-top: 0;
+}
+
+
+/* ================================================================= */
+/* ESTILOS PARA O CONTÊINER DE FILTROS (SELECTS e CUSTOM SELECT) */
+/* ================================================================= */
+.filter-container {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: var(--box-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-subtle);
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-group label {
+    font-weight: 600;
+    color: var(--text-color-dark);
+    font-size: 0.95em;
+}
+
+/* Estilos para o SELECT padrão (Contrato e Ano) */
+.filter-group select {
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: white;
+    font-size: 0.9em;
+    min-width: 150px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.filter-group select:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+/* NOVOS ESTILOS PARA O MULTI-SELECT CUSTOMIZADO (MÊS) */
+.custom-multi-select {
+    position: relative;
+    min-width: 180px;
+    font-size: 0.9em;
+    cursor: pointer;
+}
+
+.select-display {
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: white;
+    transition: border-color 0.2s;
+    user-select: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.custom-multi-select.open .select-display {
+    border-color: var(--primary-color);
+}
+
+.select-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    border: 1px solid var(--border-color);
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    background-color: white;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: none;
+}
+
+.select-option {
+    padding: 8px 12px;
+    transition: background-color 0.2s;
+}
+
+.select-option:hover {
+    background-color: #f0f4f8;
+}
+
+.select-option.selected {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.custom-multi-select.open .select-dropdown {
+    display: block;
+}
+
+
+/* ================================================================= */
+/* ESTILOS PARA TABELA/GRADE (SOLUÇÃO ROBUSTA DE ALINHAMENTO) */
+/* ================================================================= */
+
+/* --- Estrutura de Tabela (Scroll e Fixo) --- */
+.table-wrapper {
+    overflow-x: auto;
+    max-height: 70vh;
+    overflow-y: auto;
+    width: 100%;
+    border: none;
+    box-shadow: none;
+    border-radius: var(--border-radius);
+    direction: ltr;
+}
+
+.contract-grade {
+    table-layout: auto; /* PERMITE QUE A TABELA CRESÇA HORIZONTALMENTE */
+    min-width: 100%; /* Garante que preencha o contêiner (quando o conteúdo for menor) */
+    width: auto; /* O AUTO permite que o table-layout funcione e force o scroll do wrapper */
+    border-collapse: collapse;
+    background-color: white;
+}
+
+/* --- Estilo e Posicionamento do Cabeçalho --- */
+
+.contract-grade th {
+    background-color: #003366;
+    color: white;
+    font-weight: 700;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+
+    padding: 4px 10px;
+    border: 1px solid #003366;
+
+    text-align: center;
+    font-size: 0.85em;
+    white-space: normal;
+    word-wrap: break-word;
+    vertical-align: middle;
+}
+
+/* Apenas o cabeçalho da primeira coluna (Contrato) terá texto preto */
+.contract-grade th:nth-child(1) {
+    color: #000000;
+}
+
+/* --- Estilo das Células do Corpo --- */
+
+.contract-grade td {
+    padding: 4px 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+    font-size: 0.85em;
+    white-space: nowrap;
+    vertical-align: middle;
+    background-color: white;
+}
+
+/* Estilo para as linhas alternadas (Zebrado) */
+.contract-grade tbody tr:nth-child(even) td {
+    background-color: #f9f9f9;
+}
+.contract-grade tbody tr:hover td {
+    background-color: #e6f7ff;
+}
+
+/* Coluna Contrato (Corpo): Alinhado à esquerda e negrito */
+.contract-grade tbody tr td:nth-child(1) {
+    font-weight: 600;
+    text-align: left;
+}
+
+
+/* --- DEFINIÇÃO CRÍTICA DE LARGURAS PARA COLUNAS FIXAS --- */
+
+/* Coluna 1: Contrato (100px) */
+.contract-grade th:nth-child(1),
+.contract-grade td:nth-child(1) {
+    width: 100px;
+    min-width: 100px;
+    text-align: left;
+}
+
+/* Coluna 2: Indicador (150px) */
+.contract-grade th:nth-child(2),
+.contract-grade td:nth-child(2) {
+    width: 150px;
+    min-width: 150px;
+    text-align: left;
+}
+
+/* Coluna 3: UN (60px) */
+.contract-grade th:nth-child(3),
+.contract-grade td:nth-child(3) {
+    width: 60px;
+    min-width: 60px;
+}
+
+/* Coluna 4: Target (70px) */
+.contract-grade th:nth-child(4),
+.contract-grade td:nth-child(4) {
+    width: 70px;
+    min-width: 70px;
+    text-align: center; /* AGORA CENTRALIZADO */
+}
+
+/* 🔑 Colunas Dinâmicas (Mês) a partir da 5ª coluna */
+.contract-grade th:nth-child(n+5),
+.contract-grade td:nth-child(n+5) {
+    width: 90px !important;
+    min-width: 90px !important;
+}
+
+/* Fim dos estilos de Tabela */
+/* ================================================================= */
+
+
+/* ================================================================= */
+/* ESTILOS ESPECÍFICOS PARA O ÍCONE DE DASHBOARD NO FILTRO ANO (NOVO) */
+/* ================================================================= */
+
+/* 1. Contêiner para envolver o select e o ícone, permitindo posicionamento flexível */
+.ano-filter-wrap {
+    display: flex; /* Permite que os itens fiquem lado a lado */
+    align-items: center;
+    gap: 8px; /* Espaço entre o select e o ícone */
+}
+
+/* 2. Estilo do Ícone */
+.dashboard-icon {
+    font-size: 1.2em; /* Tamanho do ícone */
+    color: var(--primary-color); /* Cor primária (azul CEVA) */
+    cursor: pointer; /* Indica que é clicável (futura função) */
+    transition: color 0.2s;
+}
+
+.dashboard-icon:hover {
+    color: var(--secondary-color); /* Escurece ou muda de cor no hover */
+}
+
+
+/* ================================================================= */
+/* ESTILOS ESPECÍFICOS DO GRID DE MESES (CARINHAS) */
+/* ================================================================= */
+
+.data-grid-container {
+    display: flex;
+    justify-content: flex-start;
+    gap: 0;
+    width: 100%;
+    margin-top: 20px;
+    /* Linha tracejada discreta em volta do grid */
+    border: 1px dashed #ccc;
+}
+
+.month-block {
+    flex: 1;
+    min-width: 0;
+    padding: 0;
+    text-align: center;
+    box-sizing: border-box;
+
+    /* Borda separadora vertical discreta entre os blocos */
+    border-right: 1px dashed #ccc;
+}
+.month-block:last-child {
+    border-right: none;
+}
+
+.month-header {
+    background-color: #0F243E; /* Cor escura solicitada */
+    color: white;
+    font-weight: bold;
+    padding: 5px 0;
+    margin-bottom: 0;
+    font-size: 1em;
+}
+
+/* 💡 LINHA DE DADOS (META / RESULTADO) */
+.data-row {
+    display: flex;
+    align-items: center;
+    padding: 5px 0;
+    font-size: 0.9em;
+    font-weight: 700;
+}
+
+/* Separador horizontal entre META e Resultado (ajustado para tracejado) */
+.meta-row {
+    border-bottom: 1px dashed #ccc;
+}
+
+/* RÓTULO (ex: META:) - Alinhado à direita de sua metade */
+.data-label {
+    flex: 1; /* Ocupa 50% do espaço (rótulo) */
+    text-align: right;
+    padding-right: 10px; /* Espaço antes do separador */
+    color: #000;
+}
+
+/* SEPARADOR VERTICAL TRACEJADO */
+.data-separator {
+    height: 18px; /* Altura da linha, ajuste para centralização vertical */
+    width: 0;
+    border-left: 1px dashed #ccc; /* Linha tracejada discreta */
+}
+
+/* VALOR (ex: 99,80%) - Alinhado à esquerda de sua metade */
+.data-value {
+    flex: 1; /* Ocupa 50% do espaço (valor) */
+    text-align: left;
+    padding-left: 10px; /* Espaço depois do separador */
+}
+
+.value-meta {
+    color: #000;
+}
+
+.value-result {
+    color: #FF6600; /* Cor de destaque para o resultado */
+}
+
+/* EMOJI E PARABÉNS */
+.emoji-area p,
+.parabens-area p {
+    margin: 5px 0;
+    padding: 0;
+    font-weight: 700;
+}
+.parabens-area {
+    border-top: 1px dashed #ccc;
+    font-size: 0.8em;
+}
+
+/* Fim dos estilos do Grid de Meses */
+/* ================================================================= */

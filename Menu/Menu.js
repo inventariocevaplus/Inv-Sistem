@@ -1,5 +1,5 @@
 // *****************************************************************
-// CÓDIGO Menu.js COMPLETO (FINAL: Com % Realizado e Total Planejado DENTRO do Donut - Fonte da % reduzida para 14px)
+// CÓDIGO Menu.js COMPLETO (FINAL: Com % Realizado e Total Planejado DENTRO do Donut - Fonte da % reduzida)
 // *****************************************************************
 
 // Configurações do Supabase
@@ -32,21 +32,28 @@ const monthNames = {
  */
 
 function initializeDashboard() {
+    // 💡 IMPORTANTE: Verifica se o SDK foi carregado pelo CDN no HTML
     if (typeof supabase !== 'undefined' && supabase.createClient) {
         const { createClient } = supabase;
-        const sessionDataJSON = localStorage.getItem('user_session_data');
-        let accessToken = SUPABASE_ANON_KEY;
-        if (sessionDataJSON) {
-            try {
-                const userData = JSON.parse(sessionDataJSON);
-                if (userData.token) {
-                    accessToken = userData.token || SUPABASE_ANON_KEY;
-                }
-            } catch (e) { /* silent */ }
-        }
-        supabaseClient = createClient(SUPABASE_URL, accessToken);
+
+        // Inicializa o cliente Supabase com a chave ANON. O RLS irá gerenciar as permissões de acesso.
+        supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         window.supabaseClient = supabaseClient;
+        console.log("Supabase Client Inicializado.");
+
+        // Tenta obter a sessão atual (se a RLS estiver configurada corretamente)
+        const sessionDataString = localStorage.getItem('user_session_data');
+        if (sessionDataString) {
+            try {
+                const userData = JSON.parse(sessionDataString);
+            } catch (e) {
+                 console.warn("Falha ao analisar dados de sessão:", e);
+            }
+        }
+    } else {
+        console.error("ERRO CRÍTICO: Supabase SDK não está definido. Verifique a tag <script> no HTML.");
     }
+
 
     if (typeof Highcharts !== 'undefined' && Highcharts.setOptions) {
         Highcharts.setOptions({
@@ -76,6 +83,12 @@ async function loadAndRenderCiclicoDonutCharts(year, month) {
     const chartsGrid = document.getElementById('chartsGrid');
     if (!chartsGrid) return;
     chartsGrid.innerHTML = 'Carregando dados...';
+
+    // Garante que o cliente Supabase existe antes de chamar 'from'
+    if (!supabaseClient) {
+        chartsGrid.innerHTML = `<p style="color:red; text-align:center; width: 100%; margin-top: 20px;">Erro de inicialização: Supabase Client não está disponível.</p>`;
+        return;
+    }
 
     if (!year || !month) {
         if (!currentSelectedYear || !currentSelectedMonth) {
@@ -166,10 +179,19 @@ function prepareDonutSeries(groupedData) {
             ];
         } else {
             dataSeries = [
-                { name: 'Realizado', y: realized, color: CEVA_RED },
-                { name: 'Restante', y: remaining, color: PRIMARY_BLUE }
+                { name: 'Realizado', y: realized, color: COMPLETE_GREEN }, // Corrigido para mostrar o Realizado em VERDE
+                { name: 'Restante', y: remaining, color: CEVA_RED }       // Restante em VERMELHO
             ];
         }
+
+        // Ajuste: Quando realizado é zero e planejado não, o restante deve ser CEVA_RED
+        if (realized === 0 && planned > 0) {
+             dataSeries = [
+                { name: 'Realizado', y: realized, color: COMPLETE_GREEN },
+                { name: 'Restante', y: remaining, color: CEVA_RED }
+            ];
+        }
+
 
         seriesList.push({
             name: name,
@@ -253,7 +275,7 @@ function renderSingleDonutChart(containerId, dataItem) {
                         centerY - 6 // Desloca para cima
                     )
                     .css({
-                        fontSize: '14px', // 💡 AJUSTADO: Fonte de 16px para 14px
+                        fontSize: '10px', // 💡 MUDANÇA APLICADA AQUI: Reduzido de 14px para 10px (~30% menor)
                         fontWeight: 'bold',
                         color: dataItem.percent >= 99.9 ? COMPLETE_GREEN : CEVA_RED,
                         textAlign: 'center'
@@ -317,6 +339,12 @@ function renderSingleDonutChart(containerId, dataItem) {
  */
 
 async function fetchAllAvailableDates() {
+    // Garante que o cliente Supabase existe antes de chamar 'from'
+    if (!supabaseClient) {
+        console.error("ERRO: supabaseClient não está inicializado para buscar datas.");
+        return;
+    }
+
     try {
         const { data, error } = await supabaseClient
             .from(TABELA_CICLICO)
@@ -507,17 +535,33 @@ function setupDropdownEvents() {
  */
 
 async function performLogout(userProfile) {
-    try {
-        await supabaseClient
-            .from('active_sessions')
-            .delete()
-            .eq('user_id', userProfile.user_id)
-            .limit(1);
+    // Garante que o cliente Supabase existe antes de tentar a exclusão
+    if (!supabaseClient) {
+        console.error("Erro ao fazer logout: supabaseClient não está inicializado.");
+        localStorage.removeItem('user_session_data');
+        window.location.href = '../index.html';
+        return;
+    }
 
+    try {
+        // Assume que a coluna usada para a sessão ativa é 'user_id'
+        const userIdKey = userProfile.user_id ? 'user_id' : 'id';
+        const userIdValue = userProfile.user_id || userProfile.id;
+
+        // 1. Deleta a sessão ativa
+        if (userIdValue) {
+            await supabaseClient
+                .from('active_sessions')
+                .delete()
+                .eq(userIdKey, userIdValue)
+                .limit(1);
+        }
+
+        // 2. Atualiza o status do usuário em 'cadastros'
         await supabaseClient
             .from('cadastros')
             .update({ status: 'User Inativo' })
-            .eq('id', userProfile.user_id)
+            .eq('id', userProfile.id) // Usando 'id' que é o PK/UUID correto
             .limit(1);
 
     } catch (dbError) {
@@ -536,6 +580,7 @@ async function performLogout(userProfile) {
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // 1. Inicializa o cliente Supabase e configurações globais
     initializeDashboard();
 
     // --- ELEMENTOS E VARIÁVEIS DE USUÁRIO ---
@@ -566,16 +611,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         { id: 'btnInventario', path: 'Inventario/Inventario.html', requiredAccess: userProfile.access_ciclico },
         { id: 'btnMapping', path: 'Mapping/Mapping.html', requiredAccess: userProfile.access_rn },
         { id: 'btnOnePage', path: 'OnePage/OnePage.html', requiredAccess: userProfile.access_consulta },
-        { id: 'btnPermissoes', path: 'Permissoes/Permissoes.html', requiredAccess: userProfile.access_permissions }
+        { id: 'btnPermissoes', path: 'Permissoes/Permissoes.html', requiredAccess: userProfile.access_permissions },
+
+        // 🚀 NOVO BOTÃO CARINHAS ADICIONADO AQUI
+        { id: 'btnCarinhas', path: 'Carinhas/Carinhas.html', requiredAccess: userProfile.access_carinhas }
+        // ------------------------------------
     ];
 
     navButtons.forEach(btnInfo => {
         const btn = document.getElementById(btnInfo.id);
         if (btn) {
+            // O botão está ativo (pode ser clicado) se o acesso for TRUE
             if (btnInfo.requiredAccess === true) {
                 btn.removeAttribute('disabled');
                 btn.addEventListener('click', () => { window.location.href = btnInfo.path; });
             } else {
+                // O botão está desabilitado se o acesso for FALSE ou undefined
                 btn.setAttribute('disabled', 'true');
             }
         }
@@ -596,16 +647,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // --- LÓGICA FINAL DO FILTRO DE MÊS/ANO E CARREGAMENTO DE DADOS ---
-    await fetchAllAvailableDates();
-    await populateYearFilter();
-    setupDropdownEvents();
+    if (supabaseClient) {
+        await fetchAllAvailableDates();
+        await populateYearFilter();
+        setupDropdownEvents();
 
-    if (currentSelectedYear && currentSelectedMonth) {
-        loadAndRenderCiclicoDonutCharts(currentSelectedYear, currentSelectedMonth);
+        if (currentSelectedYear && currentSelectedMonth) {
+            loadAndRenderCiclicoDonutCharts(currentSelectedYear, currentSelectedMonth);
+        } else {
+            const chartsGrid = document.getElementById('chartsGrid');
+            if (chartsGrid) {
+                chartsGrid.innerHTML = `<p style="text-align:center; width: 100%; color: ${PRIMARY_BLUE}; margin-top: 20px;">Não há dados disponíveis para filtragem.</p>`;
+            }
+        }
     } else {
-        const chartsGrid = document.getElementById('chartsGrid');
+        // Mensagem de erro se o cliente não foi inicializado
+         const chartsGrid = document.getElementById('chartsGrid');
         if (chartsGrid) {
-             chartsGrid.innerHTML = `<p style="text-align:center; width: 100%; color: ${PRIMARY_BLUE}; margin-top: 20px;">Não há dados disponíveis para filtragem.</p>`;
+            chartsGrid.innerHTML = `<p style="color:red; text-align:center; width: 100%; margin-top: 20px;">Não foi possível conectar ao Supabase. Verifique o HTML.</p>`;
         }
     }
 });

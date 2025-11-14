@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CEVA Logistics - Carinhas</title>
+
+  <link rel="stylesheet" href="../Menu.css">
+  <link rel="stylesheet" href="Carinhas.css">
+
+  <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+  />
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    /* ------------------------------------------------ */
+    /* ESTILOS CSS GERAIS (Mantidos/Ajustados) */
+    /* ------------------------------------------------ */
+
+    /* AJUSTE CRUCIAL: CABEÇALHO COM FLEX (Filtro + Câmera) */
+    .custom-nav-header {
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .header-info h1 {
+        margin: 0;
+    }
+
+    /* Contêiner para o filtro e câmera (alinha à direita) */
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 15px; /* Espaço entre o filtro e a câmera */
+    }
+
+    /* ESTILO PARA O ÍCONE DE EXPORTAÇÃO */
+    #exportIcon {
+        font-size: 1.5em;
+        color: #0F243E;
+        cursor: pointer;
+        transition: color 0.2s;
+        padding: 5px;
+    }
+    #exportIcon:hover {
+        color: #FF6600;
+    }
+
+    /* ESTILOS PARA O DROP-DOWN PERSONALIZADO (CONTRATO) */
+    .custom-select-wrapper {
+        position: relative;
+        min-width: 250px;
+        user-select: none;
+    }
+
+    .select-display {
+        padding: 8px 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: white;
+        cursor: pointer;
+        font-weight: 600;
+        color: #0F243E;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .select-display:hover {
+        border-color: #0F243E;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .select-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        z-index: 10;
+        background-color: white;
+        border: 1px solid #ccc;
+        border-top: none;
+        border-radius: 0 0 5px 5px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        max-height: 250px;
+        overflow-y: auto;
+        display: none;
+    }
+
+    .custom-select-wrapper.open .select-dropdown {
+        display: block;
+    }
+
+    .dropdown-option {
+        padding: 10px 15px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        font-size: 0.9em;
+    }
+
+    .dropdown-option:hover {
+        background-color: #f0f0f0;
+    }
+
+    .dropdown-option.selected {
+        background-color: #0F243E;
+        color: white;
+    }
+
+    /* O resto dos seus estilos CSS (titles, grid, month-block, etc.) */
+    body { margin: 0; padding: 0; }
+    .dashboard-container { display: flex; height: 100vh; overflow: hidden; }
+    .main-content { flex-grow: 1; padding: 20px; overflow-y: auto; }
+    .info-card { min-height: calc(100vh - 120px); padding: 20px; }
+
+    .inventory-title {
+        text-align: center;
+        margin-bottom: 5px;
+        font-weight: 700;
+        color: #000;
+    }
+    .main-inventory-title {
+        font-size: 1.8em;
+        text-decoration: underline;
+    }
+    .subtitle-inventory-net {
+        font-size: 1.2em;
+        margin-bottom: 20px;
+    }
+
+    .data-grid-container {
+        display: flex;
+        justify-content: flex-start;
+        gap: 0;
+        width: 100%;
+        margin-top: 20px;
+        border: 1px dashed #ccc;
+    }
+
+    .month-block {
+        flex: 1;
+        min-width: 0;
+        padding: 0;
+        text-align: center;
+        box-sizing: border-box;
+        border-right: 1px dashed #ccc;
+    }
+    .month-block:last-child {
+        border-right: none;
+    }
+
+    .month-header {
+        background-color: #0F243E;
+        color: white;
+        font-weight: bold;
+        padding: 5px 0;
+        margin-bottom: 0;
+        font-size: 1em;
+    }
+
+    .data-row {
+        display: flex;
+        align-items: center;
+        padding: 5px 0;
+        font-size: 0.9em;
+        font-weight: 700;
+    }
+
+    .meta-row {
+        border-bottom: 1px dashed #ccc;
+    }
+
+    .data-label {
+        flex: 1;
+        text-align: right;
+        padding-right: 10px;
+        color: #000;
+    }
+
+    .data-separator {
+        height: 18px;
+        width: 0;
+        border-left: 1px dashed #ccc;
+    }
+
+    .data-value {
+        flex: 1;
+        text-align: left;
+        padding-left: 10px;
+    }
+
+    .value-meta {
+        color: #000;
+    }
+
+    .value-result {
+        color: #FF6600;
+    }
+
+    .emoji-area p,
+    .parabens-area p {
+        margin: 5px 0;
+        padding: 0;
+        font-weight: 700;
+    }
+    .parabens-area {
+        border-top: 1px dashed #ccc;
+        font-size: 0.8em;
+    }
+
+  </style>
+
+</head>
+<body>
+<div class="dashboard-container">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-area">
+        <h1 class="logo-text">CEVA <span class="text-highlight">CARINHAS</span></h1>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button class="nav-button active" id="btnCarinhas">
+        <span class="icon-text-wrap">
+          <i class="fas fa-smile"></i>
+          <span>CARINHAS</span>
+        </span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-profile" id="userProfileButton">
+        <i class="fas fa-user-circle user-icon"></i>
+        <span id="userName">Carregando...</span>
+      </div>
+
+      <a href="../Menu.html" class="nav-button logout-btn">
+        <span class="icon-text-wrap">
+          <i class="fas fa-arrow-left"></i>
+          <span>VOLTAR AO MENU</span>
+        </span>
+      </a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="custom-nav-header">
+      <div class="header-info">
+        <h1>Carinhas - CEVA Plus</h1>
+      </div>
+
+      <div class="header-actions">
+
+        <div class="custom-select-wrapper" id="contractSelectWrapper">
+          <div class="select-display" id="contractSelectDisplay">
+            Selecione o Contrato...
+            <i class="fas fa-chevron-down"></i>
+          </div>
+          <div class="select-dropdown" id="contractDropdown">
+          </div>
+        </div>
+
+        <i class="fas fa-camera" id="exportIcon" title="Exportar como Imagem (Tudo)"></i>
+      </div>
+    </div>
+
+    <section class="info-card" id="mainCarinhasContainer">
+      <div id="loadingMessage" style="text-align: center; padding: 50px; font-size: 1.2em; color: #0F243E;">
+        Selecione um contrato para carregar os resultados.
+      </div>
+
+      <div id="gridsContent" style="display: none;">
+        <div class="inventory-title main-inventory-title">
+          RESULTADO DE INVENTÁRIO
+        </div>
+        <div class="inventory-title subtitle-inventory-net">
+          Resultado da Acuracidade "NET"
+        </div>
+
+        <div class="data-grid-container" id="netGrid">
+        </div>
+
+        <hr style="border: 0; height: 1px; background-color: #ddd; margin: 30px 0;">
+
+        <div class="inventory-title main-inventory-title">
+          RESULTADO DE INVENTÁRIO
+        </div>
+        <div class="inventory-title subtitle-inventory-net">
+          Resultado da Acuracidade "GROSS"
+        </div>
+
+        <div class="data-grid-container" id="grossGrid">
+        </div>
+
+        <hr style="border: 0; height: 1px; background-color: #ddd; margin: 30px 0;">
+
+        <div class="inventory-title main-inventory-title">
+          RESULTADO DE INVENTÁRIO
+        </div>
+        <div class="inventory-title subtitle-inventory-net">
+          Resultado da Acuracidade de LOCAÇÃO
+        </div>
+
+        <div class="data-grid-container" id="locacaoGrid">
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="Carinhas.js"></script>
+
+</div>
+</body>
+</html>
