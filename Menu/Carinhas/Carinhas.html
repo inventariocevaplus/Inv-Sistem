@@ -23,7 +23,7 @@
     /* ESTILOS CSS GERAIS (Mantidos/Ajustados) */
     /* ------------------------------------------------ */
 
-    /* AJUSTE CRUCIAL: CABEÇALHO COM FLEX (Filtro + Câmera) */
+    /* AJUSTE CRUCIAL: CABEÇALHO COM FLEX (Filtro + Câmera + Impressão) */
     .custom-nav-header {
         margin-bottom: 10px;
         display: flex;
@@ -38,20 +38,36 @@
     .header-actions {
         display: flex;
         align-items: center;
-        gap: 15px; /* Espaço entre o filtro e a câmera */
+        gap: 15px; /* Espaço entre o filtro, seleção e os ícones */
     }
 
-    /* ESTILO PARA O ÍCONE DE EXPORTAÇÃO */
-    #exportIcon {
+    /* ESTILO PARA OS ÍCONES DE AÇÃO (Câmera e Impressão) */
+    #exportIcon, #printIcon {
         font-size: 1.5em;
         color: #0F243E;
         cursor: pointer;
         transition: color 0.2s;
         padding: 5px;
     }
-    #exportIcon:hover {
+    #exportIcon:hover, #printIcon:hover {
         color: #FF6600;
     }
+
+    /* ------------------------------------------------ */
+    /* ESTILOS DE IMPRESSÃO (Oculta o Menu e os Botões) */
+    /* ------------------------------------------------ */
+    @media print {
+        .custom-nav-header {
+            display: none; /* Esconde o filtro e os botões de ação ao imprimir */
+        }
+        .sidebar {
+            display: none; /* Esconde o menu lateral na impressão */
+        }
+        .main-content {
+            padding: 0;
+        }
+    }
+
 
     /* ESTILOS PARA O DROP-DOWN PERSONALIZADO (CONTRATO) */
     .custom-select-wrapper {
@@ -116,7 +132,7 @@
         color: white;
     }
 
-    /* O resto dos seus estilos CSS (titles, grid, month-block, etc.) */
+    /* Outros Estilos de Layout e Conteúdo */
     body { margin: 0; padding: 0; }
     .dashboard-container { display: flex; height: 100vh; overflow: hidden; }
     .main-content { flex-grow: 1; padding: 20px; overflow-y: auto; }
@@ -271,6 +287,8 @@
         </div>
 
         <i class="fas fa-camera" id="exportIcon" title="Exportar como Imagem (Tudo)"></i>
+
+        <i class="fas fa-print" id="printIcon" title="Imprimir/Gerar PDF"></i>
       </div>
     </div>
 
@@ -315,6 +333,9 @@
         </div>
       </div>
     </section>
+
+    <div id="cameraFeedContainer" style="display: none;">
+    </div>
   </main>
 
   <script src="Carinhas.js"></script>

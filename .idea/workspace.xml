@@ -6,7 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="7d79809c-8bab-4b33-a110-025983aa6406" name="Changes" comment="Deploy Netlify pronto. Estrutura final e limpeza de código Flask">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Carinhas/Carinhas.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Carinhas/Carinhas.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Menu/Carinhas/Carinhas.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Carinhas/Carinhas.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Carinhas/CarinhasEmoji/ATENCAO.png" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Carinhas/ATENCAO.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Carinhas/CarinhasEmoji/PARABENS.png" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Carinhas/PARABENS.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Carinhas/CarinhasEmoji/QUASE.png" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Carinhas/QUASE.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Carinhas/CarinhasEmoji/VAZIO.png" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Carinhas/VAZIO.png" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,8 +78,8 @@
       <recent name="C:\Users\Silvagabrieln\OneDrive - CEVA Logistics\Inventario APP\Inv Sistem 1.0\js" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\Silvagabrieln\OneDrive - CEVA Logistics\Inventario APP\Inv Sistem 1.0\Menu\Carinhas\CarinhasEmoji" />
       <recent name="C:\Users\Silvagabrieln\OneDrive - CEVA Logistics\Inventario APP\Inv Sistem 1.0\Menu\Carinhas" />
+      <recent name="C:\Users\Silvagabrieln\OneDrive - CEVA Logistics\Inventario APP\Inv Sistem 1.0\Menu\Carinhas\CarinhasEmoji" />
       <recent name="C:\Users\Silvagabrieln\OneDrive - CEVA Logistics\Inventario APP\Inv Sistem 1.0\Menu\JS" />
       <recent name="C:\Users\Silvagabrieln\OneDrive - CEVA Logistics\Desktop\Inv Sistem\Inv Sistem 1.0\Menu" />
       <recent name="C:\Users\Silvagabrieln\OneDrive - CEVA Logistics\Desktop\Inv Sistem\Inv Sistem 1.0\Login\Menu" />

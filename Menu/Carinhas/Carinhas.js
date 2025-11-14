@@ -1,7 +1,9 @@
 // =========================================================================
-// Módulo/Carinhas/Carinhas.js - Lógica Completa com Supabase e Metas Dinâmicas
-// AJUSTE CRÍTICO: METAS MOCKADAS AGORA SÃO BUSCADAS PELO NOME DO CONTRATO, NÃO PELO ID.
-// Isso facilita a manutenção e adição manual de metas.
+// Módulo/Carinhas/Carinhas.js - CÓDIGO FINAL E CORRIGIDO
+// 🔑 CORREÇÕES:
+// 1. IMAGE_BASE_PATH ajustado para "" (vazio).
+// 2. Lógica de esconder o elemento da Câmera (cameraFeedContainer) no html2canvas
+//    para evitar o erro "Tainted Canvas".
 // =========================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -20,11 +22,12 @@ document.addEventListener('DOMContentLoaded', () => {
     let allCarinhasData = [];
     let selectedContractMeta = {};
 
-
     // --- CONSTANTES DE LÓGICA ---
 
     const TOLERANCE_CUTOFF = 0.05; // 0.05%
-    const IMAGE_BASE_PATH = "CarinhasEmoji/";
+
+    // 🔑 CORREÇÃO 1: Caminho ajustado para "" (Vazio), pois o JS e as imagens estão no mesmo nível
+    const IMAGE_BASE_PATH = "";
 
     const EMOJIS = {
         PARABENS: 'PARABENS.png',
@@ -33,10 +36,8 @@ document.addEventListener('DOMContentLoaded', () => {
         VAZIO: 'VAZIO.png',
     };
 
-    // 🔑 LISTA MOCKADA DE METAS POR CONTRATO - CHAVE AGORA É O NOME DO CONTRATO (EM MAIÚSCULO)
-    // O nome deve ser IDÊNTICO ao nome_contrato retornado pelo Supabase (tabela 'contratos')
+    // 🔑 LISTA DE METAS POR CONTRATO (MOCKADA)
     const CONTRACT_METAS_MOCK = {
-        // Exemplo: 'NOME_DO_CONTRATO': { net: 'META_NET', gross: 'META_GROSS', locacao: 'META_LOCACAO' }
         'DEVELON': { net: '99,80%', gross: '99,70%', locacao: '99,50%' },
         'LOGITECH': { net: '99,70%', gross: '99,70%', locacao: '99,50%' },
         'OMRON': { net: '98,50%', gross: '99,70%', locacao: '99,50%' },
@@ -52,28 +53,21 @@ document.addEventListener('DOMContentLoaded', () => {
         'SEPHORA RETAIL': { net: '99,86%', gross: '99,76%', locacao: '99,56%' },
         'SEPHORA E-STOR': { net: '99,89%', gross: '99,79%', locacao: '99,59%' },
         'OBOTICARIO': { net: '99,91%', gross: '99,81%', locacao: '99,61%' },
-
-        // Exemplo de meta para um NOVO contrato (ID 35, que agora é buscado pelo nome)
-        // Você DEVE trocar 'NOME_CONTRATO_35' pelo nome real que vem do Supabase (tabela 'contratos')
         'NOME_CONTRATO_35': { net: '99,73%', gross: '99,63%', locacao: '99,43%' },
-
-        // Slots genéricos que você pode preencher
         'CONTRATO_NOVO_A': { net: '99,70%', gross: '99,60%', locacao: '99,40%' },
         'CONTRATO_NOVO_B': { net: '99,70%', gross: '99,60%', locacao: '99,40%' },
         'CONTRATO_NOVO_C': { net: '99,70%', gross: '99,60%', locacao: '99,40%' },
-        // Adicione mais nomes e metas conforme necessário
     };
 
 
     // --- ELEMENTOS DOM ---
     const loadingMessage = document.getElementById('loadingMessage');
     const gridsContent = document.getElementById('gridsContent');
-
     const contractSelectWrapper = document.getElementById('contractSelectWrapper');
     const contractSelectDisplay = document.getElementById('contractSelectDisplay');
     const contractDropdown = document.getElementById('contractDropdown');
 
-    // --- CONFIGURAÇÃO DAS MÉTRICAS (Agora dependente de selectedContractMeta) ---
+    // --- CONFIGURAÇÃO DAS MÉTRICAS ---
     const METRICS_CONFIG_BASE = [
         { gridId: 'netGrid', column: 'net_percent', metaKey: 'net', title: 'Acuracidade "NET"' },
         { gridId: 'grossGrid', column: 'gross_percent', metaKey: 'gross', title: 'Acuracidade "GROSS"' },
@@ -199,19 +193,17 @@ document.addEventListener('DOMContentLoaded', () => {
         defaultOption.classList.add('dropdown-option');
         defaultOption.textContent = 'Selecione o Contrato...';
         defaultOption.dataset.id = '';
-        defaultOption.dataset.name = ''; // Adiciona dataset name vazio
-        defaultOption.addEventListener('click', () => handleContractSelection(null, 'Selecione o Contrato...', null));
+        defaultOption.dataset.name = '';
+        defaultOption.addEventListener('click', () => handleContractSelection(null, 'Selecione o Contrato...'));
         contractDropdown.appendChild(defaultOption);
 
         contracts.forEach(contract => {
             const option = document.createElement('div');
             option.classList.add('dropdown-option');
-            // Usamos o ID real do Supabase
             option.dataset.id = contract.id;
-            option.dataset.name = contract.nome_contrato; // Armazena o nome no dataset
+            option.dataset.name = contract.nome_contrato;
             option.textContent = contract.nome_contrato;
 
-            // Passamos o ID e o Nome
             option.addEventListener('click', () => handleContractSelection(contract.id, contract.nome_contrato));
             contractDropdown.appendChild(option);
         });
@@ -239,12 +231,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (id !== null) {
-            // 🔑 NOVO: Carrega as metas usando o NOME do contrato (em MAIÚSCULO) como chave
             const contractKey = name ? name.toUpperCase() : '';
             selectedContractMeta = CONTRACT_METAS_MOCK[contractKey] || {};
 
             if (Object.keys(selectedContractMeta).length === 0) {
-                 loadingMessage.textContent = `ERRO: Metas não configuradas manualmente para o contrato: "${name}". Adicione-o ao CONTRACT_METAS_MOCK.`;
+                 loadingMessage.textContent = `ERRO: Metas não configuradas manualmente para o contrato: "${name}". Adicione-o (com esse nome exato em MAIÚSCULO) ao CONTRACT_METAS_MOCK.`;
                  loadingMessage.style.display = 'block';
                  gridsContent.style.display = 'none';
                  return;
@@ -259,13 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function loadCarinhasDashboard() {
-        if (!currentContractId) return;
-
-        // Verifica novamente se as metas foram carregadas (já feito em handleContractSelection, mas por segurança)
-        if (Object.keys(selectedContractMeta).length === 0) {
-            // A mensagem de erro já foi definida em handleContractSelection
-            return;
-        }
+        if (!currentContractId || Object.keys(selectedContractMeta).length === 0) return;
 
         allCarinhasData = await fetchCarinhasData(currentContractId);
 
@@ -286,16 +271,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 const value = item[configBase.column];
 
                 if (mesReferenciaKey && value !== null && value !== undefined) {
+                    // Mantido o formato de string para compatibilidade com a função renderModuleGrid original
                     resultsMap[mesReferenciaKey] = formatPercentage(value);
                 }
             });
 
-            // 🔑 Pega a meta dinâmica do objeto selecionado
             const metaValue = selectedContractMeta[configBase.metaKey];
 
             const moduleConfig = {
                 gridId: configBase.gridId,
-                meta: metaValue, // Meta dinâmica
+                meta: metaValue,
                 results: resultsMap
             };
 
@@ -304,7 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ---------------------------------------------------------------------------------
-    // 4. FUNÇÃO PRINCIPAL DE RENDERIZAÇÃO (CORRIGIDA)
+    // 4. FUNÇÃO PRINCIPAL DE RENDERIZAÇÃO
     // ---------------------------------------------------------------------------------
 
     function renderModuleGrid(config) {
@@ -323,7 +308,8 @@ document.addEventListener('DOMContentLoaded', () => {
             let classification;
             let imageWidth = '100px';
             let statusColorClass = '';
-            let displayValue = '0,00%';
+            let displayValue = '---';
+            let resultValueNumeric = null; // Inicializa
 
             if (!resultValueStr) {
                 classification = { emoji: EMOJIS.VAZIO, statusText: 'SEM DADOS' };
@@ -331,7 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 statusColorClass = 'text-gray-500';
                 displayValue = '---';
             } else {
-                const resultValueNumeric = parsePercentage(resultValueStr);
+                resultValueNumeric = parsePercentage(resultValueStr);
                 classification = classifyResult(resultValueNumeric, metaNumeric);
                 displayValue = resultValueStr;
 
@@ -345,9 +331,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
+            // 💡 Caminho agora é apenas o nome do arquivo, pois estão no mesmo diretório
             const fullImagePath = `${IMAGE_BASE_PATH}${classification.emoji}`;
 
-            // === AJUSTE CRÍTICO AQUI: Adicionado crossorigin="anonymous" ===
             const monthBlockHtml = `
                 <div class="month-block" data-month-key="${month.key}">
                     <div class="month-header">${month.label}</div>
@@ -367,7 +353,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="emoji-area" style="padding-top: 10px;">
                         <img src="${fullImagePath}"
                              alt="${classification.statusText}"
-                             crossorigin="anonymous"
                              style="width: ${imageWidth}; height: 100px; margin: 5px 0;" />
                     </div>
 
@@ -401,20 +386,47 @@ document.addEventListener('DOMContentLoaded', () => {
     const exportIcon = document.getElementById('exportIcon');
     const printIcon = document.getElementById('printIcon');
 
+    // 🔑 ELEMENTO DA CÂMERA/VÍDEO (Ajustado para o novo ID no HTML)
+    const cameraElementContainer = document.getElementById('cameraFeedContainer');
+
     async function handleExportAsImage() {
+        const showMessage = (msg) => {
+            const modal = document.createElement('div');
+            modal.style.cssText = "position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; display: flex; justify-content: center; align-items: center;";
+            const content = document.createElement('div');
+            content.style.cssText = "background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); max-width: 80%; text-align: center;";
+            content.innerHTML = `<p>${msg}</p><button onclick="this.parentNode.parentNode.remove()" style="margin-top: 10px; padding: 8px 15px; background: #0F243E; color: white; border: none; border-radius: 4px; cursor: pointer;">Fechar</button>`;
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+        };
+
         if (loadingMessage.style.display !== 'none') {
-             alert('Selecione um contrato e aguarde o carregamento dos dados antes de exportar.');
+             showMessage('Selecione um contrato e aguarde o carregamento dos dados antes de exportar.');
              return;
         }
 
         exportIcon.style.display = 'none';
+        let cameraWasVisible = false;
+
+        // 🔑 SOLUÇÃO CONTRA "TAINTED CANVAS": Esconder o container da câmera/vídeo
+        if (cameraElementContainer) {
+             // Salvamos o estado de visibilidade
+             cameraWasVisible = cameraElementContainer.style.display !== 'none';
+             if(cameraWasVisible) {
+                 cameraElementContainer.style.display = 'none';
+             }
+        }
+
 
         try {
+            // A opção allowTaint: false é a chave para o html2canvas não falhar se encontrar a tag,
+            // mas a remoção do elemento é a garantia máxima.
             const canvas = await html2canvas(mainCarinhasContainer, {
                 scale: 2,
-                useCORS: false,
+                useCORS: true,
                 scrollX: 0,
                 scrollY: 0,
+                allowTaint: false
             });
 
             const imageURL = canvas.toDataURL('image/png');
@@ -425,12 +437,19 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.appendChild(tempLink);
             tempLink.click();
             document.body.removeChild(tempLink);
+            showMessage('Exportação concluída! Verifique sua pasta de downloads.');
 
         } catch (error) {
             console.error('Erro ao gerar a imagem de exportação:', error);
-            alert('Não foi possível gerar a imagem. Para usar a câmera (Exportação), você DEVE rodar o projeto em um servidor local (ex: Live Server) devido às restrições do navegador (Tainted Canvas).');
+            // Mensagem atualizada para indicar o erro de segurança
+            showMessage('Não foi possível gerar a imagem. Verifique se o projeto está rodando em um **servidor local (Live Server)** e se o elemento da Câmera foi configurado corretamente.');
         } finally {
             exportIcon.style.display = 'block';
+
+            // 🔑 RESTAURAÇÃO: Restaurar o elemento da câmera
+            if (cameraElementContainer && cameraWasVisible) {
+                cameraElementContainer.style.display = '';
+            }
         }
     }
 
@@ -445,7 +464,6 @@ document.addEventListener('DOMContentLoaded', () => {
         exportIcon.addEventListener('click', handleExportAsImage);
     }
 
-    // Adiciona o evento de clique para o ícone de impressão
     if (printIcon) {
         printIcon.addEventListener('click', () => {
             window.print();
