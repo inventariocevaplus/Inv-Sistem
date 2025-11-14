@@ -1,15 +1,11 @@
 // =========================================================================
-// Módulo/Carinhas/Carinhas.js - CÓDIGO FINAL E CORRIGIDO
-// 🔑 CORREÇÕES:
-// 1. IMAGE_BASE_PATH ajustado para "" (vazio).
-// 2. Lógica de esconder o elemento da Câmera (cameraFeedContainer) no html2canvas
-//    para evitar o erro "Tainted Canvas".
-// 3. ADIÇÃO do parâmetro ignoreElements no html2canvas (Correção crítica).
+// Módulo/Carinhas/Carinhas.js - CÓDIGO COMPLETO E ATUALIZADO
+// 🔑 AJUSTE CRÍTICO: Removida a lógica de controle de posição vertical (Fixa no CSS)
 // =========================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- CONFIGURAÇÃO SUPABASE ---
+    // --- CONFIGURAÇÃO SUPABASE (mantido) ---
     const SUPABASE_URL = 'https://kidpprfegedkjifbwkju.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtpZHBwcmZlZ2Vka2ppZmJ3a2p1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA1OTE5NjQsImV4cCI6MjA3NjE2Nzk2NH0.OkpgPHJtFIKyicX_qeOSMVHMk58Bppf0SzyZAPgWzLw';
 
@@ -22,13 +18,16 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentContractId = null;
     let allCarinhasData = [];
     let selectedContractMeta = {};
+    let currentContractName = '';
 
     // --- CONSTANTES DE LÓGICA ---
 
     const TOLERANCE_CUTOFF = 0.05; // 0.05%
 
-    // 🔑 CORREÇÃO 1: Caminho ajustado para "" (Vazio), pois o JS e as imagens estão no mesmo nível
-    const IMAGE_BASE_PATH = "";
+    // Caminhos de Imagem
+    const EMOJI_BASE_PATH = "";
+    const INVENTARIO_IMAGE_PATH = "INVENTARIO.png";
+    const CONTRATO_IMAGE_BASE_PATH = "ContratoImagens/";
 
     const EMOJIS = {
         PARABENS: 'PARABENS.png',
@@ -37,7 +36,32 @@ document.addEventListener('DOMContentLoaded', () => {
         VAZIO: 'VAZIO.png',
     };
 
-    // 🔑 LISTA DE METAS POR CONTRATO (MOCKADA)
+    // 🔑 CONSTANTES DE DIMENSÃO PARA AS IMAGENS DO TOPO (INVENTÁRIO E CONTRATO)
+    const TOP_IMAGE_DIMENSIONS = {
+        INVENTARIO_WIDTH: '120px',
+        INVENTARIO_HEIGHT: '60px',
+        CONTRATO_MAX_WIDTH: '190px',
+        CONTRATO_HEIGHT: 'auto',
+    };
+
+    // OBS: A posição vertical (top) será definida diretamente no CSS, sem variáveis JS.
+
+
+    // Larguras e Alturas desejadas para cada emoji
+    const EMOJI_WIDTHS = {
+        [EMOJIS.PARABENS]: '170px',
+        [EMOJIS.QUASE]: '130px',
+        [EMOJIS.ATENCAO]: '130px',
+        [EMOJIS.VAZIO]: '130px',
+    };
+    const EMOJI_HEIGHTS = {
+        [EMOJIS.PARABENS]: '120px',
+        [EMOJIS.QUASE]: '120px',
+        [EMOJIS.ATENCAO]: '120px',
+        [EMOJIS.VAZIO]: '120px',
+    };
+
+    // LISTA DE METAS POR CONTRATO (MOCKADA - mantido)
     const CONTRACT_METAS_MOCK = {
         'DEVELON': { net: '99,80%', gross: '99,70%', locacao: '99,50%' },
         'LOGITECH': { net: '99,70%', gross: '99,70%', locacao: '99,50%' },
@@ -61,24 +85,22 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
 
-    // --- ELEMENTOS DOM ---
+    // --- ELEMENTOS DOM (mantido) ---
     const loadingMessage = document.getElementById('loadingMessage');
     const gridsContent = document.getElementById('gridsContent');
     const contractSelectWrapper = document.getElementById('contractSelectWrapper');
     const contractSelectDisplay = document.getElementById('contractSelectDisplay');
     const contractDropdown = document.getElementById('contractDropdown');
+    const topImagesContainer = document.getElementById('topImagesContainer');
 
-    // --- CONFIGURAÇÃO DAS MÉTRICAS ---
+    // --- CONFIGURAÇÃO DAS MÉTRICAS (mantido) ---
     const METRICS_CONFIG_BASE = [
         { gridId: 'netGrid', column: 'net_percent', metaKey: 'net', title: 'Acuracidade "NET"' },
         { gridId: 'grossGrid', column: 'gross_percent', metaKey: 'gross', title: 'Acuracidade "GROSS"' },
         { gridId: 'locacaoGrid', column: 'accuracy_locacao', metaKey: 'locacao', title: 'Acuracidade de LOCAÇÃO' }
     ];
 
-    // ---------------------------------------------------------------------------------
-    // 1. FUNÇÕES UTILITÁRIAS
-    // ---------------------------------------------------------------------------------
-
+    // [Funções Utilítárias - Mantidas]
     function convertSupabaseDateToMonthKey(dateString) {
         if (!dateString) return null;
         try {
@@ -135,10 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return months;
     }
 
-    // ---------------------------------------------------------------------------------
-    // 2. LÓGICA SUPABASE E DADOS
-    // ---------------------------------------------------------------------------------
-
+    // [Funções Supabase e Filtro - Mantidas]
     async function fetchContracts() {
         if (!supabaseClient) return [];
 
@@ -181,11 +200,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-
-    // ---------------------------------------------------------------------------------
-    // 3. LÓGICA DO FILTRO DE CONTRATOS (Inclui o carregamento de metas)
-    // ---------------------------------------------------------------------------------
-
     function setupContractFilter(contracts) {
         availableContracts = contracts;
         contractDropdown.innerHTML = '';
@@ -221,6 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function handleContractSelection(id, name) {
         currentContractId = id;
+        currentContractName = name || ''; // Armazena o nome do contrato selecionado
         contractSelectDisplay.textContent = name;
         contractSelectWrapper.classList.remove('open');
 
@@ -231,7 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        if (id !== null) {
+        if (id !== null && name !== 'Selecione o Contrato...') {
             const contractKey = name ? name.toUpperCase() : '';
             selectedContractMeta = CONTRACT_METAS_MOCK[contractKey] || {};
 
@@ -239,6 +254,9 @@ document.addEventListener('DOMContentLoaded', () => {
                  loadingMessage.textContent = `ERRO: Metas não configuradas manualmente para o contrato: "${name}". Adicione-o (com esse nome exato em MAIÚSCULO) ao CONTRACT_METAS_MOCK.`;
                  loadingMessage.style.display = 'block';
                  gridsContent.style.display = 'none';
+                 if (topImagesContainer) {
+                    topImagesContainer.innerHTML = '';
+                 }
                  return;
             }
 
@@ -247,6 +265,9 @@ document.addEventListener('DOMContentLoaded', () => {
             loadingMessage.textContent = 'Selecione um contrato para carregar os resultados.';
             loadingMessage.style.display = 'block';
             gridsContent.style.display = 'none';
+            if (topImagesContainer) {
+                topImagesContainer.innerHTML = '';
+            }
         }
     }
 
@@ -259,11 +280,47 @@ document.addEventListener('DOMContentLoaded', () => {
             loadingMessage.textContent = 'Não há dados de acuracidade para este contrato nos últimos 6 meses.';
             loadingMessage.style.display = 'block';
             gridsContent.style.display = 'none';
+            if (topImagesContainer) {
+                topImagesContainer.innerHTML = '';
+            }
             return;
         }
 
         loadingMessage.style.display = 'none';
         gridsContent.style.display = 'block';
+
+        // 🔑 Injeta as imagens de INVENTÁRIO e do CONTRATO usando as constantes TOP_IMAGE_DIMENSIONS
+        if (topImagesContainer) {
+            topImagesContainer.innerHTML = ''; // Limpa antes de adicionar
+
+            // 1. Imagem de INVENTÁRIO (Esquerda - Fixo)
+            const inventarioImg = document.createElement('img');
+            inventarioImg.src = INVENTARIO_IMAGE_PATH; // Caminho para INVENTARIO.png
+            inventarioImg.alt = "Inventário";
+            inventarioImg.classList.add('inventory-left-image');
+
+            // 💡 APLICANDO ESTILO INLINE COM BASE NAS CONSTANTES
+            inventarioImg.style.width = TOP_IMAGE_DIMENSIONS.INVENTARIO_WIDTH;
+            inventarioImg.style.height = TOP_IMAGE_DIMENSIONS.INVENTARIO_HEIGHT;
+
+            // 2. Imagem do Contrato (Direita - Dinâmico)
+            const safeContractName = currentContractName
+                .replace(/[^a-zA-Z0-9]/g, '')
+                .toUpperCase();
+
+            const contractImageFileName = `${safeContractName}.png`;
+            const contractImg = document.createElement('img');
+            contractImg.src = `${CONTRATO_IMAGE_BASE_PATH}${contractImageFileName}`;
+            contractImg.alt = `Logo ${currentContractName}`;
+            contractImg.classList.add('contract-right-image');
+
+            // 💡 APLICANDO ESTILO INLINE COM BASE NAS CONSTANTES
+            contractImg.style.maxWidth = TOP_IMAGE_DIMENSIONS.CONTRATO_MAX_WIDTH;
+            contractImg.style.height = TOP_IMAGE_DIMENSIONS.CONTRATO_HEIGHT;
+
+            topImagesContainer.appendChild(inventarioImg);
+            topImagesContainer.appendChild(contractImg);
+        }
 
         METRICS_CONFIG_BASE.forEach(configBase => {
             const resultsMap = {};
@@ -272,7 +329,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const value = item[configBase.column];
 
                 if (mesReferenciaKey && value !== null && value !== undefined) {
-                    // Mantido o formato de string para compatibilidade com a função renderModuleGrid original
                     resultsMap[mesReferenciaKey] = formatPercentage(value);
                 }
             });
@@ -290,7 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ---------------------------------------------------------------------------------
-    // 4. FUNÇÃO PRINCIPAL DE RENDERIZAÇÃO
+    // 4. FUNÇÃO PRINCIPAL DE RENDERIZAÇÃO (Mantida)
     // ---------------------------------------------------------------------------------
 
     function renderModuleGrid(config) {
@@ -307,14 +363,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const resultValueStr = config.results[month.key];
 
             let classification;
-            let imageWidth = '100px';
             let statusColorClass = '';
             let displayValue = '---';
-            let resultValueNumeric = null; // Inicializa
+            let resultValueNumeric = null;
 
             if (!resultValueStr) {
                 classification = { emoji: EMOJIS.VAZIO, statusText: 'SEM DADOS' };
-                imageWidth = '100px';
                 statusColorClass = 'text-gray-500';
                 displayValue = '---';
             } else {
@@ -324,7 +378,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (classification.statusText === 'PARABENS!!!') {
                     statusColorClass = 'text-green-600';
-                    imageWidth = '160px';
                 } else if (classification.statusText === 'QUASE!!!') {
                      statusColorClass = 'text-yellow-600';
                 } else if (classification.statusText === 'ATENÇÃO!!!') {
@@ -332,8 +385,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // 💡 Caminho agora é apenas o nome do arquivo, pois estão no mesmo diretório
-            const fullImagePath = `${IMAGE_BASE_PATH}${classification.emoji}`;
+            const imageWidth = EMOJI_WIDTHS[classification.emoji] || '100px';
+            const imageHeight = EMOJI_HEIGHTS[classification.emoji] || '100px';
+
+            const fullImagePath = `${EMOJI_BASE_PATH}${classification.emoji}`;
 
             const monthBlockHtml = `
                 <div class="month-block" data-month-key="${month.key}">
@@ -354,8 +409,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="emoji-area" style="padding-top: 10px;">
                         <img src="${fullImagePath}"
                              alt="${classification.statusText}"
-                             style="width: ${imageWidth}; height: 100px; margin: 5px 0;" />
-                    </div>
+                             style="width: ${imageWidth}; height: ${imageHeight}; margin: 5px 0;" />
+                            </div>
 
                     <div class="parabens-area ${statusColorClass}">
                         <p>${classification.statusText}</p>
@@ -368,7 +423,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ---------------------------------------------------------------------------------
-    // 5. INICIALIZAÇÃO GERAL E EVENTOS
+    // 5. INICIALIZAÇÃO GERAL E EVENTOS (Mantidos)
     // ---------------------------------------------------------------------------------
 
     function initializeSupabase() {
@@ -383,92 +438,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return true;
     }
 
-    const mainCarinhasContainer = document.getElementById('mainCarinhasContainer');
-    const exportIcon = document.getElementById('exportIcon');
     const printIcon = document.getElementById('printIcon');
-
-    // 🔑 ELEMENTO DA CÂMERA/VÍDEO (Ajustado para o novo ID no HTML)
-    const cameraElementContainer = document.getElementById('cameraFeedContainer');
-
-    async function handleExportAsImage() {
-        const showMessage = (msg) => {
-            const modal = document.createElement('div');
-            modal.style.cssText = "position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; display: flex; justify-content: center; align-items: center;";
-            const content = document.createElement('div');
-            content.style.cssText = "background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); max-width: 80%; text-align: center;";
-            content.innerHTML = `<p>${msg}</p><button onclick="this.parentNode.parentNode.remove()" style="margin-top: 10px; padding: 8px 15px; background: #0F243E; color: white; border: none; border-radius: 4px; cursor: pointer;">Fechar</button>`;
-            modal.appendChild(content);
-            document.body.appendChild(modal);
-        };
-
-        if (loadingMessage.style.display !== 'none') {
-             showMessage('Selecione um contrato e aguarde o carregamento dos dados antes de exportar.');
-             return;
-        }
-
-        exportIcon.style.display = 'none';
-        let cameraWasVisible = false;
-
-        // 🔑 SOLUÇÃO CONTRA "TAINTED CANVAS": Esconder o container da câmera/vídeo
-        if (cameraElementContainer) {
-             // Salvamos o estado de visibilidade
-             cameraWasVisible = cameraElementContainer.style.display !== 'none';
-             if(cameraWasVisible) {
-                 cameraElementContainer.style.display = 'none';
-             }
-        }
-
-
-        try {
-            // A opção allowTaint: false é a chave para o html2canvas não falhar se encontrar a tag,
-            // mas a remoção do elemento é a garantia máxima.
-            const canvas = await html2canvas(mainCarinhasContainer, {
-                scale: 2,
-                useCORS: true,
-                scrollX: 0,
-                scrollY: 0,
-                allowTaint: false,
-                // 🚨 CORREÇÃO CRÍTICA: Ignorar o elemento da câmera explicitamente (FIX para Tainted Canvas)
-                ignoreElements: (element) => {
-                    // Retorna TRUE se o elemento atual (ou qualquer um dentro dele)
-                    // for o container da câmera.
-                    return element === cameraElementContainer || (cameraElementContainer && cameraElementContainer.contains(element));
-                }
-            });
-
-            const imageURL = canvas.toDataURL('image/png');
-            const tempLink = document.createElement('a');
-            tempLink.href = imageURL;
-            tempLink.download = `Inventario_Carinhas_${contractSelectDisplay.textContent.replace(/\s/g, '_')}_` + new Date().toISOString().slice(0, 10) + '.png';
-
-            document.body.appendChild(tempLink);
-            tempLink.click();
-            document.body.removeChild(tempLink);
-            showMessage('Exportação concluída! Verifique sua pasta de downloads.');
-
-        } catch (error) {
-            console.error('Erro ao gerar a imagem de exportação:', error);
-            // Mensagem atualizada para indicar o erro de segurança
-            showMessage('Não foi possível gerar a imagem. Verifique se o projeto está rodando em um **servidor local (Live Server)** e se o elemento da Câmera foi configurado corretamente.');
-        } finally {
-            exportIcon.style.display = 'block';
-
-            // 🔑 RESTAURAÇÃO: Restaurar o elemento da câmera
-            if (cameraElementContainer && cameraWasVisible) {
-                cameraElementContainer.style.display = '';
-            }
-        }
-    }
-
 
     if (initializeSupabase()) {
         fetchContracts().then(contracts => {
             setupContractFilter(contracts);
         });
-    }
-
-    if (exportIcon && mainCarinhasContainer) {
-        exportIcon.addEventListener('click', handleExportAsImage);
     }
 
     if (printIcon) {

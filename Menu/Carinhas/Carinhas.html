@@ -63,25 +63,44 @@
             display: none; /* Esconde o menu lateral na impressão */
         }
         .main-content {
-            flex-grow: 1; /* Permite que o conteúdo principal ocupe todo o espaço */
+            flex-grow: 1;
             padding: 20px;
-            /* Remove a largura forçada para que se adapte melhor à folha A4 */
             width: auto;
             max-width: 100%;
         }
 
-        /* 🔑 Borda de contorno para a FOLHA INTEIRA (mainCarinhasContainer) */
+        /* 🔑 NOVO: Remove margens do corpo na impressão para liberar espaço */
+        body {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        /* 🔑 CORREÇÃO CRÍTICA: FORÇA A IMPRESSÃO DE CORES E IMAGENS DE FUNDO */
+        .month-header {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            /* Garante que o fundo preto/azul forte seja impresso */
+            background-color: #0F243E !important;
+            color: white !important; /* Garante que o texto permaneça branco */
+        }
+
+        /* 🔑 NOVO: Força a cor preta para o resultado da Acuracidade */
+        .data-value.value-result {
+            color: black !important; /* Sobrescreve a cor do site, forçando preto */
+        }
+
+        /* 🔑 Borda de contorno para a FOLHA INTEIRA (mainCarinhasContainer) - Padding ajustado */
         #mainCarinhasContainer {
             border: 2px solid black;
-            padding: 10px;
+            padding: 5px; /* Ajustei para 5px para liberar espaço na borda */
             box-shadow: none; /* Remover sombras para impressão */
         }
 
-        /* 🔑 Borda de contorno para cada GRID (Resultado de Inventário) */
+        /* 🔑 Borda de contorno para cada GRID (Resultado de Inventário) - Margem ajustada */
         .data-grid-container {
             border: 1px solid black !important; /* Força borda preta sólida */
             page-break-inside: avoid; /* Evita quebrar a grade entre páginas */
-            margin-bottom: 30px;
+            margin-bottom: 5px; /* Margem reduzida para liberar espaço na impressão */
         }
 
         /* Remover bordas pontilhadas internas para impressão mais limpa */
@@ -91,7 +110,12 @@
         .month-block:last-child {
             border-right: none !important;
         }
+        /* Garantir borda meta na impressão */
         .data-row.meta-row {
+            border-bottom: 1px solid black !important;
+        }
+        /* Adicionar borda abaixo do resultado na impressão */
+        .data-row.result-row {
             border-bottom: 1px solid black !important;
         }
         .data-separator {
@@ -166,9 +190,22 @@
 
     /* Outros Estilos de Layout e Conteúdo */
     body { margin: 0; padding: 0; }
-    .dashboard-container { display: flex; height: 100vh; overflow: hidden; }
-    .main-content { flex-grow: 1; padding: 20px; overflow-y: auto; }
-    .info-card { min-height: calc(100vh - 120px); padding: 20px; }
+    .dashboard-container {
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+    }
+    .main-content {
+        flex-grow: 1;
+        padding: 20px;
+        overflow-y: auto;
+        overflow-x: hidden; /* 🔑 AJUSTE: Remove a barra de rolagem horizontal */
+    }
+    .info-card {
+        min-height: calc(100vh - 120px);
+        padding: 20px;
+        position: relative; /* CRÍTICO para o #topImagesContainer */
+    }
 
     .inventory-title {
         text-align: center;
@@ -185,13 +222,14 @@
         margin-bottom: 20px;
     }
 
+    /* 🔑 ESCURECER LINHAS TRACEJADAS: Alterado #ccc para #888 */
     .data-grid-container {
         display: flex;
         justify-content: flex-start;
         gap: 0;
         width: 100%;
         margin-top: 20px;
-        border: 1px dashed #ccc;
+        border: 1px dashed #888;
     }
 
     .month-block {
@@ -200,7 +238,7 @@
         padding: 0;
         text-align: center;
         box-sizing: border-box;
-        border-right: 1px dashed #ccc;
+        border-right: 1px dashed #888;
     }
     .month-block:last-child {
         border-right: none;
@@ -224,7 +262,12 @@
     }
 
     .meta-row {
-        border-bottom: 1px dashed #ccc;
+        border-bottom: 1px dashed #888;
+    }
+
+    /* 🔑 CORREÇÃO: ADICIONA LINHA TRACEJADA ABAIXO DO RESULTADO */
+    .result-row {
+        border-bottom: 1px dashed #888;
     }
 
     .data-label {
@@ -234,10 +277,11 @@
         color: #000;
     }
 
+    /* 🔑 ESCURECER LINHAS TRACEJADAS: Alterado #ccc para #888 */
     .data-separator {
         height: 18px;
         width: 0;
-        border-left: 1px dashed #ccc;
+        border-left: 1px dashed #888;
     }
 
     .data-value {
@@ -251,7 +295,7 @@
     }
 
     .value-result {
-        color: #FF6600;
+        color: #FF6600; /* Cor Laranja/Destaque no site */
     }
 
     .emoji-area p,
@@ -260,8 +304,9 @@
         padding: 0;
         font-weight: 700;
     }
+    /* 🔑 ESCURECER LINHAS TRACEJADAS: Alterado #ccc para #888 */
     .parabens-area {
-        border-top: 1px dashed #ccc;
+        border-top: 1px dashed #888;
         font-size: 0.8em;
     }
 
@@ -328,9 +373,16 @@
       </div>
 
       <div id="gridsContent" style="display: none;">
+
+        <div id="topImagesContainer">
+          <img src="INVENTARIO.png" alt="Logo Inventário" class="inventory-left-image" style="height: 50px;">
+          <img src="ContratoImagens/DEVELON.png" alt="Logo Contrato" class="contract-right-image" style="height: 30px;">
+        </div>
+
         <div class="inventory-title main-inventory-title">
           RESULTADO DE INVENTÁRIO
         </div>
+
         <div class="inventory-title subtitle-inventory-net">
           Resultado da Acuracidade "NET"
         </div>
@@ -340,9 +392,6 @@
 
         <hr style="border: 0; height: 1px; background-color: #ddd; margin: 30px 0;">
 
-        <div class="inventory-title main-inventory-title">
-          RESULTADO DE INVENTÁRIO
-        </div>
         <div class="inventory-title subtitle-inventory-net">
           Resultado da Acuracidade "GROSS"
         </div>
@@ -352,9 +401,6 @@
 
         <hr style="border: 0; height: 1px; background-color: #ddd; margin: 30px 0;">
 
-        <div class="inventory-title main-inventory-title">
-          RESULTADO DE INVENTÁRIO
-        </div>
         <div class="inventory-title subtitle-inventory-net">
           Resultado da Acuracidade de LOCAÇÃO
         </div>

@@ -273,6 +273,61 @@
 
 
 /* ================================================================= */
+/* ESTILOS ESPECÍFICOS PARA AS IMAGENS SUPERIORES (INVENTÁRIO / CONTRATO) */
+/* ================================================================= */
+
+/* 🔑 NOVO: Torna o contêiner principal o ponto de referência para 'absolute' */
+/* IMPORTANTE: Este estilo PRECISA estar no Carinhas.css ou na tag <style> do Carinhas.html */
+.info-card#mainCarinhasContainer {
+    position: relative; /* CRÍTICO: Agora é a referência (viewport) do absolute */
+    /* Garante que o padding não seja removido */
+    padding: 20px;
+}
+
+
+/* 🔑 AJUSTE CRÍTICO: Usa position: absolute referenciado pelo pai (#mainCarinhasContainer) */
+#topImagesContainer {
+    position: absolute;
+    top: 5px; /* Posição vertical mais próxima do topo de #mainCarinhasContainer, descontando o padding */
+    left: 20px; /* Alinha com o padding lateral de #mainCarinhasContainer */
+    right: 20px; /* Alinha com o padding lateral de #mainCarinhasContainer */
+
+    display: flex;
+    justify-content: space-between; /* Imagem esquerda e imagem direita nas laterais */
+    align-items: center;
+
+    width: auto;
+    box-sizing: border-box;
+
+    padding: 0;
+    pointer-events: none; /* Permite clicar em elementos abaixo se a imagem não estiver lá */
+    z-index: 2;
+
+    margin: 0;
+}
+
+/* Permite que as imagens sejam clicáveis, se necessário */
+.inventory-left-image,
+.contract-right-image {
+    pointer-events: auto;
+}
+
+
+/* 🚀 AJUSTE DE ALINHAMENTO: Margem do subtítulo (Para dar espaço para as imagens flutuantes/superiores) */
+.inventory-title.subtitle-inventory-net {
+    font-size: 1.2em;
+    margin-bottom: 5px;
+
+    /* 🔑 AUMENTADO para empurrar o título para baixo e dar espaço às imagens flutuantes */
+    margin-top: 50px;
+
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+
+
+/* ================================================================= */
 /* ESTILOS ESPECÍFICOS DO GRID DE MESES (CARINHAS) */
 /* ================================================================= */
 
@@ -281,9 +336,10 @@
     justify-content: flex-start;
     gap: 0;
     width: 100%;
-    margin-top: 20px;
+
+    margin-top: 5px;
     /* Linha tracejada discreta em volta do grid */
-    border: 1px dashed #ccc;
+    border: 1px dashed #888; /* 🔑 AJUSTADO: De #ccc para #888 (Melhor visibilidade) */
 }
 
 .month-block {
@@ -294,7 +350,7 @@
     box-sizing: border-box;
 
     /* Borda separadora vertical discreta entre os blocos */
-    border-right: 1px dashed #ccc;
+    border-right: 1px dashed #888; /* 🔑 AJUSTADO: De #ccc para #888 */
 }
 .month-block:last-child {
     border-right: none;
@@ -320,7 +376,7 @@
 
 /* Separador horizontal entre META e Resultado (ajustado para tracejado) */
 .meta-row {
-    border-bottom: 1px dashed #ccc;
+    border-bottom: 1px dashed #888; /* 🔑 AJUSTADO: De #ccc para #888 */
 }
 
 /* RÓTULO (ex: META:) - Alinhado à direita de sua metade */
@@ -335,7 +391,7 @@
 .data-separator {
     height: 18px; /* Altura da linha, ajuste para centralização vertical */
     width: 0;
-    border-left: 1px dashed #ccc; /* Linha tracejada discreta */
+    border-left: 1px dashed #888; /* 🔑 AJUSTADO: De #ccc para #888 */
 }
 
 /* VALOR (ex: 99,80%) - Alinhado à esquerda de sua metade */
@@ -361,7 +417,7 @@
     font-weight: 700;
 }
 .parabens-area {
-    border-top: 1px dashed #ccc;
+    border-top: 1px dashed #888; /* 🔑 AJUSTADO: De #ccc para #888 */
     font-size: 0.8em;
 }
 
