@@ -38,15 +38,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const CONTRACT_METAS_MOCK = {
         // Exemplo: 'NOME_DO_CONTRATO': { net: 'META_NET', gross: 'META_GROSS', locacao: 'META_LOCACAO' }
         'DEVELON': { net: '99,80%', gross: '99,70%', locacao: '99,50%' },
-        'LOGITECH': { net: '99,75%', gross: '99,65%', locacao: '99,45%' },
-        'OMRON': { net: '99,85%', gross: '99,75%', locacao: '99,55%' },
-        'TRIUMPH': { net: '99,90%', gross: '99,80%', locacao: '99,60%' },
-        'FAREVA': { net: '99,70%', gross: '99,60%', locacao: '99,40%' },
-        'JCB': { net: '99,82%', gross: '99,72%', locacao: '99,52%' },
-        'STANLEY BLACK & DECKER': { net: '99,78%', gross: '99,68%', locacao: '99,48%' },
-        'TEREX': { net: '99,88%', gross: '99,78%', locacao: '99,58%' },
-        'ASP': { net: '99,77%', gross: '99,67%', locacao: '99,47%' },
-        'CONVATEC': { net: '99,81%', gross: '99,71%', locacao: '99,51%' },
+        'LOGITECH': { net: '99,70%', gross: '99,70%', locacao: '99,50%' },
+        'OMRON': { net: '98,50%', gross: '99,70%', locacao: '99,50%' },
+        'TRIUMPH': { net: '98,00%', gross: '99,70%', locacao: '99,60%' },
+        'FAREVA': { net: '99,80%', gross: '99,70%', locacao: '99,50%' },
+        'JCB': { net: '99,00%', gross: '99,70%', locacao: '99,50%' },
+        'STANLEY BLACK & DECKER': { net: '99,80%', gross: '99,70%', locacao: '99,50%' },
+        'TEREX': { net: '99,80%', gross: '99,70%', locacao: '99,50%' },
+        'ASP': { net: '99,80%', gross: '99,70%', locacao: '99,50%' },
+        'CONVATEC': { net: '99,90%', gross: '99,50%', locacao: '99,50%' },
         'UNILEVER': { net: '99,84%', gross: '99,74%', locacao: '99,54%' },
         'ESSITY': { net: '99,79%', gross: '99,69%', locacao: '99,49%' },
         'SEPHORA RETAIL': { net: '99,86%', gross: '99,76%', locacao: '99,56%' },
@@ -304,7 +304,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ---------------------------------------------------------------------------------
-    // 4. FUNÇÃO PRINCIPAL DE RENDERIZAÇÃO
+    // 4. FUNÇÃO PRINCIPAL DE RENDERIZAÇÃO (CORRIGIDA)
     // ---------------------------------------------------------------------------------
 
     function renderModuleGrid(config) {
@@ -347,7 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const fullImagePath = `${IMAGE_BASE_PATH}${classification.emoji}`;
 
-            // Imagem sem crossorigin para carregar localmente
+            // === AJUSTE CRÍTICO AQUI: Adicionado crossorigin="anonymous" ===
             const monthBlockHtml = `
                 <div class="month-block" data-month-key="${month.key}">
                     <div class="month-header">${month.label}</div>
@@ -367,6 +367,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="emoji-area" style="padding-top: 10px;">
                         <img src="${fullImagePath}"
                              alt="${classification.statusText}"
+                             crossorigin="anonymous"
                              style="width: ${imageWidth}; height: 100px; margin: 5px 0;" />
                     </div>
 

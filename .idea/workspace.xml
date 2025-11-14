@@ -5,18 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7d79809c-8bab-4b33-a110-025983aa6406" name="Changes" comment="Deploy Netlify pronto. Estrutura final e limpeza de código Flask">
-      <change afterPath="$PROJECT_DIR$/Menu/Carinhas/Carinhas.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/Carinhas/Carinhas.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/Carinhas/Carinhas.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/Carinhas/CarinhasEmoji/ATENCAO.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/Carinhas/CarinhasEmoji/PARABENS.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/Carinhas/CarinhasEmoji/QUASE.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/Carinhas/CarinhasEmoji/VAZIO.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/Carinhas/INVENTARIO.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Login.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Login.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Menu.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Menu.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Menu.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Menu.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Carinhas/Carinhas.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Carinhas/Carinhas.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
