@@ -242,7 +242,7 @@ function calculateKpiPrazo(gradeData, mesSelecionado, anoSelecionado, kpiRealiza
             if (todayStatusValue < 0) {
                 suffixText = 'Locações atrasadas';
             } else if (todayStatusValue > 0) {
-                suffixText = 'Locações adiantadas';
+                suffixText = 'Loc adiantadas';
             } else {
                 suffixText = 'Locações em dia';
             }
@@ -493,6 +493,7 @@ async function updateDashboard() {
     const contractId = contractSelect.value;
     const mesSelecionado = monthSelect.value;
     const anoSelecionado = yearSelect.value;
+
     if (!contractId || !mesSelecionado || !anoSelecionado ||
         mesSelecionado === 'Nenhum dado mensal' || anoSelecionado === 'Nenhum dado anual') {
         alert("Por favor, selecione o Contrato, Mês e Ano de Referência.");
@@ -502,6 +503,7 @@ async function updateDashboard() {
     displayLoading(`Carregando dados para ${mesSelecionado}/${anoSelecionado}...`);
 
     const mesReferenciaSupabase = formatDropdownToSupabaseMonth(mesSelecionado, anoSelecionado);
+
     // 1. Busca os dados agregados
     const { data: gradeData, error } = await supabaseClient
         .from(GRADE_DATA_TABLE)
@@ -518,6 +520,7 @@ async function updateDashboard() {
         .eq('contract_id', contractId)
         .eq('mes_referencia', mesReferenciaSupabase)
         .single();
+
     if (error && error.code !== 'PGRST116') {
         console.error("Erro ao buscar dados do GRADE:", error);
         displayLoading("Erro ao carregar dados. Verifique a busca ou RLS.");
@@ -529,47 +532,207 @@ async function updateDashboard() {
         return;
     }
 
-    // 2. Cálculo de KPIs
+    // 2. Inicializa e formata dados
     dashboardContent.style.display = 'block';
     loadingDashMessage.style.display = 'none';
+
     currentRealizadoLocacoes = gradeData.realizado_locacoes ? gradeData.realizado_locacoes.map(Number) : [];
-    currentPlanoLocacoes = gradeData.plano_locacoes ? gradeData.plano_locacoes.map(Number) : [];
+    currentPlanoLocacoes = gradeData.plano_locacoes ? currentPlanoLocacoes.map(Number) : []; // Corrigido (se necessário)
     currentStatusPlano = gradeData.status_plano ?
         gradeData.status_plano.map(Number) : [];
     currentDiasInventario = Array.isArray(gradeData.dias_inventario)
         ?
         gradeData.dias_inventario
         : (typeof gradeData.dias_inventario === 'string' ? JSON.parse(gradeData.dias_inventario) : []);
-    const locacoesIncorretas = gradeData.locacoes_incorretas ? gradeData.locacoes_incorretas.map(Number) : [];
-
-    // Variável que contém a soma das locações realizadas, ex: 4000
-    const totalRealizado = currentRealizadoLocacoes.reduce((sum, current) => sum + current, 0);
-    const totalIncorreto = locacoesIncorretas.reduce((sum, current) => sum + current, 0);
-    const totalPendentes = gradeData.total_locacoes - totalRealizado;
-
-    // KPI Realizado (Percentual)
-    const kpiRealizadoValue = gradeData.total_locacoes > 0
-        ?
-        (totalRealizado / gradeData.total_locacoes) * 100
-        : 0;
 
     const dataGeracao = gradeData.data_geracao ?
         new Date(gradeData.data_geracao).toLocaleString('pt-BR') : 'N/A';
 
-    // ⭐️ ATUALIZAÇÃO: CALCULA E ATUALIZA KPI PRAZO COM BASE NO MODO SELECIONADO ⭐️
-    const prazoHtml = calculateKpiPrazo(gradeData, mesSelecionado, anoSelecionado, kpiRealizadoValue);
-    kpiPrazo.innerHTML = prazoHtml;
+
+    // --- 3. DETERMINA O ÍNDICE DE REFERÊNCIA (HOJE ou ÚLTIMO DIA DO MÊS) ---
+    // Este índice será usado para Realizado Acumulado e Status para os KPIs.
+    let referenceIndex = -1;
+    let isCurrentMonth = false;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const currentMonthNum = getMonthNumberByName(mesSelecionado);
+    const currentYear = parseInt(anoSelecionado);
+    const currentMonthRef = new Date(currentYear, currentMonthNum - 1, 1);
+    const todayMonthRef = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    if (currentMonthRef.getTime() === todayMonthRef.getTime()) {
+        isCurrentMonth = true;
+        // Mês atual: Mapeia HOJE para o índice mais próximo do Eixo X (data mais recente <= HOJE)
+        const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+        let foundIndex = -1;
+        for (let i = 0; i < currentDiasInventario.length; i++) {
+            if (currentDiasInventario[i] <= todayStr) {
+                 foundIndex = i;
+            }
+            if (currentDiasInventario[i] > todayStr) {
+                break;
+            }
+        }
+        referenceIndex = foundIndex;
+
+    } else {
+        // Mês passado ou futuro: A referência é o último dia com dados no Eixo X
+        referenceIndex = currentDiasInventario.length - 1;
+    }
+
+    // Fallback: Garante que o índice é válido
+    if (referenceIndex < 0) {
+        referenceIndex = 0;
+    }
+    if (referenceIndex >= currentRealizadoLocacoes.length) {
+         referenceIndex = currentRealizadoLocacoes.length > 0 ? currentRealizadoLocacoes.length - 1 : 0;
+    }
 
 
-    // 3. Atualiza KPIs
+    // --- 4. CÁLCULO DOS VALORES DE REFERÊNCIA ---
+
+    // Total Realizado ACUMULADO no dia de referência (Soma dos dias até o referenceIndex)
+    const totalRealizadoToday = currentRealizadoLocacoes.slice(0, referenceIndex + 1).reduce((sum, current) => sum + current, 0);
+
+    // Status (Realizado Acumulado - Plano Acumulado) no dia de referência
+    const todayStatusValue = currentStatusPlano[referenceIndex] !== undefined ? currentStatusPlano[referenceIndex] : 0;
+
+    // KPI Realizado (Percentual) - Baseado no valor acumulado até a referência
+    const kpiRealizadoValue = gradeData.total_locacoes > 0
+        ? (totalRealizadoToday / gradeData.total_locacoes) * 100
+        : 0;
+
+    const totalPendentes = gradeData.total_locacoes - totalRealizadoToday;
+
+    // 5. ATUALIZAÇÃO DOS KPIS GERAIS NA TELA
     kpiTotalLocacoes.textContent = gradeData.total_locacoes.toLocaleString('pt-BR');
     kpiRealizado.textContent = `${kpiRealizadoValue.toFixed(1)}%`;
-    // CORREÇÃO APLICADA: Mostra totalRealizado
-    kpiLocInc.textContent = totalRealizado.toLocaleString('pt-BR');
+    // KPI TOTAL REALIZADO (Contagem) usa o valor acumulado até o dia de referência (totalRealizadoToday)
+    kpiLocInc.textContent = totalRealizadoToday.toLocaleString('pt-BR');
     dataLastUpdate.textContent = `Última atualização: ${dataGeracao}`;
 
-    // 4. Atualiza Gráficos
-    drawRealizadoPendenteChart(totalRealizado, totalPendentes);
+
+    // --- 6. ATUALIZAÇÃO DO KPI PRAZO (SWITCH) ---
+
+    const totalLocacoesMes = gradeData.total_locacoes;
+    const selectedMode = document.querySelector('input[name="prazo_mode"]:checked');
+
+    if (kpiRealizadoValue >= 100) {
+        // Regra de Finalizado se o KPI geral for 100%
+        kpiPrazo.innerHTML = `FINALIZADO <i class="fas fa-check-circle text-success ml-1" style="font-size: 0.8em;"></i>`;
+    } else if (selectedMode) {
+
+        switch (selectedMode.id) {
+            case 'radioPrazoModeValue':
+                // MODO: Valor Acumulado do Status (CORRIGIDO: usa todayStatusValue)
+                const signValue = todayStatusValue >= 0 ? '+' : '';
+                const valueClass = todayStatusValue >= 0 ? 'text-success' : 'text-danger';
+
+                let suffixText = '';
+                if (todayStatusValue < 0) {
+                    suffixText = 'Locações atrasadas';
+                } else if (todayStatusValue > 0) {
+                    suffixText = 'Locações adiantadas';
+                } else {
+                    suffixText = 'Locações em dia';
+                }
+
+                kpiPrazo.innerHTML = `<span class="${valueClass}">${signValue}${Math.abs(todayStatusValue).toLocaleString('pt-BR')}</span> <span class="text-muted" style="font-size: 0.75em; font-weight: normal;">${suffixText}</span>`;
+                break;
+
+            case 'radioPrazoModeConditional':
+                // MODO: Status Condicional (CORRIGIDO: usa todayStatusValue)
+                if (todayStatusValue < 0) {
+                    kpiPrazo.innerHTML = 'ATRASADO <i class="fas fa-times-circle text-danger ml-1" style="font-size: 0.8em;"></i>';
+                } else if (todayStatusValue >= 0 && todayStatusValue <= 50) {
+                    kpiPrazo.innerHTML = 'EM DIA <i class="fas fa-arrow-up text-success ml-1" style="font-size: 0.8em;"></i>';
+                } else if (todayStatusValue > 50) {
+                    kpiPrazo.innerHTML = 'ADIANTADO <i class="fas fa-forward text-success ml-1" style="font-size: 0.8em;"></i>';
+                } else {
+                    kpiPrazo.innerHTML = 'N/A';
+                }
+                break;
+
+            case 'radioPrazoModePercent':
+                // MODO: Percentual do Total (CORRIGIDO: usa todayStatusValue)
+                if (totalLocacoesMes > 0) {
+                    const percent = (todayStatusValue / totalLocacoesMes) * 100;
+                    const isPositive = todayStatusValue >= 0;
+                    const arrowClass = isPositive ? 'fa-arrow-up text-success' : 'fa-arrow-down text-danger';
+                    kpiPrazo.innerHTML = `${percent.toFixed(1)}% <i class="fas ${arrowClass} ml-1" style="font-size: 0.8em;"></i>`;
+                } else {
+                    kpiPrazo.innerHTML = '0%';
+                }
+                break;
+
+            case 'radioPrazoModeDays':
+            default:
+                // MODO: Diferença em Dias (LÓGICA CORRIGIDA E MANTIDA)
+                let prazoDiff = 0;
+                let prazoText = 'N/A';
+                let arrowIcon = '';
+
+                // 1. Busca o último dia com Status Positivo
+                let lastStatusDateIndex = -1;
+                for (let i = currentStatusPlano.length - 1; i >= 0; i--) {
+                    if (currentStatusPlano[i] > 0) {
+                        lastStatusDateIndex = i;
+                        break;
+                    }
+                }
+
+                // 2. Cálculo da diferença baseado nos índices operacionais (dias úteis)
+                if (lastStatusDateIndex !== -1 && referenceIndex !== -1) {
+                    // Diferença de índices: quantos dias operacionais separam o último status positivo do dia de referência
+                    prazoDiff = lastStatusDateIndex - referenceIndex;
+                } else {
+                    prazoDiff = 0;
+                }
+
+                const isPositive = prazoDiff >= 0;
+                const sign = prazoDiff > 0 ? '+' : '';
+                const arrowClass = isPositive ? 'fa-arrow-up text-success' : 'fa-arrow-down text-danger';
+                arrowIcon = `<i class="fas ${arrowClass} ml-1" style="font-size: 0.8em;"></i>`;
+                prazoText = `${sign}${prazoDiff} dias`;
+
+                kpiPrazo.innerHTML = `${prazoText} ${arrowIcon}`;
+                break;
+        }
+    } else {
+        // Se nenhum modo estiver selecionado (inicialização), usa o modo padrão (Dias)
+        // Recalcula o modo Dias como fallback
+        let prazoDiff = 0;
+        let prazoText = 'N/A';
+        let arrowIcon = '';
+
+        let lastStatusDateIndex = -1;
+        for (let i = currentStatusPlano.length - 1; i >= 0; i--) {
+            if (currentStatusPlano[i] > 0) {
+                lastStatusDateIndex = i;
+                break;
+            }
+        }
+
+        if (lastStatusDateIndex !== -1 && referenceIndex !== -1) {
+            prazoDiff = lastStatusDateIndex - referenceIndex;
+        } else {
+            prazoDiff = 0;
+        }
+
+        const isPositive = prazoDiff >= 0;
+        const sign = prazoDiff > 0 ? '+' : '';
+        const arrowClass = isPositive ? 'fa-arrow-up text-success' : 'fa-arrow-down text-danger';
+        arrowIcon = `<i class="fas ${arrowClass} ml-1" style="font-size: 0.8em;"></i>`;
+        prazoText = `${sign}${prazoDiff} dias`;
+        kpiPrazo.innerHTML = `${prazoText} ${arrowIcon}`;
+    }
+
+
+    // 7. Atualiza Gráficos
+    drawRealizadoPendenteChart(totalRealizadoToday, totalPendentes);
     applyChartSettings();
 }
 
