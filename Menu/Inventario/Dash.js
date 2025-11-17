@@ -179,153 +179,6 @@ function setupPrazoSettingsDropdown() {
     }
 }
 
-/**
- * Calcula e formata o KPI Prazo com base na regra selecionada (Modo Selecionado).
- * @param {object} gradeData - O objeto de dados do GRADE.
- * @param {string} mesSelecionado - Nome completo do mês selecionado.
- * @param {string} anoSelecionado - Ano selecionado.
- * @param {number} kpiRealizadoValue - O percentual de realizado (para checagem de "FINALIZADO").
- * @returns {string} O HTML formatado para o kpiPrazo.
- */
-function calculateKpiPrazo(gradeData, mesSelecionado, anoSelecionado, kpiRealizadoValue) {
-    const totalLocacoesMes = gradeData.total_locacoes;
-    const currentDiasInventario = Array.isArray(gradeData.dias_inventario) ? gradeData.dias_inventario.map(String) : [];
-    const currentStatusPlano = Array.isArray(gradeData.status_plano) ? gradeData.status_plano.map(Number) : [];
-
-    // 1. Determina o modo selecionado
-    // Verifica qual radio está checado, ou usa 'radioPrazoModeDays' como padrão
-    const selectedMode = document.querySelector('input[name="prazo_mode"]:checked')?.id || 'radioPrazoModeDays';
-
-    // Checagem de Finalização (100% Realizado)
-    if (kpiRealizadoValue >= 100) {
-        return `FINALIZADO <i class="fas fa-check-circle text-success ml-1" style="font-size: 0.8em;"></i>`;
-    }
-
-    // --- Lógica para o dia atual (necessária para os 3 novos modos) ---
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const currentMonthNum = getMonthNumberByName(mesSelecionado);
-    const currentYear = parseInt(anoSelecionado);
-
-    const currentMonthRef = new Date(currentYear, currentMonthNum - 1, 1);
-    const todayMonthRef = new Date(today.getFullYear(), today.getMonth(), 1);
-
-    let todayStatusValue = null;
-    let todayIndex = -1;
-
-    // Apenas busca o Status do Dia Atual se o mês selecionado for o mês corrente
-    if (currentMonthRef.getTime() === todayMonthRef.getTime()) {
-        const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-        todayIndex = currentDiasInventario.indexOf(todayStr);
-
-        if (todayIndex !== -1 && currentStatusPlano.length > todayIndex) {
-            todayStatusValue = currentStatusPlano[todayIndex];
-        }
-    }
-
-    // Se o modo for um dos novos e o Status do Dia Atual não puder ser determinado (mês passado/futuro ou dia sem dado), retorna N/A
-    if (selectedMode !== 'radioPrazoModeDays' && todayStatusValue === null) {
-        return `N/A <i class="fas fa-info-circle text-warning ml-1" style="font-size: 0.8em;"></i>`;
-    }
-    // -------------------------------------------------------------------
-
-
-    switch (selectedMode) {
-        case 'radioPrazoModeValue':
-            // MODO: Valor Acumulado do Status (Realizado Acumulado)
-            const signValue = todayStatusValue >= 0 ? '+' : '';
-            const valueClass = todayStatusValue >= 0 ? 'text-success' : 'text-danger';
-
-            // NOVO: Adiciona o texto "Locações atrasadas" (se for negativo) ou "Locações adiantadas" (se for positivo)
-            let suffixText = '';
-            if (todayStatusValue < 0) {
-                suffixText = 'Locações atrasadas';
-            } else if (todayStatusValue > 0) {
-                suffixText = 'Loc adiantadas';
-            } else {
-                suffixText = 'Locações em dia';
-            }
-
-            return `<span class="${valueClass}">${signValue}${Math.abs(todayStatusValue).toLocaleString('pt-BR')}</span> <span class="text-muted" style="font-size: 0.75em; font-weight: normal;">${suffixText}</span>`;
-
-        case 'radioPrazoModeConditional':
-            // MODO: Status Condicional (ATRASADO/EM DIA/ADIANTADO)
-            if (todayStatusValue < 0) {
-                return 'ATRASADO <i class="fas fa-times-circle text-danger ml-1" style="font-size: 0.8em;"></i>';
-            } else if (todayStatusValue >= 0 && todayStatusValue <= 50) {
-                // Positivo (>=0) e até +50 locações
-                return 'EM DIA <i class="fas fa-arrow-up text-success ml-1" style="font-size: 0.8em;"></i>';
-            } else if (todayStatusValue > 50) {
-                // Mais positiva que 50 locações
-                return 'ADIANTADO <i class="fas fa-forward text-success ml-1" style="font-size: 0.8em;"></i>';
-            }
-            return 'N/A';
-
-        case 'radioPrazoModePercent':
-            // MODO: Percentual do Total
-            if (totalLocacoesMes > 0) {
-                const percent = Math.abs((todayStatusValue / totalLocacoesMes) * 100);
-                const isPositive = todayStatusValue >= 0;
-                const arrowClass = isPositive ? 'fa-arrow-up text-success' : 'fa-arrow-down text-danger';
-                return `${percent.toFixed(1)}% <i class="fas ${arrowClass} ml-1" style="font-size: 0.8em;"></i>`;
-            }
-            return '0%';
-
-        case 'radioPrazoModeDays':
-        default:
-            // MODO: Diferença em Dias (Padrão/Original)
-            let prazoDiff = 0;
-            let prazoText = 'N/A';
-            let arrowIcon = '';
-
-            // 1. Busca o último dia com Status Positivo (no mês selecionado)
-            let lastStatusDate = null;
-            for (let i = currentStatusPlano.length - 1; i >= 0; i--) {
-                if (currentStatusPlano[i] > 0) {
-                    const dateStr = currentDiasInventario[i];
-                    if (dateStr) {
-                        lastStatusDate = new Date(dateStr + 'T00:00:00');
-                        break;
-                    }
-                }
-            }
-
-            if (lastStatusDate) {
-                // 2. Determina a data de referência (Hoje ou Último Dia do Gráfico)
-                const todayForDiff = new Date();
-                todayForDiff.setHours(0, 0, 0, 0);
-
-                let referenceDate;
-
-                // Verifica se o mês selecionado é o mês atual
-                if (currentMonthRef.getTime() === todayMonthRef.getTime()) {
-                    referenceDate = todayForDiff;
-                } else {
-                    // Mês passado/futuro: Usa o último dia com dados do inventário/gráfico
-                    const lastDataDateStr = currentDiasInventario[currentDiasInventario.length - 1];
-                    referenceDate = new Date(lastDataDateStr + 'T00:00:00');
-                }
-
-                // Calcula a diferença de dias
-                const MS_PER_DAY = 1000 * 60 * 60 * 24;
-                const diffTime = lastStatusDate.getTime() - referenceDate.getTime();
-
-                prazoDiff = Math.round(diffTime / MS_PER_DAY);
-                const isPositive = prazoDiff >= 0;
-                const sign = prazoDiff > 0 ? '+' : '';
-                const arrowClass = isPositive ? 'fa-arrow-up text-success' : 'fa-arrow-down text-danger';
-                arrowIcon = `<i class="fas ${arrowClass} ml-1" style="font-size: 0.8em;"></i>`;
-                prazoText = `${sign}${prazoDiff} dias`;
-            } else {
-                arrowIcon = '';
-                prazoText = 'N/A';
-            }
-
-            return `${prazoText} ${arrowIcon}`;
-    }
-}
-
 
 // =======================================================
 // LÓGICA DE CARREGAMENTO DE DATOS
@@ -537,7 +390,7 @@ async function updateDashboard() {
     loadingDashMessage.style.display = 'none';
 
     currentRealizadoLocacoes = gradeData.realizado_locacoes ? gradeData.realizado_locacoes.map(Number) : [];
-    currentPlanoLocacoes = gradeData.plano_locacoes ? currentPlanoLocacoes.map(Number) : []; // Corrigido (se necessário)
+    currentPlanoLocacoes = gradeData.plano_locacoes ? gradeData.plano_locacoes.map(Number) : [];
     currentStatusPlano = gradeData.status_plano ?
         gradeData.status_plano.map(Number) : [];
     currentDiasInventario = Array.isArray(gradeData.dias_inventario)
@@ -670,12 +523,12 @@ async function updateDashboard() {
 
             case 'radioPrazoModeDays':
             default:
-                // MODO: Diferença em Dias (LÓGICA CORRIGIDA E MANTIDA)
+                // MODO: Diferença em Dias (A LÓGICA JÁ UTILIZA APENAS OS DIAS OPERACIONAIS)
                 let prazoDiff = 0;
                 let prazoText = 'N/A';
                 let arrowIcon = '';
 
-                // 1. Busca o último dia com Status Positivo
+                // 1. Busca o índice do último dia com Status Positivo
                 let lastStatusDateIndex = -1;
                 for (let i = currentStatusPlano.length - 1; i >= 0; i--) {
                     if (currentStatusPlano[i] > 0) {
@@ -686,7 +539,8 @@ async function updateDashboard() {
 
                 // 2. Cálculo da diferença baseado nos índices operacionais (dias úteis)
                 if (lastStatusDateIndex !== -1 && referenceIndex !== -1) {
-                    // Diferença de índices: quantos dias operacionais separam o último status positivo do dia de referência
+                    // A diferença de índices é a contagem de DIAS OPERACIONAIS/COLUNAS DO GRÁFICO
+                    // entre o último status positivo e o dia de referência (hoje ou último dia do mês).
                     prazoDiff = lastStatusDateIndex - referenceIndex;
                 } else {
                     prazoDiff = 0;
@@ -1082,6 +936,10 @@ function drawContagemDiariaChart(labels, contagens, planoLocacoes, statusPlano, 
                     display: false,
                 },
                 tooltip: {
+                    // Adicionei yAlign para garantir que o tooltip seja renderizado na posição ideal (pode ser 'top' ou 'bottom')
+                    yAlign: 'bottom', // Define o alinhamento vertical padrão
+                    // ⭐️ AJUSTE AQUI: Aumentado para afastar o tooltip da linha/ponto ⭐️
+                    caretPadding: 15,
                     callbacks: {
                         label:
                             function(context) {
