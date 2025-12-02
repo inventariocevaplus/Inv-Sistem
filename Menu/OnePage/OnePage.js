@@ -1,20 +1,22 @@
 // *****************************************************************
-// CÓDIGO OnePage.js COMPLETO E FINALIZADO
-// CORREÇÃO FINAL: Apenas "NIL Picking" ativo. "SNAPSHOT", "EPM" e "SUSPENSE" são placeholders.
-// RECURSOS ATIVOS: Targets Fixos, NIL Picking (via ID), Formatação Condicional (Cores).
+// CÓDIGO OnePage.js COMPLETO E FINALIZADO (VERSÃO INTEGRAL)
+// ✅ CORREÇÃO: Unificação Automática de IDs (Lê Contratos, Ciclico e RN).
+// ✅ DADOS: Todos os Targets e KPIs originais mantidos.
+// ✅ AUTOMÁTICO: Resolve o problema de 1 Nome = Vários IDs sem mexer no código.
 // *****************************************************************
 
 const SUPABASE_URL = 'https://kidpprfegedkjifbwkju.supabase.co';
-
 // 🔑 CHAVE DE API MANTIDA: Versão funcional.
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtpZHBwcmZlZ2Vka2ppZmJ3a2p1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA1OTE5NjQsImV4cCI6MjA3NjE2Nzk2NH0.OkpgPHJtFIKyicX_qeOSMVHMk58Bppf0SzyZAPgWzLw';
 
-const TABELA_CONTRATOS = 'contratos';
-const TABELA_RN_CONTRATOS = 'rn_contratos';
-const TABELA_CONTRATOS_MASTER = 'ciclico_contratos';
+// Definição das Tabelas
+const TABELA_CONTRATOS = 'contratos';               // Geralmente IDs do Inventory
+const TABELA_RN_CONTRATOS = 'rn_contratos';         // IDs do RN (Ex: Fareva ID 16)
+const TABELA_CONTRATOS_MASTER = 'ciclico_contratos'; // IDs do Cíclico (Ex: Logitech ID 30)
+
 const TABELA_DADOS_CICLICO = 'ciclico_grade_dados';
 const TABELA_DADOS_INVENTORY = 'inventory_details'; // Contém stock_value, contract_id, reference_month
-const TABELA_DADOS_RN = 'rn_details'; // Contém acuracia_mes (e no futuro suspense_value)
+const TABELA_DADOS_RN = 'rn_details';               // Contém acuracia_mes
 const TABELA_MAPPING_CONTRATOS = 'mapping_contratos'; // Colunas: contrato_nome, posicoes_wh_fisico
 
 const sessionDataJSON = localStorage.getItem('user_session_data');
@@ -39,11 +41,19 @@ const supabaseClient = createClient(SUPABASE_URL, accessToken);
 let availableDatesMap = {};
 let allContractNames = [];
 let selectedMonths = [];
-// Mapeamento global de ID do Contrato para Nome do Contrato
+
+// =================================================================
+// MAPAS GLOBAIS (AJUSTADOS PARA MULTIPLOS IDs)
+// =================================================================
+
+// Mapeamento ID -> Nome (Ex: {36: "LOGITECH", 30: "LOGITECH", 18: "LOGITECH"})
 let GLOBAL_CONTRACT_ID_TO_NAME = {};
-// NOVO MAPA PARA POSIÇÕES FÍSICAS (Chave: Nome do Contrato, Valor: Total de Posições)
+// Mapeamento Nome -> Lista de IDs (Ex: {"LOGITECH": [36, 30, 18]})
+let GLOBAL_CONTRACT_NAME_TO_IDS = {};
+// Mapa de Posições Físicas
 let GLOBAL_POSICOES_MAP = {};
-// 🆕 BLOCO DE DADOS FIXOS PARA TARGETS DOS CONTRATOS (COMPLETO)
+
+// 🆕 BLOCO DE DADOS FIXOS PARA TARGETS DOS CONTRATOS (COMPLETO E ORIGINAL)
 const GLOBAL_TARGETS_MAP = {
     "DEVELON": {
         "Valor de Estoque": '-',
@@ -62,7 +72,6 @@ const GLOBAL_TARGETS_MAP = {
         "Meta de Posições Diaria": '-',
         "Dias Disponíveis P/ Contar": '-',
     },
-    // Novos Contratos Adicionados:
     "JCB": {
         "Valor de Estoque": '-',
         "Total de Posições": '-',
@@ -284,8 +293,11 @@ const GLOBAL_TARGETS_MAP = {
         "Meta de Posições Diaria": '-',
         "Dias Disponíveis P/ Contar": '-',
     },
+    "OBOTICARIO": {
+         "Valor de Estoque": '-', "Total de Posições": '-', "Assesment de Inventario": '-',
+         "NET": '-', "GROSS": '-', "ILA": '-', "NIL Picking": '-', "SNAPSHOT": '-', "EPM": '-', "SUSPENSE": '-', "Cíclico Projetado": '-', "Cíclico Realizado": '-', "Cíclico Realizado -": '-', "Meta de Posições Diaria": '-', "Dias Disponíveis P/ Contar": '-',
+    }
 };
-
 
 // 🌟 KPI_MASTER_LIST REORDENADA E COMPLETA
 const KPI_MASTER_LIST = [
@@ -299,9 +311,9 @@ const KPI_MASTER_LIST = [
     {
         nome: "Assesment de Inventario",
         un: "%",
-        data_column: "assesment_inventario", // COLUNA CORRETA
-        source_table: TABELA_DADOS_INVENTORY, // TABELA CORRETA
-        type: "direct", // ATIVADO
+        data_column: "assesment_inventario",
+        source_table: TABELA_DADOS_INVENTORY,
+        type: "direct",
         target_goal: "higher_is_better"
     },
 
@@ -317,7 +329,7 @@ const KPI_MASTER_LIST = [
         data_column: "suspense_value",
         source_table: TABELA_DADOS_INVENTORY,
         type: "direct",
-        target_goal: "lower_is_better" // Melhor para custo/perda
+        target_goal: "lower_is_better"
     },
 
     // 7. ATIVO: NIL Picking (Busca da TABELA_DADOS_RN: acuracia_mes)
@@ -327,9 +339,9 @@ const KPI_MASTER_LIST = [
     {
         nome: "SNAPSHOT",
         un: "%",
-        data_column: "snapshot_percent", // COLUNA CORRETA
-        source_table: TABELA_DADOS_INVENTORY, // TABELA CORRETA
-        type: "direct", // ATIVADO
+        data_column: "snapshot_percent",
+        source_table: TABELA_DADOS_INVENTORY,
+        type: "direct",
         target_goal: "higher_is_better"
     },
 
@@ -337,9 +349,9 @@ const KPI_MASTER_LIST = [
     {
         nome: "EPM",
         un: "Quant.",
-        data_column: "epm_value", // COLUNA CORRETA
-        source_table: TABELA_DADOS_INVENTORY, // TABELA CORRETA
-        type: "direct", // ATIVADO
+        data_column: "epm_value",
+        source_table: TABELA_DADOS_INVENTORY,
+        type: "direct",
         target_goal: "higher_is_better"
     },
 
@@ -364,7 +376,6 @@ const KPI_MASTER_LIST = [
 const monthNames = [null, 'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
                     'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
-
 document.addEventListener('DOMContentLoaded', () => {
     const userNameSpan = document.getElementById('userName');
     const selectContrato = document.getElementById('selectContrato');
@@ -385,15 +396,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchFilterMasterData() {
         const data = {};
+        // 🆕 LISTA DE TABELAS ATUALIZADA: Inclui todas as 3 tabelas de cadastro
         const contractTables = [
             { name: TABELA_CONTRATOS, key: 'contratos' },
             { name: TABELA_CONTRATOS_MASTER, key: 'ciclicoContratos' },
             { name: TABELA_RN_CONTRATOS, key: 'rnContratos' }
         ];
-
         let allContracts = [];
 
-        // 1. Busca todos os contratos (ID e Nome) para o mapeamento
+        // 1. Busca todos os contratos (ID e Nome) de TODAS as tabelas
         for (const table of contractTables) {
             try {
                 const { data: contratos, error } = await supabaseClient
@@ -408,20 +419,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         data.contratosMaster = allContracts;
-
         const tablesToFetch = [
             { name: TABELA_DADOS_CICLICO, select: 'contract_name, mes_referencia', key: 'ciclicoDados' },
             { name: TABELA_DADOS_INVENTORY, select: 'contract_id, reference_month', key: 'inventoryDados' },
             { name: TABELA_DADOS_RN, select: 'contract_id, reference_month', key: 'rnDados' },
         ];
-
         // 2. Busca datas disponíveis para os filtros de Ano/Mês
         for (const table of tablesToFetch) {
             try {
                 const { data: tableData, error } = await supabaseClient
                     .from(table.name)
                     .select(table.select);
-
                 if (error) throw error;
                 data[table.key] = tableData || [];
             } catch (e) {
@@ -432,11 +440,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 3. Busca dados da tabela de Mapeamento para Total de Posições
         try {
-            // Assumindo que a coluna de posições tem aspas duplas, como no prompt anterior
             const { data: mappingData, error } = await supabaseClient
                 .from(TABELA_MAPPING_CONTRATOS)
                 .select('contratos, "Posições WH físico"');
-
             if (error) throw error;
             data.mappingContratos = mappingData || [];
         } catch (e) {
@@ -450,53 +456,70 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadFilters() {
         availableDatesMap = {};
-        GLOBAL_POSICOES_MAP = {}; // Resetar o mapa
+        GLOBAL_POSICOES_MAP = {};
+        GLOBAL_CONTRACT_ID_TO_NAME = {};
+        GLOBAL_CONTRACT_NAME_TO_IDS = {}; // 🆕 Resetar o mapa (Array de IDs)
+
         const data = await fetchFilterMasterData();
         const contractNameSet = new Set();
 
-        GLOBAL_CONTRACT_ID_TO_NAME = {};
-
-        // 4. Constrói o Mapeamento ID -> Nome
+        // 4. Constrói o Mapeamento UNIFICADO ID <-> Nome
+        // ESSA É A LÓGICA QUE PERMITE NOVOS CONTRATOS AUTOMATICAMENTE
         data.contratosMaster.forEach(c => {
              if (c.id && c.nome_contrato) {
-                GLOBAL_CONTRACT_ID_TO_NAME[c.id] = c.nome_contrato;
-                contractNameSet.add(c.nome_contrato);
+                // Normaliza o nome (Upper Case e sem espaços) para evitar duplicatas por erro de digitação
+                const cleanName = c.nome_contrato.trim().toUpperCase();
+
+                // Mapeamento 1:1 (ID -> Nome Normalizado)
+                GLOBAL_CONTRACT_ID_TO_NAME[c.id] = cleanName;
+
+                // Mapeamento 1:N (Nome -> ARRAY de IDs)
+                if (!GLOBAL_CONTRACT_NAME_TO_IDS[cleanName]) {
+                    GLOBAL_CONTRACT_NAME_TO_IDS[cleanName] = [];
+                }
+                // Adiciona o ID ao array se ainda não existir
+                if (!GLOBAL_CONTRACT_NAME_TO_IDS[cleanName].includes(c.id)) {
+                    GLOBAL_CONTRACT_NAME_TO_IDS[cleanName].push(c.id);
+                }
+
+                contractNameSet.add(cleanName);
              }
         });
 
+        // 🆕 BLOCO DE DEBUG PARA CHECAR M.A.P.E.A.M.E.N.T.O
+        console.log("--- DEBUG Mapeamento de Contratos ---");
+        console.log("IDs do LOGITECH (Universal):", GLOBAL_CONTRACT_NAME_TO_IDS['LOGITECH']);
+        console.log("IDs do FAREVA (Universal):", GLOBAL_CONTRACT_NAME_TO_IDS['FAREVA']);
+        console.log("--- FIM DEBUG Mapeamento ---");
+
         // 5. Preenche o Mapa de Posições Físicas
         data.mappingContratos.forEach(item => {
-            const contractName = item.contratos;
-            const posicoes = item["Posições WH físico"];
-            if (contractName && posicoes !== undefined) {
-                GLOBAL_POSICOES_MAP[contractName] = posicoes;
-                contractNameSet.add(contractName); // Garante que contratos da tabela de mapping apareçam no filtro
+            if (item.contratos && item["Posições WH físico"] !== undefined) {
+                const cleanName = item.contratos.trim().toUpperCase();
+                GLOBAL_POSICOES_MAP[cleanName] = item["Posições WH físico"];
+                contractNameSet.add(cleanName);
             }
         });
 
         // 6. 🆕 Garante que todos os contratos com targets apareçam no filtro
         Object.keys(GLOBAL_TARGETS_MAP).forEach(contractName => {
-            contractNameSet.add(contractName);
+            contractNameSet.add(contractName.trim().toUpperCase());
         });
-
 
         // 7. Popula datas disponíveis e lista de nomes de contratos (restante)
         data.ciclicoDados.forEach(item => {
             if (item.contract_name) {
-                contractNameSet.add(item.contract_name);
+                contractNameSet.add(item.contract_name.trim().toUpperCase());
             }
             extractDateParts(item.mes_referencia);
         });
-
         [...data.inventoryDados, ...data.rnDados].forEach(item => {
             const contractId = item.contract_id;
-
-            if (contractId && GLOBAL_CONTRACT_ID_TO_NAME[contractId]) {
-                contractNameSet.add(GLOBAL_CONTRACT_ID_TO_NAME[contractId]);
+            const contractName = GLOBAL_CONTRACT_ID_TO_NAME[contractId];
+            if (contractName) {
+                contractNameSet.add(contractName);
             }
-
-            const dateSource = item.reference_month;
-            extractDateParts(dateSource);
+            extractDateParts(item.reference_month);
         });
 
         allContractNames = Array.from(contractNameSet).sort();
@@ -514,7 +537,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function formatKpiValue(value, unit) {
         if (value === null || value === undefined) return '-';
-
         let numValue = parseFloat(value);
         if (isNaN(numValue)) return String(value);
 
@@ -539,7 +561,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let numValue = parseFloat(value);
         if (isNaN(numValue)) return String(value); // Retorna a string se não for número
 
-        // A formatação de Target (R$ e %) segue a mesma lógica dos dados
         switch (unit) {
             case 'R$':
                 return 'R$ ' + numValue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -555,12 +576,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // 🆕 NOVA FUNÇÃO: Aplica a classe de cor na célula com base no Target
     function applyKpiStyle(tdElement, kpiName, contract, rawDataValue) {
         if (rawDataValue === null || rawDataValue === undefined || rawDataValue === '-') return;
-
         const kpiDefinition = KPI_MASTER_LIST.find(kpi => kpi.nome === kpiName);
         if (!kpiDefinition || kpiDefinition.target_goal === "N/A") return;
 
-        // Obtém o Target
-        const rawTargetValue = GLOBAL_TARGETS_MAP[contract] ? GLOBAL_TARGETS_MAP[contract][kpiName] : null;
+        // Obtém o Target (Normalizando o nome)
+        const cleanContract = contract.trim().toUpperCase();
+        let rawTargetValue = null;
+
+        // Tenta buscar o target pelo nome exato ou normalizado
+        if (GLOBAL_TARGETS_MAP[contract]) {
+            rawTargetValue = GLOBAL_TARGETS_MAP[contract][kpiName];
+        } else if (GLOBAL_TARGETS_MAP[cleanContract]) {
+            rawTargetValue = GLOBAL_TARGETS_MAP[cleanContract][kpiName];
+        } else {
+             // Tenta fallback insensitive busca nas chaves do mapa
+             const key = Object.keys(GLOBAL_TARGETS_MAP).find(k => k.toUpperCase() === cleanContract);
+             if (key) rawTargetValue = GLOBAL_TARGETS_MAP[key][kpiName];
+        }
 
         if (rawTargetValue === null || rawTargetValue === '-' || rawTargetValue === 'N/A') return;
 
@@ -570,19 +602,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isNaN(targetValue) || isNaN(dataValue)) return;
 
         let isTargetAchieved = false;
-
         if (kpiDefinition.target_goal === 'higher_is_better') {
-            // Meta é melhor ser MAIOR (Ex: Acuidade 99.50)
             isTargetAchieved = dataValue >= targetValue;
         } else if (kpiDefinition.target_goal === 'lower_is_better') {
-            // Meta é melhor ser MENOR (Ex: Suspense R$ 0)
             isTargetAchieved = dataValue <= targetValue;
         }
 
         if (isTargetAchieved) {
-            tdElement.classList.add('kpi-above-target'); // Cor de sucesso (Verde)
+            tdElement.classList.add('kpi-above-target');
         } else {
-            tdElement.classList.add('kpi-below-target'); // Cor de alerta (Vermelho/Amarelo)
+            tdElement.classList.add('kpi-below-target');
         }
     }
 
@@ -598,21 +627,17 @@ document.addEventListener('DOMContentLoaded', () => {
              kpi.type !== 'placeholder' &&
              kpi.type !== 'static_map'
         );
-
         // Filtra apenas KPIs de tipo 'direct' para a query SELECT
         let dataCols = kpisForTable
             .filter(kpi => kpi.type === 'direct')
             .map(kpi => kpi.data_column);
-
         // Filtra as colunas de origem para os KPIs calculados
         const calculatedSourceCols = kpisForTable
             .filter(kpi => kpi.type === 'calculated' && kpi.source_column)
             .map(kpi => kpi.source_column);
-
         let additionalCols = [];
         let identifierCol = '';
         let dateCol = '';
-
         if (tableName === TABELA_DADOS_CICLICO) {
             identifierCol = 'contract_name';
             dateCol = 'mes_referencia';
@@ -624,7 +649,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (tableName === TABELA_DADOS_RN) {
              identifierCol = 'contract_id';
              dateCol = 'reference_month';
-             // *** IMPORTANTE: Apenas 'acuracia_mes' é buscada na rn_details por enquanto. ***
              dataCols = ['acuracia_mes'];
         } else {
             return '';
@@ -637,21 +661,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     async function fetchKpiData(contracts, year, months) {
-        console.log("-----------------------------------------");
-        console.log("FILTROS RECEBIDOS PARA BUSCA DE KPI:");
-        console.log("Contratos Selecionados (Nomes):", contracts);
-        console.log("Ano Selecionado:", year);
-        console.log("Meses Selecionados (Números):", months);
-        console.log("-----------------------------------------");
+        // Normaliza para garantir busca correta
+        const cleanContracts = contracts.map(c => c.trim().toUpperCase());
+
+        // 🆕 PASSO 1: OBTÉM TODOS OS IDs DOS CONTRATOS SELECIONADOS A PARTIR DOS NOMES (Usando flatMap)
+        const contractIdsToUse = cleanContracts
+            .flatMap(name => GLOBAL_CONTRACT_NAME_TO_IDS[name] || [])
+            .filter((value, index, self) => self.indexOf(value) === index); // IDs únicos
+
+        if (contractIdsToUse.length === 0 && contracts.length > 0) {
+            console.warn("[FETCH] Nenhum ID válido encontrado para os contratos selecionados.");
+            // Não retornamos vazio aqui para permitir que a busca do Cíclico (que usa Nome) ainda funcione
+        }
 
         // Geração de DOIS formatos de data
-        const formattedDates_InventoryRN = months.map(m =>
-            `${year}-${String(m).padStart(2, '0')}-01`
-        );
-        const formattedDates_Ciclico = months.map(m =>
-            `${year}-${String(m).padStart(2, '0')}`
-        );
-
+        const formattedDates_InventoryRN = months.map(m => `${year}-${String(m).padStart(2, '0')}-01`);
+        const formattedDates_Ciclico = months.map(m => `${year}-${String(m).padStart(2, '0')}`);
 
         const tablesToFetch = [
             TABELA_DADOS_CICLICO,
@@ -667,9 +692,14 @@ document.addEventListener('DOMContentLoaded', () => {
             let datesToUse = [];
 
             if (tableName === TABELA_DADOS_CICLICO) {
+                // Filtra por NOME do Contrato (passamos os originais)
                 query = query.in('contract_name', contracts);
                 datesToUse = formattedDates_Ciclico;
             } else {
+                // Filtra por ID do Contrato (TABELA_DADOS_INVENTORY e TABELA_DADOS_RN)
+                // O array contractIdsToUse contém IDs de TODAS as tabelas de contratos mapeadas
+                if (contractIdsToUse.length === 0) return Promise.resolve(null);
+                query = query.in('contract_id', contractIdsToUse);
                 datesToUse = formattedDates_InventoryRN;
             }
 
@@ -691,38 +721,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const results = await Promise.all(fetchPromises);
 
-        const consolidatedData = consolidateResults(results.filter(r => r !== null), contracts);
-
-        console.log("-----------------------------------------");
-        console.log(`DADOS CONSOLIDADOS (Busca: ${contracts.length} Contratos | Ano: ${year} | Meses: ${months.join(',')})`);
-        console.log(consolidatedData);
-        console.log("-----------------------------------------");
+        // Passamos os contratos limpos para garantir comparação correta
+        const consolidatedData = consolidateResults(results.filter(r => r !== null), cleanContracts);
 
         populateDataGrid(consolidatedData, year);
     }
 
     function consolidateResults(results, contractsToFilter) {
         const unifiedMap = new Map();
-
         results.forEach(result => {
             result.data.forEach(item => {
-                let contractName = item.contract_name;
+                let contractName = null;
                 let date = item.mes_referencia || item.reference_month;
 
-                // Trata as tabelas que usam ID (Inventory e RN)
-                if (item.contract_id) {
-                    const contractId = item.contract_id;
-                    contractName = GLOBAL_CONTRACT_ID_TO_NAME[contractId];
+                // 🆕 LÓGICA DE RESOLUÇÃO DE NOME
+                if (item.contract_name) {
+                     contractName = item.contract_name.trim().toUpperCase();
+                } else if (item.contract_id) {
+                    // Converte ID -> Nome Normalizado
+                    contractName = GLOBAL_CONTRACT_ID_TO_NAME[item.contract_id];
+                }
 
-                    if (!contractName || !contractsToFilter.includes(contractName)) {
-                        return;
-                    }
-                } else if (item.contract_name && !contractsToFilter.includes(item.contract_name)) {
-                    // Trata a tabela Cíclico
+                // Se o nome resolvido não estiver na lista de filtro, ignora
+                if (!contractName || !contractsToFilter.includes(contractName)) {
                     return;
                 }
 
-                if (contractName && date) {
+                if (date) {
                     const monthIdentifier = date.substring(0, 7);
                     const key = `${contractName}_${monthIdentifier}`;
 
@@ -769,10 +794,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const contractData = {};
-
         // 1. Organiza e CALCULA os dados
         data.forEach(item => {
-            const contract = item.contract_name;
+            const contract = item.contract_name; // Já normalizado UPPERCASE
             const rawDate = item.mes_referencia || item.reference_month;
             const date = rawDate ? rawDate.substring(0, 7) : null;
 
@@ -788,17 +812,16 @@ document.addEventListener('DOMContentLoaded', () => {
             KPI_MASTER_LIST.forEach(kpi => {
                 const kpiColumn = kpi.data_column;
 
-                // IGNORA KPIs de placeholder. Eles só existem na renderização estática.
+                // IGNORA KPIs de placeholder.
                 if (kpi.type === 'placeholder') return;
 
                 // CÁLCULO PARA DADOS ESTÁTICOS DE MAPA (Total de Posições)
                 if (kpi.type === 'static_map') {
                     const posicoesValue = GLOBAL_POSICOES_MAP[contract];
                     if (posicoesValue !== undefined) {
-                         // Repete o valor para todos os meses do contrato
                         contractData[contract][month][kpiColumn] = posicoesValue;
                     }
-                    return; // Já processado, vai para o próximo KPI
+                    return;
                 }
 
                 // LÓGICA DE CÁLCULO PARA KPI's DO CÍCLICO
@@ -809,33 +832,28 @@ document.addEventListener('DOMContentLoaded', () => {
                     const planoLocacoes = item.plano_locacoes;
 
                     let realizadoAcumulado = 0;
-                    for (let i = realizadoAcumuladoArray.length - 1; i >= 0; i--) {
-                        const currentValue = parseFloat(realizadoAcumuladoArray[i]);
-                        if (!isNaN(currentValue) && currentValue > 0) {
-                            realizadoAcumulado = currentValue;
-                            break;
+                    if (Array.isArray(realizadoAcumuladoArray)) {
+                        for (let i = realizadoAcumuladoArray.length - 1; i >= 0; i--) {
+                            const currentValue = parseFloat(realizadoAcumuladoArray[i]);
+                            if (!isNaN(currentValue) && currentValue > 0) {
+                                realizadoAcumulado = currentValue;
+                                break;
+                            }
                         }
                     }
 
                     if (kpi.data_column === "total_locacoes") {
-                        // 1. Cíclico Projetado (Dado direto)
                         contractData[contract][month][kpiColumn] = totalLocacoes;
 
                     } else if (kpi.calculation_type === "SUM_REALIZADO") {
-                        // 2. Cíclico Realizado (Último valor acumulado não-zero)
                         contractData[contract][month][kpiColumn] = realizadoAcumulado;
-
                     } else if (kpi.calculation_type === "PERCENT_REALIZADO") {
-                        // 3. Cíclico Realizado - (%)
-
                         let calculatedValue = 0;
                         if (totalLocacoes > 0) {
                             calculatedValue = (realizadoAcumulado / totalLocacoes) * 100;
                         }
                         contractData[contract][month][kpiColumn] = calculatedValue;
-
                     } else if (kpi.calculation_type === "FIRST_PLAN_VALUE") {
-                        // Meta de Posições Diaria (Primeiro valor de plano_locacoes)
                         let metaDiaria = 0;
                         if (planoLocacoes && Array.isArray(planoLocacoes) && planoLocacoes.length > 0) {
                             const firstValueStr = String(planoLocacoes[0]);
@@ -847,10 +865,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
 
                         contractData[contract][month][kpiColumn] = metaDiaria;
-
-
                     } else if (kpi.type === 'direct') {
-                         // Lógica para colunas de dados diretas (ex: dias_uteis_ciclo)
                         const dataValue = item[kpiColumn];
                         if (dataValue !== null && dataValue !== undefined) {
                             contractData[contract][month][kpiColumn] = dataValue;
@@ -869,57 +884,52 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 2. Popula a grade
         const rows = document.getElementById('tableBody').querySelectorAll('tr');
-
         rows.forEach(row => {
-            const contract = row.dataset.contract;
-
-            if (contract) {
+            const rawContractName = row.dataset.contract; // Nome original (display)
+            if (rawContractName) {
+                const contract = rawContractName.trim().toUpperCase(); // Nome chave (key)
 
                 const tdTarget = row.querySelector('.data-target');
                 if (tdTarget) {
-                    // 🆕 Buscando e formatando o Target do mapa fixo
                     const kpiName = row.querySelector('td:nth-child(2)').textContent;
                     const unit = row.querySelector('td:nth-child(3)').textContent;
 
-                    const targetValue = GLOBAL_TARGETS_MAP[contract] ? GLOBAL_TARGETS_MAP[contract][kpiName] : '-';
+                    // Busca Target de forma segura
+                    let targetValue = '-';
+                    if (GLOBAL_TARGETS_MAP[rawContractName]) {
+                        targetValue = GLOBAL_TARGETS_MAP[rawContractName][kpiName];
+                    } else if (GLOBAL_TARGETS_MAP[contract]) {
+                        targetValue = GLOBAL_TARGETS_MAP[contract][kpiName];
+                    }
+
                     tdTarget.textContent = formatTargetValue(targetValue, unit);
                 }
 
                 const tdDataCells = row.querySelectorAll('td[data-type="data"]');
                 tdDataCells.forEach(td => {
-                    // Limpa classes de estilo antes de aplicar uma nova
                     td.classList.remove('kpi-above-target', 'kpi-below-target');
 
                     const month = parseInt(td.dataset.month, 10);
                     const kpiColumn = td.dataset.kpi;
-
                     const unit = kpiUnitMap.get(kpiColumn);
-
                     const kpiDefinition = KPI_MASTER_LIST.find(k => k.data_column === kpiColumn);
                     const kpiName = kpiNameMap.get(kpiColumn);
 
-
-                    // Apenas KPIs que AINDA são placeholders são ignorados
                     if (kpiDefinition && kpiDefinition.type === 'placeholder') {
                         td.textContent = '-';
                         return;
                     }
 
-                    // TRATAMENTO ESPECIAL PARA DADOS ESTÁTICOS
                     if (kpiDefinition && kpiDefinition.type === 'static_map') {
                         const staticValue = GLOBAL_POSICOES_MAP[contract];
                         td.textContent = formatKpiValue(staticValue, unit);
                         return;
                     }
 
-
                     if (contractData[contract] && contractData[contract][month] && contractData[contract][month][kpiColumn] !== undefined) {
                         const dataValue = contractData[contract][month][kpiColumn];
                         td.textContent = formatKpiValue(dataValue, unit);
-
-                        // 🆕 APLICAÇÃO DA COR
                         applyKpiStyle(td, kpiName, contract, dataValue);
-
                     } else {
                         td.textContent = '-';
                     }
@@ -937,28 +947,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedYear = selectAno.value;
         const currentSelectedMonths = selectedMonths;
 
-        // NOVO: Verifica se o valor é o placeholder inicial. Se for, limpa a tela e sai.
         if (selectedContract === "!placeholder") {
              updateTableHeader(currentSelectedMonths);
-             renderStaticKpiRows([], currentSelectedMonths); // Renderiza a grade vazia
-             populateDataGrid([], selectedYear); // Limpa os dados
-             return; // Interrompe o processo sem chamar fetchKpiData
+             renderStaticKpiRows([], currentSelectedMonths);
+             populateDataGrid([], selectedYear);
+             return;
         }
 
-
-        // Se o valor for "" (o que significa "Todos os Contratos"), usamos todos os nomes.
-        // Caso contrário, usamos o contrato selecionado.
         const contractsToDisplay = selectedContract ? [selectedContract] : allContractNames;
 
-        // Renderiza as linhas estáticas antes de buscar os dados
         updateTableHeader(currentSelectedMonths);
         renderStaticKpiRows(contractsToDisplay, currentSelectedMonths);
 
-        // A busca só ocorrerá se o Ano E os Meses estiverem selecionados.
         if (selectedYear && currentSelectedMonths.length > 0 && contractsToDisplay.length > 0) {
             fetchKpiData(contractsToDisplay, selectedYear, currentSelectedMonths);
         } else {
-            // Se faltar filtro, limpa os dados
             populateDataGrid([], selectedYear);
         }
     }
@@ -969,7 +972,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // =================================================================
 
     loadFilters();
-
     selectAno.addEventListener('change', updateMonthFilterOptions);
     selectContrato.addEventListener('change', filterDataAndRefreshGrid);
 
@@ -977,7 +979,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function extractDateParts(dateString) {
         if (!dateString) return;
-        // Pega apenas AAAA e MM, ignorando o dia (se houver)
         const parts = dateString.substring(0, 7).split('-');
         if (parts.length >= 2) {
             const year = parts[0];
@@ -988,16 +989,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function populateContractSelect(names) {
-        // 1. Placeholder que vem por padrão, com valor único.
         selectContrato.innerHTML = '<option value="!placeholder" selected disabled>Selecione os Contratos</option>';
-
-        // 2. Opção "Todos os Contratos" que usa o valor vazio ("") para buscar todos.
         const allOption = document.createElement('option');
         allOption.value = "";
         allOption.textContent = "Todos os Contratos";
         selectContrato.appendChild(allOption);
 
-        // 3. Adiciona os contratos reais
         names.forEach(name => {
             const option = document.createElement('option');
             option.value = name;
@@ -1080,6 +1077,7 @@ document.addEventListener('DOMContentLoaded', () => {
             mesContainer.classList.remove('open');
         }
     });
+
     function renderStaticKpiRows(contractNames, months) {
         const tableBody = document.getElementById('tableBody');
         const messageArea = document.getElementById('infoMessage');
@@ -1091,9 +1089,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         messageArea.style.display = 'none';
         contractNames.forEach(contractName => {
+            const cleanContract = contractName.trim().toUpperCase();
+
             KPI_MASTER_LIST.forEach((kpi, index) => {
                 const tr = document.createElement('tr');
-                tr.dataset.contract = contractName;
+                tr.dataset.contract = contractName; // Usa nome original para display
 
                 const tdContract = document.createElement('td');
                 if (index === 0) tdContract.textContent = contractName;
@@ -1109,10 +1109,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const tdTarget = document.createElement('td');
 
-                // 🆕 LÓGICA DE TARGET: Busca no mapa fixo
-                const targetValue = GLOBAL_TARGETS_MAP[contractName] ? GLOBAL_TARGETS_MAP[contractName][kpi.nome] : '-';
-                tdTarget.textContent = formatTargetValue(targetValue, kpi.un);
+                // LÓGICA DE TARGET
+                let targetValue = '-';
+                if (GLOBAL_TARGETS_MAP[contractName]) {
+                    targetValue = GLOBAL_TARGETS_MAP[contractName][kpi.nome];
+                } else if (GLOBAL_TARGETS_MAP[cleanContract]) {
+                    targetValue = GLOBAL_TARGETS_MAP[cleanContract][kpi.nome];
+                }
 
+                tdTarget.textContent = formatTargetValue(targetValue, kpi.un);
                 tdTarget.classList.add('data-target');
                 tdTarget.dataset.kpi = kpi.data_column;
                 tr.appendChild(tdTarget);
@@ -1120,13 +1125,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 months.forEach(monthNumber => {
                      const tdData = document.createElement('td');
 
-                     // Se for static_map, renderiza o valor do mapa imediatamente
                      if (kpi.type === 'static_map') {
-                         const unit = kpi.un;
-                         const staticValue = GLOBAL_POSICOES_MAP[contractName];
-                         tdData.textContent = formatKpiValue(staticValue, unit);
+                         const staticValue = GLOBAL_POSICOES_MAP[cleanContract];
+                         tdData.textContent = formatKpiValue(staticValue, kpi.un);
                      } else {
-                        // Se for placeholder, inicia com '-', se não, inicia com '...'
                         tdData.textContent = (kpi.type === 'placeholder') ? '-' : '...';
                      }
 

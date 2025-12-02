@@ -486,7 +486,7 @@ async function updateDashboard() {
 
                 let suffixText = '';
                 if (todayStatusValue < 0) {
-                    suffixText = 'Locações atrasadas';
+                    suffixText = 'Loc atrasadas';
                 } else if (todayStatusValue > 0) {
                     suffixText = 'Locações adiantadas';
                 } else {

@@ -1,6 +1,6 @@
 // =========================================================================
-// Módulo/Carinhas/Carinhas.js - CÓDIGO COMPLETO E ATUALIZADO
-// 🔑 AJUSTE CRÍTICO: Removida a lógica de controle de posição vertical (Fixa no CSS)
+// Módulo/Carinhas/Carinhas.js - CÓDIGO COMPLETO E ATUALIZADO (Corrigido)
+// 🔑 AJUSTE CRÍTICO: Lógica de geração de meses corrigida para incluir o mês atual.
 // =========================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -137,21 +137,33 @@ document.addEventListener('DOMContentLoaded', () => {
         return { emoji: EMOJIS.ATENCAO, statusText: 'ATENÇÃO!!!' };
     }
 
+    /**
+     * @function generateMonthsToDisplay
+     * @description Gera as 6 chaves de mês. CORRIGIDA para começar pelo mês atual.
+     */
     function generateMonthsToDisplay() {
         const today = new Date();
-        let currentMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        // 🔑 CORREÇÃO: Começa no mês atual (getMonth() é 0-indexado)
+        let currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
         const months = [];
 
+        // Itera 6 vezes, sendo que a primeira iteração é o mês atual
         for (let i = 0; i < 6; i++) {
             const monthDate = new Date(currentMonth);
+            // Formato 'MM/YYYY'
             const monthKey = `${String(monthDate.getMonth() + 1).padStart(2, '0')}/${monthDate.getFullYear()}`;
 
+            // Formato 'MÊS/YY'
             const monthLabel = monthDate.toLocaleString('pt-BR', { month: 'short' })
                                          .replace('.', '')
                                          .replace(/^\w/, c => c.toUpperCase());
             const yearShort = String(monthDate.getFullYear()).substring(2);
 
+            // Adiciona no início do array, garantindo que o mês mais recente (atual) fique no final
+            // e seja renderizado como o bloco da extrema direita.
             months.unshift({ label: `${monthLabel}/${yearShort}`, key: monthKey });
+
+            // Retrocede um mês para a próxima iteração
             currentMonth.setMonth(currentMonth.getMonth() - 1);
         }
         return months;
@@ -353,6 +365,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const monthsGrid = document.getElementById(config.gridId);
         if (!monthsGrid) return;
 
+        // Pega os meses corrigidos
         const monthsData = generateMonthsToDisplay();
         const metaNumeric = parsePercentage(config.meta);
         monthsGrid.innerHTML = '';
