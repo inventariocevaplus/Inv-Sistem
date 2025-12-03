@@ -146,6 +146,7 @@ function checkAndDisplayNavigation() {
         const btn = document.getElementById('btnClause');
         if (btn) btn.style.display = 'none';
     }
+
     if (!hasPermission('access_ciclico')) {
         const btn = document.getElementById('btnCiclico');
         if (btn) btn.style.display = 'none';
