@@ -1,6 +1,7 @@
 // =========================================================================
-// Módulo/Carinhas/Carinhas.js - CÓDIGO COMPLETO E ATUALIZADO (Corrigido)
-// 🔑 AJUSTE CRÍTICO: Lógica de geração de meses corrigida para incluir o mês atual.
+// Módulo/Carinhas/Carinhas.js - CÓDIGO COMPLETO E ATUALIZADO
+// 🔑 NOVO: Constantes para largura/altura das imagens de Inventário e Contrato
+// 🔑 AJUSTE: Reaplicação de estilos inline para as imagens de topo (baseado nas constantes)
 // =========================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -38,14 +39,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 🔑 CONSTANTES DE DIMENSÃO PARA AS IMAGENS DO TOPO (INVENTÁRIO E CONTRATO)
     const TOP_IMAGE_DIMENSIONS = {
+        // Você pode usar uma largura fixa ou max-width para o Contrato
         INVENTARIO_WIDTH: '120px',
         INVENTARIO_HEIGHT: '60px',
         CONTRATO_MAX_WIDTH: '190px',
-        CONTRATO_HEIGHT: 'auto',
+        CONTRATO_HEIGHT: 'auto', // Geralmente é melhor deixar a altura do contrato automática
     };
-
-    // OBS: A posição vertical (top) será definida diretamente no CSS, sem variáveis JS.
-
 
     // Larguras e Alturas desejadas para cada emoji
     const EMOJI_WIDTHS = {
@@ -100,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { gridId: 'locacaoGrid', column: 'accuracy_locacao', metaKey: 'locacao', title: 'Acuracidade de LOCAÇÃO' }
     ];
 
-    // [Funções Utilítárias - Mantidas]
+    // [Funções Utilítárias]
     function convertSupabaseDateToMonthKey(dateString) {
         if (!dateString) return null;
         try {
@@ -137,39 +136,27 @@ document.addEventListener('DOMContentLoaded', () => {
         return { emoji: EMOJIS.ATENCAO, statusText: 'ATENÇÃO!!!' };
     }
 
-    /**
-     * @function generateMonthsToDisplay
-     * @description Gera as 6 chaves de mês. CORRIGIDA para começar pelo mês atual.
-     */
     function generateMonthsToDisplay() {
         const today = new Date();
-        // 🔑 CORREÇÃO: Começa no mês atual (getMonth() é 0-indexado)
-        let currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        let currentMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
         const months = [];
 
-        // Itera 6 vezes, sendo que a primeira iteração é o mês atual
         for (let i = 0; i < 6; i++) {
             const monthDate = new Date(currentMonth);
-            // Formato 'MM/YYYY'
             const monthKey = `${String(monthDate.getMonth() + 1).padStart(2, '0')}/${monthDate.getFullYear()}`;
 
-            // Formato 'MÊS/YY'
             const monthLabel = monthDate.toLocaleString('pt-BR', { month: 'short' })
                                          .replace('.', '')
                                          .replace(/^\w/, c => c.toUpperCase());
             const yearShort = String(monthDate.getFullYear()).substring(2);
 
-            // Adiciona no início do array, garantindo que o mês mais recente (atual) fique no final
-            // e seja renderizado como o bloco da extrema direita.
             months.unshift({ label: `${monthLabel}/${yearShort}`, key: monthKey });
-
-            // Retrocede um mês para a próxima iteração
             currentMonth.setMonth(currentMonth.getMonth() - 1);
         }
         return months;
     }
 
-    // [Funções Supabase e Filtro - Mantidas]
+    // [Funções Supabase e Filtro]
     async function fetchContracts() {
         if (!supabaseClient) return [];
 
@@ -301,7 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loadingMessage.style.display = 'none';
         gridsContent.style.display = 'block';
 
-        // 🔑 Injeta as imagens de INVENTÁRIO e do CONTRATO usando as constantes TOP_IMAGE_DIMENSIONS
+        // 🔑 NOVO: Injeta as imagens de INVENTÁRIO e do CONTRATO usando as constantes TOP_IMAGE_DIMENSIONS
         if (topImagesContainer) {
             topImagesContainer.innerHTML = ''; // Limpa antes de adicionar
 
@@ -358,14 +345,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ---------------------------------------------------------------------------------
-    // 4. FUNÇÃO PRINCIPAL DE RENDERIZAÇÃO (Mantida)
+    // 4. FUNÇÃO PRINCIPAL DE RENDERIZAÇÃO
     // ---------------------------------------------------------------------------------
 
     function renderModuleGrid(config) {
         const monthsGrid = document.getElementById(config.gridId);
         if (!monthsGrid) return;
 
-        // Pega os meses corrigidos
         const monthsData = generateMonthsToDisplay();
         const metaNumeric = parsePercentage(config.meta);
         monthsGrid.innerHTML = '';
@@ -436,7 +422,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ---------------------------------------------------------------------------------
-    // 5. INICIALIZAÇÃO GERAL E EVENTOS (Mantidos)
+    // 5. INICIALIZAÇÃO GERAL E EVENTOS (mantido)
     // ---------------------------------------------------------------------------------
 
     function initializeSupabase() {

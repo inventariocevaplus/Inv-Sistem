@@ -62,6 +62,7 @@ if (jwtToken && loggedInUserId) {
 
 let userPermissions = {};
 let recordToDeleteId = null;
+
 // =======================================================
 // REFERÊNCIAS DO DOM (Sem alterações)
 // =======================================================
@@ -135,7 +136,7 @@ function loadUserPermissions() {
 
 function hasPermission(key) {
     userPermissions = userPermissions ||
-    loadUserPermissions();
+loadUserPermissions();
 
     if (userPermissions.role && userPermissions.role.toUpperCase() === 'MASTER') {
         return true;
@@ -254,7 +255,7 @@ function parsePercentInput(inputElement) {
 // Converte um input number (ex: qtdLinhas) para inteiro
 function parseInputInt(inputElement) {
     return parseInt(inputElement.value) ||
-    0;
+0;
 }
 
 
@@ -377,7 +378,7 @@ async function searchAndLoadRNMonthlyData() {
     // 2. Extrai o registro: Verifica se o array tem itens.
     const rnMonthlyData = (rnMonthlyDataArray && rnMonthlyDataArray.length > 0)
                           ?
-    rnMonthlyDataArray[0] // Pega o primeiro registro encontrado
+                          rnMonthlyDataArray[0] // Pega o primeiro registro encontrado
                           : null;
     // Se 0 linhas, define como null
 
@@ -393,7 +394,7 @@ async function searchAndLoadRNMonthlyData() {
 
         // Preenche os campos de INPUT (MANTIDO)
         qtdLinhasInput.value = rnMonthlyData.qtd_linhas ||
-        0;
+0;
         repickingInput.value = rnMonthlyData.repicking || 0;
         nilPickingInput.value = rnMonthlyData.nil_picking || 0;
         metaRNInput.value = formatToTwoDecimals(rnMonthlyData.meta || 0.15);
@@ -415,11 +416,10 @@ async function searchAndLoadRNMonthlyData() {
 }
 
 // =======================================================
-// FUNÇÃO saveRNMonthlyData (CORRIGIDA PARA INTEGER)
+// FUNÇÃO saveRNMonthlyData (AJUSTADA PARA INCLUIR contract_name)
 // =======================================================
 async function saveRNMonthlyData(e) {
     e.preventDefault();
-
     if (!hasPermission('can_send_data') && !hasPermission('can_edit_data')) {
         displayMessage(rnMonthlyFormMessage, "Erro: Você não tem permissão para salvar dados.", false);
         return;
@@ -430,12 +430,12 @@ async function saveRNMonthlyData(e) {
     const recordId = rnDataRecordIdInput.value;
     const contractId = rnContractIdInput.value;
     const mesReferencia = rnMensReferenciaInput.value;
+    const contractName = rnMensalContractNameInput.value; // Lendo o nome do contrato
 
     // ⭐ CORREÇÃO CRÍTICA APLICADA AQUI:
     // Converte o ID para o tipo numérico INTEGER, que corresponde ao int4 do Supabase.
     // Isso faz com que o JSON seja serializado como "contract_id": 11 (sem aspas).
     const contractIdInt = parseInt(contractId, 10);
-
     // Validação de segurança
     if (isNaN(contractIdInt) || contractIdInt <= 0) {
         displayMessage(rnMonthlyFormMessage, 'Erro: ID de contrato (INT) inválido para salvar.', false);
@@ -446,6 +446,8 @@ async function saveRNMonthlyData(e) {
     const dataToSave = {
         // ✅ CORREÇÃO FINAL JS: Envia o valor como o tipo nativo Number.
         contract_id: contractIdInt,
+        // ⭐ AJUSTE FEITO: Incluindo o contract_name aqui para o Supabase!
+        contract_name: contractName,
         reference_month: formatMonthYearToDate(mesReferencia), // DATE
 
         // Campos de Entrada (Enviados como string para a RPC fazer o cast)
@@ -457,6 +459,7 @@ async function saveRNMonthlyData(e) {
         // Campos Calculados
         qtd_erros: String(parseInputInt(qtdErrosInput)),
         repi_percent: String(parsePercentInput(repiPercentInput)),
+
         nilpi_percent: String(parsePercentInput(nilpiPercentInput)),
         erros_percent: String(parsePercentInput(errosPercentInput)),
         acuracia_mes: String(parsePercentInput(acuraciaMesInput)),
@@ -475,6 +478,7 @@ async function saveRNMonthlyData(e) {
             .rpc('update_rn_details', {
                 p_user_id: loggedInUserId, // 🚨 NOVO: Inclui o user_id para a checagem de permissão
                 p_record_id: recordId,
+
 
 
                 p_data: dataToSave
@@ -523,23 +527,18 @@ async function loadRNRecords(searchTerm = '') {
         if (rnListDiv) rnListDiv.innerHTML = `<p style="color:red;">Você não tem permissão para consultar dados.</p>`;
         return;
     }
-
     if (loadingMessage) loadingMessage.textContent = 'Carregando reservas normais...';
-
     let query = supabaseClient.from(TARGET_TABLE_NAME).select('id, nome_contrato, status, analista_responsavel');
     if (searchTerm) {
         query = query.or(`nome_contrato.ilike.%${searchTerm}%,analista_responsavel.ilike.%${searchTerm}%`);
     }
-
     let { data: records, error } = await query;
-
     if (loadingMessage) loadingMessage.textContent = '';
     if (error) {
         if (rnListDiv) rnListDiv.innerHTML = `<p style="color:red;">Erro ao carregar reservas: ${error.message}</p>`;
         console.error("Supabase Error (SELECT):", error);
         return;
     }
-
     if (rnListDiv) {
         rnListDiv.innerHTML = '';
         if (records && records.length > 0) {
@@ -550,13 +549,11 @@ async function loadRNRecords(searchTerm = '') {
             rnListDiv.innerHTML = '<p style="color:var(--text-muted);">Nenhuma reserva normal encontrada.</p>';
         }
     }
-
     if (addRNBtn) {
         addRNBtn.style.display = hasPermission('can_send_data') ?
-        'block' : 'none';
+'block' : 'none';
     }
 }
-
 
 function createRNCard(record) {
     const card = document.createElement('div');
@@ -564,27 +561,14 @@ function createRNCard(record) {
     card.setAttribute('data-id', record.id);
     const statusText = record.status ? record.status.toUpperCase() : 'INATIVO';
     const statusClass = (statusText === 'ATIVA' || statusText === 'ATIVO') ?
-    'ATIVO' : 'INATIVO';
-
-    const editButtonHTML = hasPermission('can_edit_data') ?
-        `<button class="edit-status-btn" title="Editar Status Rápido"><i class="fas fa-cog"></i></button>` : '';
-    const deleteButtonHTML = hasPermission('can_delete_data')
-        ?
-    `<button class="delete-btn" title="Excluir Reserva"><i class="fas fa-times"></i></button>`
-        : '';
-
+'ATIVO' : 'INATIVO';
+    const editButtonHTML = hasPermission('can_edit_data') ? `<button class="edit-status-btn" title="Editar Status Rápido"><i class="fas fa-cog"></i></button>` : '';
+    const deleteButtonHTML = hasPermission('can_delete_data') ? `<button class="delete-btn" title="Excluir Reserva"><i class="fas fa-times"></i></button>` : '';
     const actionsHTML = `<div class="card-actions">${editButtonHTML}${deleteButtonHTML}</div>`;
     const isClickable = hasPermission('can_edit_data') || hasPermission('can_consult');
     card.classList.toggle('clickable', isClickable);
-
-    card.innerHTML = `
-        <div class="status-bar ${statusClass}"></div>
-        <div class="contract-name">${record.nome_contrato ||
-    'N/A'}</div>
-        <div class="contract-analyst">Analista: ${record.analista_responsavel ||
-    'N/A'}</div>
-        ${actionsHTML}
-    `;
+    card.innerHTML = ` <div class="status-bar ${statusClass}"></div> <div class="contract-name">${record.nome_contrato ||
+'N/A'}</div> <div class="contract-analyst">Analista: ${record.analista_responsavel || 'N/A'}</div> ${actionsHTML} `;
     // 1. Listener para o botão de exclusão
     if (hasPermission('can_delete_data')) {
         const deleteBtn = card.querySelector('.delete-btn');
@@ -596,7 +580,6 @@ function createRNCard(record) {
             });
         }
     }
-
     // 2. Listener para o botão de Edição (Engrenagem)
     if (hasPermission('can_edit_data')) {
         const editBtn = card.querySelector('.edit-status-btn');
@@ -608,22 +591,16 @@ function createRNCard(record) {
             });
         }
     }
-
-
     // 3. Listener para o clique no Card (Ação principal - Detalhamento Mensal)
     if (isClickable) {
         card.addEventListener('click', () => {
             const recordName = record.nome_contrato || 'Reserva Desconhecida';
             // 🚨 CRÍTICO: record.id é o ID do contrato (que é usado como contractId no input)
             openRNMonthlyDataModal(recordName, record.id);
-
-
         });
     }
-
     return card;
 }
-
 
 async function deleteRNRecord() {
     if (!hasPermission('can_delete_data')) {
@@ -631,7 +608,6 @@ async function deleteRNRecord() {
         if (deleteConfirmModal) deleteConfirmModal.style.display = 'none';
         return;
     }
-
     if (!recordToDeleteId) return;
     // Nota: O RLS em 'rn_contratos' deve permitir DELETE baseado no can_delete_data OU role = MASTER
     const { error } = await supabaseClient
@@ -644,7 +620,6 @@ async function deleteRNRecord() {
         loadRNRecords();
         console.log(`Reserva ${recordToDeleteId} excluída com sucesso.`);
     }
-
     recordToDeleteId = null;
     if (deleteConfirmModal) deleteConfirmModal.style.display = 'none';
 }
@@ -687,6 +662,7 @@ function setupAddRecordListener() {
             } else {
 
 
+
                 alert("Você não tem permissão para adicionar novos contratos.");
             }
         });
@@ -707,6 +683,7 @@ function setupFormSubmit() {
             nome_contrato: document.getElementById('contractNameRN').value,
 
 
+
             status: document.getElementById('contractStatusRN').value,
             analista_responsavel: document.getElementById('analystNameRN').value,
         };
@@ -715,6 +692,7 @@ function setupFormSubmit() {
         const { error } = await supabaseClient
             .from(TARGET_TABLE_NAME)
             .insert([newRecord]);
+
 
         if (error) {
 
@@ -733,10 +711,9 @@ function setupFormSubmit() {
 function setupSearchListener() {
     const searchInput = document.getElementById('searchInput');
     const searchBtn = document.getElementById('searchBtn');
-
     const executeSearch = () => {
         const searchTerm = searchInput ?
-        searchInput.value.trim() : '';
+searchInput.value.trim() : '';
         loadRNRecords(searchTerm);
     };
 
@@ -757,7 +734,6 @@ function setupDropdown() {
 
     const dropdownToggle = rotinasDropdown.querySelector('.dropdown-toggle');
     const dropdownLinks = rotinasDropdown.querySelectorAll('.dropdown-content a');
-
     const closeDropdown = () => {
         rotinasDropdown.classList.remove('open');
         const icon = rotinasDropdown.querySelector('.dropdown-icon');
@@ -777,6 +753,7 @@ function setupDropdown() {
                 icon.classList.toggle('fa-chevron-down');
 
 
+
                 icon.classList.toggle('fa-chevron-up');
             }
         });
@@ -790,6 +767,7 @@ function setupDropdown() {
             if (linkPath === currentPath || linkPath.endsWith(currentPath)) {
                 e.preventDefault();
             }
+
 
 
 
@@ -821,6 +799,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const mainContent = document.querySelector('.main-content');
         if (mainContent) mainContent.innerHTML = `<h1 style="color:red; margin-top: 50px; text-align: center;">Acesso Negado.</h1>`;
         const sidebar = document.querySelector('.sidebar');
+
 
         if (sidebar) sidebar.style.display = 'none';
         return;
