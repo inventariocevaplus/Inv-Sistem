@@ -5,18 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7d79809c-8bab-4b33-a110-025983aa6406" name="Changes" comment="Deploy Netlify pronto. Estrutura final e limpeza de código Flask">
-      <change afterPath="$PROJECT_DIR$/Menu/Inventario/Vazias.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/Inventario/Vazias.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Menu/Inventario/Vazias.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Carinhas/Carinhas.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Carinhas/Carinhas.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Menu/Inventario/Ciclico.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Ciclico.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Menu/Inventario/Ciclico.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Ciclico.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Menu/Inventario/Consulta.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Consulta.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Menu/Inventario/Dash.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Dash.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Menu/Inventario/Grade.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Grade.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Menu/Inventario/Inventario.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Inventario.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Inventario/Inventario.js" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Inventario.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Menu/Inventario/RN.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/RN.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Menu/Inventario/Relatorio.html" beforeDir="false" afterPath="$PROJECT_DIR$/Menu/Inventario/Relatorio.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Inventario/Vazias.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Inventario/Vazias.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Menu/Inventario/Vazias.js" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

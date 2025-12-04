@@ -1,7 +1,6 @@
 // =========================================================================
 // Módulo/Carinhas/Carinhas.js - CÓDIGO COMPLETO E ATUALIZADO
-// 🔑 NOVO: Constantes para largura/altura das imagens de Inventário e Contrato
-// 🔑 AJUSTE: Reaplicação de estilos inline para as imagens de topo (baseado nas constantes)
+// 🔑 REGRA DE FORMATAÇÃO: 3 casas decimais entre 99.990 e 99.999
 // =========================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -120,8 +119,17 @@ document.addEventListener('DOMContentLoaded', () => {
         return parseFloat(numericStr);
     }
 
+    // 🌟 FUNÇÃO AJUSTADA COM A REGRA DE 3 CASAS (99.990 até 99.999)
     function formatPercentage(value) {
         if (typeof value !== 'number' || isNaN(value)) return '0,00%';
+
+        // Se o valor estiver entre 99.990 e 99.999 (inclusive)
+        // Mostra 3 casas para não arredondar para 100% falsamente
+        if (value >= 99.990 && value <= 99.999) {
+            return value.toFixed(3).replace('.', ',') + '%';
+        }
+
+        // Caso contrário (ex: 98.50% ou 100.00%), mantém o padrão de 2 casas
         return value.toFixed(2).replace('.', ',') + '%';
     }
 
