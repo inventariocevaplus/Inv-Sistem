@@ -1,0 +1,15 @@
+name: Manter Supabase Ativo
+on:
+  schedule:
+    - cron: '0 0 * * 1,4' # Roda automaticamente toda segunda e quinta-feira às 00:00
+  workflow_dispatch: # Permite que você clique em um botão no GitHub para testar agora
+
+jobs:
+  ping_supabase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enviando Ping para o Banco de Dados
+        run: |
+          curl -i -X GET "https://kidpprfegedkjifbwkju.supabase.co/rest/v1/Permissoes?select=*" \
+          -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+          -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}"
