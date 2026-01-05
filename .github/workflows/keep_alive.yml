@@ -1,8 +1,8 @@
 name: Manter Supabase Ativo
 on:
   schedule:
-    - cron: '0 0 * * 1,4' # Roda automaticamente toda segunda e quinta-feira às 00:00
-  workflow_dispatch: # Permite que você clique em um botão no GitHub para testar agora
+    - cron: '0 0 * * 1,4' # Roda segunda e quinta às 00:00
+  workflow_dispatch: # Ativa o botão manual
 
 jobs:
   ping_supabase:
