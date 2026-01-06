@@ -1,0 +1,122 @@
+/* Allowance.css */
+
+.filter-grid-allowance {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Dois seletores lado a lado */
+    gap: 15px;
+}
+
+.custom-select-container {
+    position: relative;
+    width: 100%;
+}
+
+.select-styled {
+    cursor: pointer;
+    background-color: white;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.85em;
+    min-height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.select-options {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    z-index: 100;
+    background: white;
+    border: 1px solid #ccc;
+    max-height: 180px; /* Altura controlada */
+    overflow-y: auto;
+    display: none;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.select-options.open { display: block; }
+
+.select-option-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 0.85em;
+    border-bottom: 1px solid #eee;
+}
+
+/* DESTAQUE AZUL PARA SELECIONADOS */
+.select-option-item.selected {
+    background-color: #051039 !important;
+    color: white !important;
+}
+
+/* Área de Resultados */
+.allowance-results-card {
+    margin-top: 20px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.results-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.result-box {
+    padding: 12px;
+    border: 1px solid #eef0f2;
+    border-radius: 6px;
+    background: #fcfdfe;
+}
+
+.result-box label {
+    font-size: 0.75em;
+    font-weight: 700;
+    color: #888;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.display-value {
+    font-size: 1.3em;
+    font-weight: 700;
+    color: #051039;
+    padding: 5px;
+}
+
+.readonly-box {
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.readonly-box:hover { background: #f0f4f8; }
+
+.editable-box input {
+    width: 100%;
+    border: 2px solid #051039;
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 1.2em;
+    font-weight: 700;
+    color: #FF0000;
+}
+
+/* Botão de busca posicionado embaixo */
+.action-area-bottom {
+    display: flex;
+    justify-content: flex-end;
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+}
+
+.large-search-btn {
+    min-width: 200px;
+    padding: 12px 30px;
+}

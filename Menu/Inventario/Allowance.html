@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Allowance - CEVA Inventário</title>
+    <link rel="stylesheet" href="styleCiclico.css">
+    <link rel="stylesheet" href="Allowance.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@300;400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+<div class="app-layout">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h3>CEVA Inventário</h3>
+        </div>
+        <nav class="sidebar-menu">
+            <div class="sidebar-item dropdown-rotinas" id="rotinasDropdown">
+                <a href="#" class="dropdown-toggle">
+                    <i class="fas fa-list-ul"></i> Rotinas <i class="fas fa-chevron-down dropdown-icon"></i>
+                </a>
+                <div class="dropdown-content">
+                    <a href="Ciclico.html"><i class="fas fa-redo-alt"></i> Cíclico</a>
+                    <a href="Inventario.html"><i class="fas fa-balance-scale"></i> Clause</a>
+                    <a href="RN.html"><i class="fas fa-tags"></i> RN </a>
+                </div>
+            </div>
+            <div class="sidebar-item">
+                <a href="Dash.html"><i class="fas fa-chart-line"></i> Dashboard</a>
+            </div>
+            <div class="sidebar-item">
+                <a href="Consulta.html"><i class="fas fa-search"></i> CONSULTA</a>
+            </div>
+            <div class="sidebar-item">
+                <a href="Relatorio.html"><i class="fas fa-file-alt"></i> Relatório</a>
+            </div>
+            <div class="sidebar-item active">
+                <a href="Allowance.html"><i class="fas fa-money-bill-wave"></i> Allowance</a>
+            </div>
+            <div class="sidebar-item">
+                <a href="../Menu.html"><i class="fas fa-arrow-circle-left"></i> Voltar (Menu)</a>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="rotina-container">
+            <header class="content-header">
+                <h1>Gestão de Allowance</h1>
+            </header>
+
+            <div class="filter-panel">
+                <div class="filter-grid-allowance">
+                    <div class="input-group">
+                        <label>Mês de Referência</label>
+                        <div class="custom-select-container">
+                            <div class="select-styled" id="monthDisplay">Selecione Mês(es)</div>
+                            <div class="select-options" id="monthOptions">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Ano</label>
+                        <div class="custom-select-container">
+                            <div class="select-styled" id="yearDisplay">Ano(s)</div>
+                            <div class="select-options" id="yearOptions">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-group" style="grid-column: span 2;">
+                        <label>Contrato</label>
+                        <select id="contractSelector" class="select-styled" style="width: 100%;">
+                            <option value="">Selecione o período primeiro...</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="allowance-results-card">
+                <div class="results-grid">
+                    <div class="result-box readonly-box" id="copyBSC" title="Clique para copiar">
+                        <label>Allowance BSC (Soma de Meses)</label>
+                        <div class="display-value" id="displayBSC">R$ 0,00</div>
+                    </div>
+
+                    <div class="result-box readonly-box" id="copyRisco" title="Clique para copiar">
+                        <label>Allowance RISCO (Mês Recente)</label>
+                        <div class="display-value" id="displayRisco">R$ 0,00</div>
+                    </div>
+
+                    <div class="result-box editable-box">
+                        <label>PERCENTUAL (%)</label>
+                        <input type="text" id="inputPercentual" placeholder="Ex: 0,2" class="select-styled" style="text-align: center; font-weight: bold; font-size: 1.2rem;">
+                    </div>
+                </div>
+
+                <div class="action-area-bottom">
+                    <button type="button" id="btnBuscarAllowance" class="action-btn primary-action large-search-btn">
+                        <i class="fas fa-search"></i> CALCULAR ALLOWANCE
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="Allowance.js"></script>
+</body>
+</html>
